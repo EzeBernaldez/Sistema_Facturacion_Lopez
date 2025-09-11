@@ -12,13 +12,13 @@ const root = createRoot(container);
 
 root.render(
   <React.StrictMode>
-    <ContextProvider>
-      <ChakraProvider>
-        <AuthProvider>
-          <App />
-        </AuthProvider>
-      </ChakraProvider>
-    </ContextProvider>
+    <ChakraProvider>
+      <ContextProvider>
+          <AuthProvider>
+            <App />
+          </AuthProvider>
+      </ContextProvider>
+    </ChakraProvider>
   </React.StrictMode>
 );
 

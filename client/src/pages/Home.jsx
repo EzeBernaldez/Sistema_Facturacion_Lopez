@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import  Login  from './Login.jsx';
 import { Header } from '../components/Header.jsx';
 import fotoFrente from '../assets/images/home/foto_frente_1.jpeg';
@@ -14,11 +14,20 @@ import {
   VStack,
   Flex
 } from '@chakra-ui/react';
+import { useContexto } from '../contexts/GlobalContext.jsx';
 
 
 const Home = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
+  const {
+    cargarPagina: setPagina
+  } = useContexto();
+
+  useEffect( 
+    () => setPagina('Home')
+    , []
+)
 
 
   return (

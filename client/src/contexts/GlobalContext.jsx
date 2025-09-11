@@ -8,9 +8,9 @@ export const ContextProvider = ({children}) => {
 
     const [pagina,setPagina] = useState('');
 
-    const cambiarPagina = (string) => setPagina(string);
+    const cargarPagina = (string) => setPagina(string);
 
-    return <Context.Provider value={{pagina, cambiarPagina}}> {children}</Context.Provider>;
+    return <Context.Provider value={{pagina, cargarPagina}}> {children}</Context.Provider>;
 }
 
 export const useContexto = () => useContext(Context);
