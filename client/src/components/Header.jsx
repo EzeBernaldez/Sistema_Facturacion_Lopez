@@ -9,7 +9,7 @@ import { useContexto } from "../contexts/GlobalContext";
 
 export const Header = () => {
 
-    const {currentUser} = useAuth();
+    const { currentUser, logout } = useAuth();
     const navigate = useNavigate();
     const {
       pagina,
@@ -30,7 +30,7 @@ export const Header = () => {
                 height="100%"
             />
           </a>
-          { currentUser && (
+          { currentUser && pagina !== 'Home' && (
             <>
             <button
                 className="navbar-toggler"
@@ -44,7 +44,6 @@ export const Header = () => {
                 <span className="navbar-toggler-icon"></span>
             </button>
             <div className="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
-              { pagina !== 'Home' && (
                 <ul className="navbar-nav ">
                   <li className="nav-item">
                       <a className="nav-link " aria-current="page" href="#">
@@ -77,8 +76,6 @@ export const Header = () => {
                       </a>
                   </li>
                 </ul>
-              )
-              }
             </div>
             </>
           )}
@@ -89,6 +86,21 @@ export const Header = () => {
                 <li className="nav-item">
                     <button className=" btn btn-primary" aria-current="page" onClick={() => navigate("/login")}>
                     Iniciar Sesión
+                    </button>
+                </li>
+            </ul>
+            </>
+          )}
+
+          {currentUser && (
+            <>
+            <ul className="navbar-nav">
+                <li className="nav-item">
+                    <button className=" btn btn-secondary" aria-current="page" onClick={() => {
+                        logout();
+                      }
+                    }>
+                    Cerrar Sesión
                     </button>
                 </li>
             </ul>

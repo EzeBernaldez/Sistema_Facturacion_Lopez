@@ -17,21 +17,21 @@ const Login = () => {
 
     const formik = useFormik({
         initialValues: {
-            email: '',
+            username: '',
             password: '',
         },
         onSubmit: async (values) => {
             setLoading(true);
             setError("");
             try {
-                const result = await login(values.email, values.password);
+                const result = await login(values.username, values.password);
                 if (!result.success) {
                     setError(result.message);
                     formik.setFieldValue('password','');
                     return;
                 }
                 formik.resetForm();
-                navigate("/Home");
+                navigate("/");
             } catch (err) {
                 setError("Error en el login");
             } finally {
@@ -39,8 +39,8 @@ const Login = () => {
             }
         },
         validationSchema: Yup.object({
-            email: Yup.string().email("Debes ingresar un email válido").required("El email es obligatorio"),
             password: Yup.string().trim().min(2, "La contraseña debe tener al menos 2 caracteres").required("Debes ingresar una contraseña"),
+            username: Yup.string().required('Debe ingresar su usuario'),
         })
     });
 
@@ -84,16 +84,16 @@ const Login = () => {
                     <Heading as='h2' fontSize='2xl' mb={4}>Iniciar Sesión</Heading>
                     <form onSubmit={formik.handleSubmit}>
                         <VStack gap="4" alignItems='flex-start'>
-                            <FormControl width='100%' isInvalid={formik.touched.email && !!formik.errors.email}>
-                                <FormLabel htmlFor="email">Email:</FormLabel>
+                            <FormControl width='100%' isInvalid={formik.touched.username && !!formik.errors.username}>
+                                <FormLabel htmlFor="username">Usuario:</FormLabel>
                                 <Input
-                                id="email"
-                                type="email"
+                                id="username"
+                                type="text"
                                 width='100%'
                                 border='1px solid #A0BDE8'
-                                {...formik.getFieldProps("email")}
+                                {...formik.getFieldProps("username")}
                                 />
-                                <FormErrorMessage>{formik.errors.email}</FormErrorMessage>
+                                <FormErrorMessage>{formik.errors.username}</FormErrorMessage>
                             </FormControl>
                             <FormControl width='100%' isInvalid={formik.touched.password && !!formik.errors.password}>
                                 <FormLabel htmlFor="password">Contraseña:</FormLabel>

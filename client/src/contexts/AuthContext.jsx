@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
 
     const fetchUserProfile = async () => {
         try {
-            const response = await api.get("/user/profile/");
+            const response = await api.get("/api/user/profile/");
             setCurrentUser(response.data);
         } catch (error) {
             console.error("Error fetching user profile:", error);
@@ -33,9 +33,9 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const login = async (email, password) => {
+    const login = async (username, password) => {
         try {
-            const response = await api.post("/auth/login/", { email, password });
+            const response = await api.post("/api/auth/login/", { username, password });
             const { access, refresh } = response.data;
 
             localStorage.setItem("access_token", access);

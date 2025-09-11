@@ -64,7 +64,7 @@ const Home = () => {
                     <VStack 
                     spacing={6} color="white" textAlign="center">
                         <Heading as="h1" size="2xl">
-                            { currentUser ? `Hola ${currentUser}` : `Bienvenido a López Repuestos` }
+                            { currentUser ? `Hola ${currentUser.username}` : `Bienvenido a López Repuestos` }
                         </Heading>
                     </VStack>
                 </Box>
