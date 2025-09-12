@@ -4,15 +4,16 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import logoLopez from '../assets/icons/Logo_Lopez_Completo.png';
 import { Image } from '@chakra-ui/react';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useContexto } from "../contexts/GlobalContext";
 
-export const Header = () => {
+const Header = () => {
 
     const { currentUser, logout } = useAuth();
     const navigate = useNavigate();
     const {
       pagina,
+      cargarPagina: setPagina
      } = useContexto();
 
   return (
@@ -21,7 +22,9 @@ export const Header = () => {
         <div className="container-fluid" style={{
         background: "#DCEAFF",
       }}>
-          <a className="navbar-brand" href="#">
+          <a className="navbar-brand" onClick={() => {
+            setPagina('Home');
+            navigate("/");}}>
             <Image
                 src={logoLopez}
                 fit="cover"
@@ -30,53 +33,61 @@ export const Header = () => {
                 height="100%"
             />
           </a>
-          { currentUser && pagina !== 'Home' && (
+          { currentUser && pagina!== 'Home' && (
             <>
-            <button
-                className="navbar-toggler"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent"
-                aria-expanded="false"
-                aria-label="Toggle navigation"
-            >
-                <span className="navbar-toggler-icon"></span>
-            </button>
-            <div className="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
-                <ul className="navbar-nav ">
-                  <li className="nav-item">
-                      <a className="nav-link " aria-current="page" href="#">
-                      Factura
-                      </a>
-                  </li>
-                  <li className="nav-item">
-                      <a className="nav-link" href="#">
-                      Presupuesto
-                      </a>
-                  </li>
-                  <li className="nav-item">
-                      <a className="nav-link" href="#">
-                      Remito
-                      </a>
-                  </li>
-                  <li className="nav-item">
-                      <a className="nav-link" href="#">
-                      Repuestos
-                      </a>
-                  </li>
-                  <li className="nav-item">
-                      <a className="nav-link" href="#">
-                      Clientes
-                      </a>
-                  </li>
-                  <li className="nav-item">
-                      <a className="nav-link" aria-disabled="true">
-                      Proveedores
-                      </a>
-                  </li>
-                </ul>
-            </div>
+              <div className="position-absolute top-0 end-0 d-flex align-items-center gap-3 pe-2 pt-2">
+                <button className="btn btn-secondary" aria-current="page" onClick={() => {
+                    logout();
+                    }
+                }>
+                  Cerrar Sesión
+                </button>
+                  <button
+                  className="navbar-toggler"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#navbarSupportedContent"
+                  aria-controls="navbarSupportedContent"
+                  aria-expanded="false"
+                  aria-label="Toggle navigation"
+                  >
+                  <span className="navbar-toggler-icon"></span>
+                  </button>
+              </div>
+              <div className="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
+                  <ul className="navbar-nav">
+                    <li className="nav-item">
+                        <Link className="nav-link" aria-current="page" to="/">
+                        Factura
+                        </Link>
+                    </li>
+                    <li className="nav-item">
+                        <Link className="nav-link" to="/vehiculos">
+                        Presupuesto
+                        </Link>
+                    </li>
+                    <li className="nav-item">
+                        <Link className="nav-link" to="/remitos">
+                        Remito
+                        </Link>
+                    </li>
+                    <li className="nav-item">
+                        <Link className="nav-link" to="/repuestos">
+                        Repuestos
+                        </Link>
+                    </li>
+                    <li className="nav-item">
+                        <Link className="nav-link" to="/clientes">
+                        Clientes
+                        </Link>
+                    </li>
+                    <li className="nav-item">
+                        <Link className="nav-link" to="/proveedores">
+                        Proveedores
+                        </Link>
+                    </li>
+                  </ul>
+              </div>              
             </>
           )}
 
@@ -92,22 +103,22 @@ export const Header = () => {
             </>
           )}
 
-          {currentUser && (
-            <>
-            <ul className="navbar-nav">
-                <li className="nav-item">
-                    <button className=" btn btn-secondary" aria-current="page" onClick={() => {
-                        logout();
+          {currentUser && pagina === 'Home' && (
+              <div className="position-absolute top-0 end-0 d-flex align-items-center gap-3 pe-2 pt-2">
+                  <button className="btn btn-secondary" aria-current="page" onClick={() => {
+                      logout();
+                      navigate('/');
                       }
-                    }>
+                  }>
                     Cerrar Sesión
-                    </button>
-                </li>
-            </ul>
-            </>
+                  </button>
+                </div>
           )}
         </div>
       </nav>
     </>
   );
 };
+
+
+export default Header;

@@ -7,6 +7,7 @@ import {useFormik} from "formik";
 import * as Yup from 'yup';
 import { useNavigate } from "react-router-dom";
 import imageLogin from '../assets/images/login/login.png';
+import BeatLoader from 'react-spinners/BeatLoader';
 
 const Login = () => {
     const [error, setError] = useState("");
@@ -107,7 +108,7 @@ const Login = () => {
                             </FormControl>
                         </VStack>
                         <VStack alignItems='flex-end' mt={6}>
-                            <Button mt={4} colorScheme="teal" type="submit" isLoading={loading} loadingText="Iniciando sesión...">
+                            <Button mt={4} colorScheme="teal" type="submit" isLoading={loading} spinner={<BeatLoader size={8} color="white" />}>
                                 Iniciar Sesión
                             </Button>
                         </VStack>

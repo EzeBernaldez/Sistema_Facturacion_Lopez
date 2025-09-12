@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
+from .models import Repuestos
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -28,3 +29,8 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError('Debe proporcionar el usuario y contraseña')
 
         return data
+
+class RepuestosSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Repuestos
+        fields = '__all__'

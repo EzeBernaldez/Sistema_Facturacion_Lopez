@@ -3,8 +3,11 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth.models import User
-from .serializers import UserSerializer, LoginSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.generics import CreateAPIView, ListCreateAPIView
+from .serializers import UserSerializer, LoginSerializer, RepuestosSerializer
+from .models import Repuestos
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -66,3 +69,13 @@ def logout_view(request):
         return Response({'message': 'Sesión cerrada'}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+# ----------------------------------------Repuestos
+
+class CreateRepuestos(ListCreateAPIView):
+    serializer_class = RepuestosSerializer
+    permission_classes_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    queryset = Repuestos.objects.all()
