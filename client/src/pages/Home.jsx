@@ -27,7 +27,7 @@ const Home = () => {
   const {
     cargarPagina: setPagina
   } = useContexto();
-
+  const hora_actual = parseInt(new Date().getHours());
   useEffect( 
     () => setPagina('Home')
     , []
@@ -68,7 +68,8 @@ const Home = () => {
                     <VStack 
                     spacing={6} color="white" textAlign="center">
                         <Heading as="h1" size="2xl" filter='drop-shadow(0 0 5px #E8F1FF)'>
-                            { currentUser ? `Hola ${currentUser.username}` : `Bienvenido a López Repuestos` }
+                            { currentUser ? (
+                            hora_actual <= 12 && hora_actual >= 6 ? `Buenos Dias ${currentUser.username}`: `Buenos Tardes ${currentUser.username}`) : `Bienvenido a López Repuestos` }
                         </Heading>
                         { !currentUser && (
                             <Text filter='drop-shadow(0 0 5px #E8F1FF)' fontSize='1.5rem'>
