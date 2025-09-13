@@ -38,6 +38,7 @@ const Header = () => {
               <div className="position-absolute top-0 end-0 d-flex align-items-center gap-3 pe-2 pt-2">
                 <button className="btn btn-secondary" aria-current="page" onClick={() => {
                     logout();
+                    navigate('/');
                     }
                 }>
                   Cerrar Sesión
