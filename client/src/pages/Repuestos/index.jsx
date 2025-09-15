@@ -1,7 +1,7 @@
 import { React , useEffect, useState} from 'react';
-import { useContexto } from "../contexts/GlobalContext";
-import api from '../utils/api';
-import  Header  from '../components/Header';
+import { useContexto } from "../../contexts/GlobalContext";
+import api from '../../utils/api';
+import  Header  from '../../components/Header';
 import {
     TableContainer,
     Table,
@@ -32,13 +32,6 @@ const Repuestos = (props) => {
     } = useContexto();
 
     const {
-        codigo,
-        descripcion,
-        marca,
-        precio_venta,
-        stock,
-        tipo,
-        porcentaje_recargo,
         arrayRepuestos,
     } = estadoRepuestos;
 
@@ -61,7 +54,7 @@ const Repuestos = (props) => {
             }
             fetchData();
         }
-    , [api]);
+    , []);
 
     return(
         <>
@@ -70,7 +63,7 @@ const Repuestos = (props) => {
         </header>
 
         <Flex justifyContent='end' p={3} >
-            <IconButton colorScheme='blue' size='md' icon={<FontAwesomeIcon icon={faPlus}/>} onClick={() => navigate("/")}/>
+            <IconButton colorScheme='blue' size='md' icon={<FontAwesomeIcon icon={faPlus}/>} onClick={() => navigate("/repuestos/nuevo")}/>
         </Flex>
         <Stack mt={6}>
             <TableContainer>

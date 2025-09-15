@@ -2,7 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Login from './pages/Login';
-import Repuestos from './pages/Repuestos';
+import Repuestos from './pages/Repuestos/index';
+import RepuestosPost from './pages/Repuestos/RepuestosPost';
 import './App.css';
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/repuestos" element={<Repuestos />}/>
+            <Route path='/repuestos/nuevo' element={<RepuestosPost />} />
           </Routes>
         </div>
       </Router>
