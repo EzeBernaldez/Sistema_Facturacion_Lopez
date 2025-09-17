@@ -5,7 +5,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.generics import CreateAPIView, ListCreateAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveDestroyAPIView 
 from .serializers import UserSerializer, LoginSerializer, RepuestosSerializer
 from .models import Repuestos
 
@@ -76,6 +76,14 @@ def logout_view(request):
 
 class CreateRepuestos(ListCreateAPIView):
     serializer_class = RepuestosSerializer
-    permission_classes_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
     queryset = Repuestos.objects.all()
+
+class RetrieveDestroyRepuestos(RetrieveDestroyAPIView):
+    serializer_class = RepuestosSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    queryset = Repuestos.objects.all()
+    lookup_field = 'codigo'
+    

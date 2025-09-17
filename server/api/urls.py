@@ -10,4 +10,5 @@ urlpatterns = [
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('user/profile/', views.user_profile, name='user_profile'),
     path('repuestos/', views.CreateRepuestos.as_view()),
+    path('repuestos/<str:codigo>', views.RetrieveDestroyRepuestos.as_view()),
 ]

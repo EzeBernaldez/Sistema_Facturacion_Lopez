@@ -26,6 +26,7 @@ const Header = () => {
             setPagina('Home');
             navigate("/");}}>
             <Image
+              cursor='pointer'
                 src={logoLopez}
                 fit="cover"
                 alt="Logo López Repuestos"

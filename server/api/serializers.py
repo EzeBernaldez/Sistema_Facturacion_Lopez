@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from .models import Repuestos, Proveedores, Telefonos_Proveedores, Vehiculos, Clientes, Telefonos_Clientes, Empleados, Telefonos_Empleados 
+from rest_framework.validators import UniqueValidator
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -31,9 +32,20 @@ class LoginSerializer(serializers.Serializer):
         return data
 
 class RepuestosSerializer(serializers.ModelSerializer):
+    
+    codigo = serializers.CharField(
+        validators=[
+            UniqueValidator(
+                queryset=Repuestos.objects.all(),
+                message='El código de repuesto ya existe. Utilice otro código o modifique el repuesto existente'
+            )
+        ]
+    )
+    
     class Meta:
         model = Repuestos
         fields = '__all__'
+    
 
 class VehiculosSerializer(serializers.ModelSerializer):
     class Meta:

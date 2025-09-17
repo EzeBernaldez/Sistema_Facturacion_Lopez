@@ -13,7 +13,8 @@ import {
     Stack,
     Box,
     Flex,
-    IconButton
+    IconButton,
+    Button
 } from '@chakra-ui/react';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -23,6 +24,7 @@ import { useNavigate } from 'react-router-dom';
 const Repuestos = (props) => {
 
     const navigate = useNavigate();
+    const [isDeleted, setIsDeleted] = useState(false);
 
     const {
         cargarPagina: setPagina,
@@ -54,7 +56,16 @@ const Repuestos = (props) => {
             }
             fetchData();
         }
-    , []);
+    , [isDeleted]);
+
+    const deleteRepuesto = async (id) => {
+        try{
+            await api.delete(`api/repuestos/${id}`);
+            setIsDeleted(!isDeleted);
+        }catch (err){
+            console.log('Error al eliminar el repuesto');
+        }
+    };
 
     return(
         <>
@@ -78,6 +89,7 @@ const Repuestos = (props) => {
                                     <Th>Precio</Th>
                                     <Th>Stock</Th>
                                     <Th>Tipo</Th>
+                                    <Th>Acciones</Th>
                                 </Tr>
                             </Thead>
                             <Tbody>
@@ -91,6 +103,11 @@ const Repuestos = (props) => {
                                                 <Td>{item.precio_venta}</Td>
                                                 <Td>{item.stock}</Td>
                                                 <Td>{item.tipo}</Td>
+                                                <Td>
+                                                    <Button colorScheme='red' onClick={() => deleteRepuesto(item.codigo)}>
+                                                        Eliminar
+                                                    </Button>
+                                                </Td>
                                             </Tr>
                                         );
                                     })
@@ -99,13 +116,11 @@ const Repuestos = (props) => {
                         </>
                     ) :
                     (
-                        <>
                         <Tbody>
                             <Tr>
                                 <Td>No hay elementos para mostrar</Td>
                             </Tr>
                         </Tbody>
-                        </>
                     )}
                 </Table>
             </TableContainer>
