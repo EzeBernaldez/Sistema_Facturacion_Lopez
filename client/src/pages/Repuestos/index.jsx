@@ -26,6 +26,7 @@ const Repuestos = (props) => {
     const navigate = useNavigate();
     const [isDeleted, setIsDeleted] = useState(false);
 
+
     const {
         cargarPagina: setPagina,
         estadoRepuestos,
@@ -106,6 +107,9 @@ const Repuestos = (props) => {
                                                 <Td>
                                                     <Button colorScheme='red' onClick={() => deleteRepuesto(item.codigo)}>
                                                         Eliminar
+                                                    </Button>
+                                                    <Button colorScheme='green' className='ms-3' onClick={() => navigate(`/repuestos/actualizar/${item.codigo}`)}>
+                                                        Actualizar
                                                     </Button>
                                                 </Td>
                                             </Tr>

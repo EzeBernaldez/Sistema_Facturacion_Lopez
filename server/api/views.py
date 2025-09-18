@@ -5,7 +5,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.generics import ListCreateAPIView, RetrieveDestroyAPIView 
+from rest_framework.generics import ListCreateAPIView, RetrieveDestroyAPIView, RetrieveUpdateDestroyAPIView
 from .serializers import UserSerializer, LoginSerializer, RepuestosSerializer
 from .models import Repuestos
 
@@ -86,4 +86,16 @@ class RetrieveDestroyRepuestos(RetrieveDestroyAPIView):
     authentication_classes = [JWTAuthentication]
     queryset = Repuestos.objects.all()
     lookup_field = 'codigo'
+
+class RetrieveUpdateRepuestos(RetrieveUpdateDestroyAPIView):
+    serializer_class = RepuestosSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
     
+    def get_object(self):
+        codigo = self.kwargs['codigo']
+        try:
+            return Repuestos.objects.get(codigo=codigo)
+        except Repuestos.DoesNotExist:
+            from rest_framework.exceptions import NotFound
+            raise NotFound("Repuesto no encontrado")

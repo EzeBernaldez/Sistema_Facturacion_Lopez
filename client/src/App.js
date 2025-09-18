@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Repuestos from './pages/Repuestos/index';
 import RepuestosPost from './pages/Repuestos/RepuestosPost';
+import RepuestosPatch from './pages/Repuestos/RepuestosPatch';
 import './App.css';
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/repuestos" element={<Repuestos />}/>
             <Route path='/repuestos/nuevo' element={<RepuestosPost />} />
+            <Route path='/repuestos/actualizar/:codigo' element={<RepuestosPatch />} />
           </Routes>
         </div>
       </Router>
