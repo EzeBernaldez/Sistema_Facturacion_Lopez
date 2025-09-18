@@ -25,7 +25,7 @@ import {
 } from '@chakra-ui/react';
 import api from "../../utils/api";
 import BeatLoader from "react-spinners/BeatLoader";
-
+import { ToastContainer, toast } from 'react-toastify';
 
 const RepuestosPost = () => {
 
@@ -58,6 +58,7 @@ const RepuestosPost = () => {
                 
                 setLoading(false);
                 formik.resetForm();
+                toast.success("Repuesto cargado correctamente");
                 navigate('/repuestos');
             }
             catch (err){

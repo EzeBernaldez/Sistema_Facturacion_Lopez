@@ -19,13 +19,13 @@ import {
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate } from 'react-router-dom';
-
+import { ToastContainer, toast } from 'react-toastify';
 
 const Repuestos = (props) => {
 
     const navigate = useNavigate();
     const [isDeleted, setIsDeleted] = useState(false);
-
+    const notify = () => toast("Wow so easy!");
 
     const {
         cargarPagina: setPagina,
@@ -63,6 +63,7 @@ const Repuestos = (props) => {
         try{
             await api.delete(`api/repuestos/${id}`);
             setIsDeleted(!isDeleted);
+            toast.success("Repuesto eliminado correctamente");
         }catch (err){
             console.log('Error al eliminar el repuesto');
         }

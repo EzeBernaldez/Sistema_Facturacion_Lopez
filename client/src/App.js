@@ -6,6 +6,8 @@ import Repuestos from './pages/Repuestos/index';
 import RepuestosPost from './pages/Repuestos/RepuestosPost';
 import RepuestosPatch from './pages/Repuestos/RepuestosPatch';
 import './App.css';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
@@ -19,6 +21,18 @@ function App() {
             <Route path='/repuestos/actualizar/:codigo' element={<RepuestosPatch />} />
           </Routes>
         </div>
+        <ToastContainer
+            position="top-right"
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="dark"
+          />
       </Router>
   );
 }
