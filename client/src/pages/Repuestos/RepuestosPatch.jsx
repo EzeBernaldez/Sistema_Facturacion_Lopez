@@ -74,7 +74,7 @@ const RepuestosPatch = () => {
                 
                 setLoading(false);
                 formik.resetForm();
-                toast.success("El repuesto se actualizo correactmente")
+                toast.success("El repuesto se actualizo correctamente")
                 navigate('/repuestos');
             }
             catch (err){

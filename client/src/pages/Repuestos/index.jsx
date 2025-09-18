@@ -14,9 +14,10 @@ import {
     Box,
     Flex,
     IconButton,
-    Button
+    Button,
+    background
 } from '@chakra-ui/react';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
@@ -24,7 +25,7 @@ import { ToastContainer, toast } from 'react-toastify';
 const Repuestos = (props) => {
 
     const navigate = useNavigate();
-    const [isDeleted, setIsDeleted] = useState(false);
+    const [isDeleted, setIsDeleted] = useState(true);
     const notify = () => toast("Wow so easy!");
 
     const {
@@ -106,12 +107,21 @@ const Repuestos = (props) => {
                                                 <Td>{item.stock}</Td>
                                                 <Td>{item.tipo}</Td>
                                                 <Td>
-                                                    <Button colorScheme='red' onClick={() => deleteRepuesto(item.codigo)}>
-                                                        Eliminar
+                                                    <Button colorScheme='red' 
+                                                    onClick={() => setIsDeleted(false)}
+                                                    onDoubleClick={() => deleteRepuesto(item.codigo)}>
+                                                        { isDeleted ? `Eliminar` : `¿Desea eliminar el repuesto?` } 
                                                     </Button>
+                                                    { isDeleted && (
                                                     <Button colorScheme='green' className='ms-3' onClick={() => navigate(`/repuestos/actualizar/${item.codigo}`)}>
                                                         Actualizar
                                                     </Button>
+                                                    )}
+                                                    { !isDeleted && (
+                                                        <IconButton ms={1} icon={<FontAwesomeIcon icon={faXmark} color='black' fade/> 
+                                                        } 
+                                                        onClick={() => setIsDeleted(true)}/>
+                                                    ) }
                                                 </Td>
                                             </Tr>
                                         );
