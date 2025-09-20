@@ -43,11 +43,13 @@ class Clientes(models.Model):
         ('Exento', 'Exento')
     ]
     
+    nombre=models.CharField(max_length=100, default="Sin nombre")
     codigo_clientes = models.CharField(max_length=30, db_index=True, primary_key=True)
     correo = models.EmailField(max_length=254, help_text='Ingrese una dirección de email válida')
     condicion_iva = models.CharField(max_length=11, choices=condiciones_iva)
     razon_social = models.CharField(max_length=50)
     cuit = models.CharField(max_length=50, unique=True)
+    direccion = models.CharField(max_length=200,default="Sin direccion")
 
 class Telefonos_Clientes(models.Model):
     cliente = models.ForeignKey(Clientes, on_delete=models.CASCADE)

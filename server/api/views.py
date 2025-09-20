@@ -6,8 +6,8 @@ from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.generics import ListCreateAPIView, RetrieveDestroyAPIView, RetrieveUpdateDestroyAPIView
-from .serializers import UserSerializer, LoginSerializer, RepuestosSerializer, ProveedoresSerializer
-from .models import Repuestos, Proveedores
+from .serializers import UserSerializer, LoginSerializer, RepuestosSerializer, ProveedoresSerializer, ClientesSerializer
+from .models import Repuestos, Proveedores, Clientes
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -112,3 +112,11 @@ class RetrieveUpdateDestroyProveedores(RetrieveUpdateDestroyAPIView):
     authentication_classes = [JWTAuthentication]
     queryset = Proveedores.objects.all()
     lookup_field = 'codigo_proveedores'
+        
+
+# ----------------------------------------Clientes
+class CreateClientes(ListCreateAPIView):
+    serializer_class = ClientesSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    queryset = Clientes.objects.all()

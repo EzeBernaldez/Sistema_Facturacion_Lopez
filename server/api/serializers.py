@@ -104,13 +104,33 @@ class TelefonosClientesSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ClientesSerializer(serializers.ModelSerializer):
-    telefonos = TelefonosClientesSerializer(many=True, read_only=True)
+    
+    codigo = serializers.CharField(
+        source='codigo_clientes',
+        validators=[
+            UniqueValidator(
+                queryset=Clientes.objects.all(),
+                message='El código de cliente ya existe. Utilice otro código o modifique el cliente existente'
+            )
+        ]
+    )
+    
+    cuit = serializers.CharField(
+        validators=[
+            UniqueValidator(
+                queryset=Clientes.objects.all(),
+                message='El cuit del cliente ya existe. Utilice otro cuit o modifique el cliente existente'
+            )
+        ]
+    )
+    
+    telefonos = TelefonosClientesSerializer(many=True, read_only=True, source='telefonos_clientes_set')
     
     telefonos_clientes = TelefonosClientesSerializer(many=True,write_only=True,required=False)
     
     class Meta:
         model = Clientes
-        fields = ['codigo_cliente', 'correo', 'condicion_iva', 'razon_social', 'telefonos', 'telefonos_clientes']
+        fields = ['codigo', 'correo', 'nombre','condicion_iva', 'razon_social', 'telefonos', 'telefonos_clientes','cuit','direccion']
     
     def create(self, validated_data):
         telefonos_clientes = validated_data.pop('telefonos_clientes', [])
