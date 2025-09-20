@@ -6,8 +6,8 @@ from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.generics import ListCreateAPIView, RetrieveDestroyAPIView, RetrieveUpdateDestroyAPIView
-from .serializers import UserSerializer, LoginSerializer, RepuestosSerializer
-from .models import Repuestos
+from .serializers import UserSerializer, LoginSerializer, RepuestosSerializer, ProveedoresSerializer
+from .models import Repuestos, Proveedores
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -99,3 +99,16 @@ class RetrieveUpdateRepuestos(RetrieveUpdateDestroyAPIView):
         except Repuestos.DoesNotExist:
             from rest_framework.exceptions import NotFound
             raise NotFound("Repuesto no encontrado")
+
+class CreateProveedores(ListCreateAPIView):
+    serializer_class = ProveedoresSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    queryset = Proveedores.objects.all()
+
+class RetrieveUpdateDestroyProveedores(RetrieveUpdateDestroyAPIView):
+    serializer_class = ProveedoresSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    queryset = Proveedores.objects.all()
+    lookup_field = 'codigo_proveedores'

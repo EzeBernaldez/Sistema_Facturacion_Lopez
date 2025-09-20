@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from .models import Repuestos, Proveedores, Telefonos_Proveedores, Vehiculos, Clientes, Telefonos_Clientes, Empleados, Telefonos_Empleados 
-from rest_framework.validators import UniqueValidator
+from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -60,11 +60,19 @@ class TelefonosProveedoresSerializer(serializers.ModelSerializer):
 class ProveedoresSerializer(serializers.ModelSerializer):
     telefonos = TelefonosProveedoresSerializer(many=True, read_only=True)
     
-    telefonos_proveedores = serializers.ListField(child=serializers.DictField(), write_only=True, required=False, default=list)
+    
+    telefonos_proveedores = TelefonosProveedoresSerializer(many=True,write_only=True,required=False)
     
     class Meta:
         model = Proveedores
         fields = ['codigo_proveedores', 'correo', 'nombre', 'direccion', 'telefonos', 'telefonos_proveedores']
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Telefonos_Proveedores.objects.all(),
+                fields=['proveedor','numero'],
+                message='Este número de teléfono ya existe para este proveedor'
+            )
+        ]
     
     def create(self, validated_data):
         telefonos_proveedores = validated_data.pop('telefonos_proveedores', [])
@@ -98,7 +106,7 @@ class TelefonosClientesSerializer(serializers.ModelSerializer):
 class ClientesSerializer(serializers.ModelSerializer):
     telefonos = TelefonosClientesSerializer(many=True, read_only=True)
     
-    telefonos_clientes = serializers.ListField(child=serializers.DictField(), write_only=True, required=False, default=list)
+    telefonos_clientes = TelefonosClientesSerializer(many=True,write_only=True,required=False)
     
     class Meta:
         model = Clientes
@@ -136,7 +144,7 @@ class TelefonosEmpleadosSerializer(serializers.ModelSerializer):
 class EmpleadosSerializer(serializers.ModelSerializer):
     telefonos = TelefonosEmpleadosSerializer(many=True, read_only=True)
     
-    telefonos_empleados = serializers.ListField(child=serializers.DictField(), write_only=True, required=False, default=list)
+    telefonos_empleados = TelefonosEmpleadosSerializer(many=True,write_only=True,required=False)
     
     class Meta:
         model = Empleados
