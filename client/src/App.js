@@ -8,6 +8,9 @@ import RepuestosPatch from './pages/Repuestos/RepuestosPatch';
 import './App.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Clientes from './pages/Clientes/index'
+import ClientesPost from './pages/Clientes/ClientesPost'
+
 
 function App() {
   return (
@@ -19,6 +22,9 @@ function App() {
             <Route path="/repuestos" element={<Repuestos />}/>
             <Route path='/repuestos/nuevo' element={<RepuestosPost />} />
             <Route path='/repuestos/actualizar/:codigo' element={<RepuestosPatch />} />
+            <Route path="/clientes" element={<Clientes />} />
+            <Route path="/clientes/nuevo" element={<ClientesPost />} />
+
           </Routes>
         </div>
         <ToastContainer

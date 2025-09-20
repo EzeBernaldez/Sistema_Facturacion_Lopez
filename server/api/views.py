@@ -6,8 +6,9 @@ from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.generics import ListCreateAPIView, RetrieveDestroyAPIView, RetrieveUpdateDestroyAPIView
-from .serializers import UserSerializer, LoginSerializer, RepuestosSerializer
+from .serializers import UserSerializer, LoginSerializer, RepuestosSerializer, ClientesSerializer
 from .models import Repuestos
+from .models import Clientes
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -99,3 +100,11 @@ class RetrieveUpdateRepuestos(RetrieveUpdateDestroyAPIView):
         except Repuestos.DoesNotExist:
             from rest_framework.exceptions import NotFound
             raise NotFound("Repuesto no encontrado")
+        
+
+# ----------------------------------------Clientes
+class CreateClientes(ListCreateAPIView):
+    serializer_class = ClientesSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    queryset = Clientes.objects.all()

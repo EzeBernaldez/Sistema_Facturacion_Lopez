@@ -18,7 +18,7 @@ import {
 } from '@chakra-ui/react';
 import { useContexto } from '../contexts/GlobalContext.jsx';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faWrench, faFileInvoiceDollar, faCommentDollar, faFileInvoice, faParachuteBox } from '@fortawesome/free-solid-svg-icons';
+import {faWrench, faFileInvoiceDollar, faCommentDollar, faFileInvoice, faParachuteBox, faUsers } from '@fortawesome/free-solid-svg-icons';
 
 
 const Home = () => {
@@ -105,6 +105,16 @@ const Home = () => {
                                 <FontAwesomeIcon icon={faCommentDollar} fontSize='2rem
                                 '/>
                                 <Text>Presupuesto</Text>
+                            </Button>
+
+                            <Button size='lg'  shadow='lg' borderRadius='lg' p={4} bgColor='#C4DAFA' _hover={{
+                                bgColor:'#A0BDE8'
+                            }}
+                            display='flex' flexDirection='column' height='auto' alignItems='center' justifyContent='center' gap={2}
+                            onClick={ () => navigate("/clientes") }>
+                                <FontAwesomeIcon icon={faUsers} fontSize='2rem
+                                '/>
+                                <Text>Clientes</Text>
                             </Button>
                         
                             <Button size='lg'  shadow='lg' borderRadius='lg' p={4} bgColor='#C4DAFA' _hover={{
