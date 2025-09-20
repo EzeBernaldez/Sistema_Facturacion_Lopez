@@ -54,7 +54,7 @@ const RepuestosPost = () => {
                         .toFixed(2)
                         .toString(),
                 };
-                await api.post('/api/repuestos/', payload);
+                await api.post('/api/repuestos', payload);
                 
                 setLoading(false);
                 formik.resetForm();

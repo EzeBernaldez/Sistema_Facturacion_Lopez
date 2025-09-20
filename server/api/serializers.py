@@ -55,24 +55,16 @@ class VehiculosSerializer(serializers.ModelSerializer):
 class TelefonosProveedoresSerializer(serializers.ModelSerializer):
     class Meta:
         model = Telefonos_Proveedores
-        fields = '__all__'
+        fields = ['numero', 'tipo']
 
 class ProveedoresSerializer(serializers.ModelSerializer):
-    telefonos = TelefonosProveedoresSerializer(many=True, read_only=True)
-    
+    telefonos = TelefonosProveedoresSerializer(many=True, read_only=True, source='telefonos_proveedores_set')
     
     telefonos_proveedores = TelefonosProveedoresSerializer(many=True,write_only=True,required=False)
     
     class Meta:
         model = Proveedores
         fields = ['codigo_proveedores', 'correo', 'nombre', 'direccion', 'telefonos', 'telefonos_proveedores']
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Telefonos_Proveedores.objects.all(),
-                fields=['proveedor','numero'],
-                message='Este número de teléfono ya existe para este proveedor'
-            )
-        ]
     
     def create(self, validated_data):
         telefonos_proveedores = validated_data.pop('telefonos_proveedores', [])

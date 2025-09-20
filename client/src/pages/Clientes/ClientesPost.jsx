@@ -28,6 +28,7 @@ import api from "../../utils/api";
 import BeatLoader from "react-spinners/BeatLoader";
 import { ToastContainer, toast } from 'react-toastify';
 
+
 const ClientesPost = () => {
 
     const [loading,setLoading] = useState(false);
@@ -53,7 +54,7 @@ const ClientesPost = () => {
                 const payload = {
                     ...values
                 };
-                await api.post('/api/clientes/', payload);
+                await api.post('/api/clientes', payload);
                 
                 setLoading(false);
                 formik.resetForm();

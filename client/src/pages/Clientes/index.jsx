@@ -41,12 +41,11 @@ const Clientes = (props) => {
         SETARRAYCLIENTES,
     } = actionClientes;
 
-
     useEffect(
         () => {
             setPagina('Clientes');
             const fetchData = async () => {
-                const response = await api.get('api/clientes/')
+                const response = await api.get('api/clientes')
                 dispatch(
                     {
                         payload: Array.isArray(response.data) ? response.data : [],
@@ -120,8 +119,6 @@ const Clientes = (props) => {
                 </Table>
             </TableContainer>
         </Stack>
-        
-
         </>
     )
 }

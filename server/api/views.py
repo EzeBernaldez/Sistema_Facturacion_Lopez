@@ -119,4 +119,4 @@ class CreateClientes(ListCreateAPIView):
     serializer_class = ClientesSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
-    queryset = Clientes.objects.all()
+    queryset = Clientes.objects.prefetch_related('telefonos_proveedores').all()

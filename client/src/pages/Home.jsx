@@ -136,10 +136,12 @@ const Home = () => {
                                 <Text>Repuestos</Text>
                             </Button>
 
-                            <Button size='lg'  shadow='lg' borderRadius='lg' p={4} bgColor='#C4DAFA' _hover={{
+                            <Button size='lg'  shadow='lg' borderRadius='lg' p={4} bgColor='#C4DAFA' 
+                            _hover={{
                                 bgColor:'#A0BDE8'
                             }}
-                            display='flex' flexDirection='column' height='auto' alignItems='center' justifyContent='center' gap={2}>
+                            display='flex' flexDirection='column' height='auto' alignItems='center' justifyContent='center' gap={2}
+                            onClick={() => navigate('/proveedores')}>
                                 <FontAwesomeIcon icon={faParachuteBox} fontSize='2rem
                                 '/>
                                 <Text>Proveedores</Text>

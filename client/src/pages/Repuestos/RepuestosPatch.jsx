@@ -29,6 +29,7 @@ import api from "../../utils/api";
 import BeatLoader from "react-spinners/BeatLoader";
 import { ToastContainer, toast } from 'react-toastify';
 
+
 const RepuestosPatch = () => {
     const [loading,setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -70,7 +71,7 @@ const RepuestosPatch = () => {
                         .toFixed(2)
                         .toString(),
                 };
-                await api.patch(`/api/repuestos/actualizar/${codigo}/`, payload);
+                await api.patch(`/api/repuestos/actualizar/${codigo}`, payload);
                 
                 setLoading(false);
                 formik.resetForm();

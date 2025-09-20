@@ -1,6 +1,7 @@
-import { React , useEffect, useState} from 'react';
+import { useEffect, useState } from "react";
+import api from "../../utils/api";
 import { useContexto } from "../../contexts/GlobalContext";
-import api from '../../utils/api';
+import { useNavigate } from "react-router-dom";
 import  Header  from '../../components/Header';
 import {
     TableContainer,
@@ -11,18 +12,15 @@ import {
     Tbody,
     Td,
     Stack,
-    Box,
     Flex,
     IconButton,
     Button,
-    background
 } from '@chakra-ui/react';
 import { faPlus, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 
-const Repuestos = (props) => {
+const Proveedores = () => {
 
     const navigate = useNavigate();
     const [isDeleted, setIsDeleted] = useState(true);
@@ -30,29 +28,29 @@ const Repuestos = (props) => {
 
     const {
         cargarPagina: setPagina,
-        estadoRepuestos,
-        dispatchRepuestos: dispatch,
-        actionRepuestos,
+        estadoProveedores,
+        dispatchProveedores: dispatch,
+        actionProveedores,
     } = useContexto();
 
     const {
-        arrayRepuestos,
-    } = estadoRepuestos;
+        arrayProveedores,
+    } = estadoProveedores;
 
     const {
-        SETARRAYREPUESTOS,
-    } = actionRepuestos;
+        SETARRAYPROVEEDORES,
+    } = actionProveedores;
 
 
     useEffect(
         () => {
-            setPagina('Repuestos');
+            setPagina('Proveedores');
             const fetchData = async () => {
-                const response = await api.get('api/repuestos')
+                const response = await api.get('api/proveedores')
                 dispatch(
                     {
                         payload: Array.isArray(response.data) ? response.data : [],
-                        type: SETARRAYREPUESTOS,
+                        type: SETARRAYPROVEEDORES,
                     }
                 )
             }
@@ -60,13 +58,13 @@ const Repuestos = (props) => {
         }
     , [isDeleted]);
 
-    const deleteRepuesto = async (id) => {
+    const deleteProveedores = async (id) => {
         try{
-            await api.delete(`api/repuestos/${id}`);
+            await api.delete(`api/proveedores/proveedor/${id}`);
             setIsDeleted(!isDeleted);
-            toast.success("Repuesto eliminado correctamente");
+            toast.success("Proveedor eliminado correctamente");
         }catch (err){
-            console.log('Error al eliminar el repuesto');
+            console.log('Error al eliminar el proveedor');
         }
     };
 
@@ -77,43 +75,51 @@ const Repuestos = (props) => {
         </header>
 
         <Flex justifyContent='end' p={3} >
-            <IconButton colorScheme='blue' size='md' icon={<FontAwesomeIcon icon={faPlus}/>} onClick={() => navigate("/repuestos/nuevo")}/>
+            <IconButton colorScheme='blue' size='md' icon={<FontAwesomeIcon icon={faPlus}/>} onClick={() => navigate("/proveedores/nuevo")}/>
         </Flex>
         <Stack mt={6}>
             <TableContainer>
                 <Table variant='simple'>
-                    {arrayRepuestos.length > 0 ? (
+                    {arrayProveedores.length > 0 ? (
                         <>
                             <Thead>
                                 <Tr>
-                                    <Th>Código</Th>
-                                    <Th>Descripción</Th>
-                                    <Th>Marca</Th>
-                                    <Th>Precio</Th>
-                                    <Th>Stock</Th>
-                                    <Th>Tipo</Th>
-                                    <Th>Acciones</Th>
+                                    <Th>Código de proveedor</Th>
+                                    <Th>Correo</Th>
+                                    <Th>Nombre</Th>
+                                    <Th>Dirección</Th>
+                                    <Th>Teléfonos</Th>
                                 </Tr>
                             </Thead>
                             <Tbody>
                                 {
-                                    arrayRepuestos.map((item) => {
+                                    arrayProveedores.map((item) => {
                                         return(
                                             <Tr>
-                                                <Td>{item.codigo}</Td>
-                                                <Td>{item.descripcion}</Td>
-                                                <Td>{item.marca}</Td>
-                                                <Td>{item.precio_venta}</Td>
-                                                <Td>{item.stock}</Td>
-                                                <Td>{item.tipo}</Td>
+                                                <Td>{item.codigo_proveedores}</Td>
+                                                <Td>{item.correo}</Td>
+                                                <Td>{item.nombre}</Td>
+                                                <Td>{item.direccion}</Td>
+                                                <Td>
+                                                    {
+                                                        item.telefonos.length > 0 ? (
+                                                            <>
+                                                            {
+                                                                item.telefonos.map((telefono,index) =>
+                                                                    `${index+1}: ${telefono.numero} ` )
+                                                            }
+                                                            </>
+                                                        ) : item.telefonos[0]
+                                                    }
+                                                </Td>
                                                 <Td>
                                                     <Button colorScheme='red' 
                                                     onClick={() => setIsDeleted(false)}
-                                                    onDoubleClick={() => deleteRepuesto(item.codigo)}>
-                                                        { isDeleted ? `Eliminar` : `¿Desea eliminar el repuesto?` } 
+                                                    onDoubleClick={() => deleteProveedores(item.codigo)}>
+                                                        { isDeleted ? `Eliminar` : `¿Desea eliminar el proveedor?` } 
                                                     </Button>
                                                     { isDeleted && (
-                                                    <Button colorScheme='green' className='ms-3' onClick={() => navigate(`/repuestos/actualizar/${item.codigo}`)}>
+                                                    <Button colorScheme='green' className='ms-3' onClick={() => navigate(`/proveedores/actualizar/${item.codigo_proveedores}`)}>
                                                         Actualizar
                                                     </Button>
                                                     )}
@@ -146,4 +152,5 @@ const Repuestos = (props) => {
     )
 }
 
-export default Repuestos;
+
+export default Proveedores;

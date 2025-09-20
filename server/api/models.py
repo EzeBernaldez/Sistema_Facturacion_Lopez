@@ -34,6 +34,9 @@ class Telefonos_Proveedores(models.Model):
     
     class Meta:
         unique_together = [['proveedor', 'numero']]
+    
+    def __str__(self):
+        return f'{self.numero}'
 
 class Clientes(models.Model):
     condiciones_iva = [
