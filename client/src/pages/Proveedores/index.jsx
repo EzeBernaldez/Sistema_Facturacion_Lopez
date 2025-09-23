@@ -117,7 +117,7 @@ const Proveedores = () => {
                                                 <Td>
                                                     <Button colorScheme='red' 
                                                     onClick={() => setIsDeleted(false)}
-                                                    onDoubleClick={() => deleteProveedores(item.codigo)}>
+                                                    onDoubleClick={() => deleteProveedores(item.codigo_proveedores)}>
                                                         { isDeleted ? `Eliminar` : `¿Desea eliminar el proveedor?` } 
                                                     </Button>
                                                     { isDeleted && (
