@@ -7,6 +7,7 @@ import {
 } from '../utils/reducers/reducer_repuestos';
 import { initialValueClientes,reducerClientes,actionClientes } from "../utils/reducers/reducer_clientes";
 import { actionProveedores, initialValueProveedores, reducerProveedores } from "../utils/reducers/reducer_proveedores";
+import { actionEmpleados, initialValueEmpleados, reducerEmpleados } from "../utils/reducers/reducer_empleados";
 
 const Context = createContext();
 
@@ -29,6 +30,11 @@ export const ContextProvider = ({children}) => {
     const [estadoProveedores, dispatchProveedores] = useReducer(
         reducerProveedores,
         initialValueProveedores,
+    );
+
+    const [estadoEmpleados, dispatchEmpleados] = useReducer(
+        reducerEmpleados,
+        initialValueEmpleados
     )
 
     return <Context.Provider value={{
@@ -42,7 +48,10 @@ export const ContextProvider = ({children}) => {
         actionClientes,
         estadoProveedores,
         dispatchProveedores,
-        actionProveedores
+        actionProveedores,
+        estadoEmpleados,
+        dispatchEmpleados,
+        actionEmpleados,
     }}> {children}</Context.Provider>;
 }
 

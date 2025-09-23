@@ -20,7 +20,7 @@ export const initialValueClientes = {
     condicion_iva: '',
     nombre: '',
     razon_social: '',
-    telefonos: [],
+    telefonos_clientes: [],
     cuit: '',
     direccion: '',
 }

@@ -16,4 +16,6 @@ urlpatterns = [
     path('repuestos/actualizar/<str:codigo>', views.RetrieveUpdateRepuestos.as_view()),
     path('proveedores', views.CreateProveedores.as_view()),
     path('proveedores/proveedor/<str:codigo_proveedores>', views.RetrieveUpdateDestroyProveedores.as_view()),
+    path('empleados', views.CreateEmpleados.as_view()),
+    path('empleados/empleado/<str:dni_empleado>', views.RetrieveUpdateDestroyEmpleados.as_view()),
 ]

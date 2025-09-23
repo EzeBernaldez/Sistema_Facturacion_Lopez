@@ -16,7 +16,7 @@ export const initialValueProveedores = {
     correo: '',
     nombre: '',
     direccion: '',
-    telefonos: [],
+    telefonos_proveedores: [],
 }
 
 

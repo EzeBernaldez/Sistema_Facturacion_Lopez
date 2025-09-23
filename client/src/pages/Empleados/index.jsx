@@ -20,7 +20,7 @@ import { faPlus, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ToastContainer, toast } from 'react-toastify';
 
-const Proveedores = () => {
+const Empleados = () => {
 
     const navigate = useNavigate();
     const [isDeleted, setIsDeleted] = useState(true);
@@ -29,29 +29,29 @@ const Proveedores = () => {
 
     const {
         cargarPagina: setPagina,
-        estadoProveedores,
-        dispatchProveedores: dispatch,
-        actionProveedores,
+        estadoEmpleados,
+        dispatchEmpleados: dispatch,
+        actionEmpleados,
     } = useContexto();
 
     const {
-        arrayProveedores,
-    } = estadoProveedores;
+        arrayEmpleados,
+    } = estadoEmpleados;
 
     const {
-        SETARRAYPROVEEDORES,
-    } = actionProveedores;
+        SETARRAYEMPLEADOS,
+    } = actionEmpleados;
 
 
     useEffect(
         () => {
-            setPagina('Proveedores');
+            setPagina('Empleados');
             const fetchData = async () => {
-                const response = await api.get('api/proveedores')
+                const response = await api.get('api/empleados')
                 dispatch(
                     {
                         payload: Array.isArray(response.data) ? response.data : [],
-                        type: SETARRAYPROVEEDORES,
+                        type: SETARRAYEMPLEADOS,
                     }
                 )
             }
@@ -59,14 +59,14 @@ const Proveedores = () => {
         }
     , [success]);
 
-    const deleteProveedores = async (id) => {
+    const deleteEmpleados = async (id) => {
         try{
-            await api.delete(`api/proveedores/proveedor/${id}`);
+            await api.delete(`api/empleados/empleado/${id}`);
             setIsDeleted(!isDeleted);
-            toast.success("Proveedor eliminado correctamente");
+            toast.success("Empleado eliminado correctamente");
             setSuccess(!success);
         }catch (err){
-            console.log('Error al eliminar el proveedor');
+            console.log('Error al eliminar el empleado');
         }
     };
 
@@ -77,31 +77,29 @@ const Proveedores = () => {
         </header>
 
         <Flex justifyContent='end' p={3} >
-            <IconButton colorScheme='blue' size='md' icon={<FontAwesomeIcon icon={faPlus}/>} onClick={() => navigate("/proveedores/nuevo")}/>
+            <IconButton colorScheme='blue' size='md' icon={<FontAwesomeIcon icon={faPlus}/>} onClick={() => navigate("/empleados/nuevo")}/>
         </Flex>
         <Stack mt={6}>
             <TableContainer>
                 <Table variant='simple'>
-                    {arrayProveedores.length > 0 ? (
+                    {arrayEmpleados.length > 0 ? (
                         <>
                             <Thead>
                                 <Tr>
-                                    <Th>Código de proveedor</Th>
-                                    <Th>Correo</Th>
+                                    <Th>Dni</Th>
                                     <Th>Nombre</Th>
-                                    <Th>Dirección</Th>
+                                    <Th>Apellido</Th>
                                     <Th>Teléfonos</Th>
                                 </Tr>
                             </Thead>
                             <Tbody>
                                 {
-                                    arrayProveedores.map((item, index) => {
+                                    arrayEmpleados.map((item, index) => {
                                         return(
                                             <Tr key={index}>
-                                                <Td>{item.codigo_proveedores}</Td>
-                                                <Td>{item.correo}</Td>
+                                                <Td>{item.dni_empleado}</Td>
                                                 <Td>{item.nombre}</Td>
-                                                <Td>{item.direccion}</Td>
+                                                <Td>{item.apellido}</Td>
                                                 <Td>
                                                     {
                                                         item.telefonos.length > 0 ? (
@@ -117,11 +115,11 @@ const Proveedores = () => {
                                                 <Td>
                                                     <Button colorScheme='red' 
                                                     onClick={() => setIsDeleted(false)}
-                                                    onDoubleClick={() => deleteProveedores(item.codigo)}>
-                                                        { isDeleted ? `Eliminar` : `¿Desea eliminar el proveedor?` } 
+                                                    onDoubleClick={() => deleteEmpleados(item.dni_empleado)}>
+                                                        { isDeleted ? `Eliminar` : `¿Desea eliminar el empleado?` } 
                                                     </Button>
                                                     { isDeleted && (
-                                                    <Button colorScheme='green' className='ms-3' onClick={() => navigate(`/proveedores/actualizar/${item.codigo_proveedores}`)}>
+                                                    <Button colorScheme='green' className='ms-3' onClick={() => navigate(`/empleados/actualizar/${item.dni_empleado}`)}>
                                                         Actualizar
                                                     </Button>
                                                     )}
@@ -155,4 +153,4 @@ const Proveedores = () => {
 }
 
 
-export default Proveedores;
+export default Empleados;

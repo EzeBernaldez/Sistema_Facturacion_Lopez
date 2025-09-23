@@ -14,6 +14,9 @@ import Proveedores from './pages/Proveedores/index';
 import ProveedoresPost from './pages/Proveedores/ProveedoresPost';
 import ClientesPatch from './pages/Clientes/ClientesPatch'; 
 import ProveedoresPatch from './pages/Proveedores/ProveedoresPatch';
+import Empleados from './pages/Empleados';
+import EmpleadosPost from './pages/Empleados/EmpleadosPost';
+import EmpleadosPatch from './pages/Empleados/EmpleadosPatch';
 
 function App() {
   return (
@@ -34,6 +37,9 @@ function App() {
             <Route path='/proveedores' element={<Proveedores />} />
             <Route path='/proveedores/nuevo' element={<ProveedoresPost />} />
             <Route path='/proveedores/actualizar/:codigo' element={<ProveedoresPatch />} />
+            <Route path='/empleados' element={<Empleados />} />
+            <Route path='/empleados/nuevo' element={<EmpleadosPost />} />
+            <Route path='/empleados/actualizar/:dni' element={<EmpleadosPatch />} />
 
 
           </Routes>

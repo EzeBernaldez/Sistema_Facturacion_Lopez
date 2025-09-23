@@ -155,7 +155,7 @@ class ClientesSerializer(serializers.ModelSerializer):
 class TelefonosEmpleadosSerializer(serializers.ModelSerializer):
     class Meta:
         model = Telefonos_Empleados
-        fields = '__all__'
+        fields = ['numero']
 
 class EmpleadosSerializer(serializers.ModelSerializer):
     telefonos = TelefonosEmpleadosSerializer(many=True, read_only=True, source='telefonos_empleados_set')
@@ -181,6 +181,8 @@ class EmpleadosSerializer(serializers.ModelSerializer):
         
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
+        
+        instance.save()
         
         if telefonos_empleados is not None:
             Telefonos_Empleados.objects.filter(empleado=instance).delete()
