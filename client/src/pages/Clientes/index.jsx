@@ -89,6 +89,7 @@ const Clientes = (props) => {
                                     <Th>Código</Th>
                                     <Th>Nombre</Th>
                                     <Th>Razon Social</Th>
+                                    <Th>Condición IVA</Th>
                                     <Th>CUIT</Th>
                                     <Th>Direccion</Th>
                                     <Th>Correo</Th>
@@ -98,13 +99,13 @@ const Clientes = (props) => {
                             </Thead>
                             <Tbody>
                                 {
-                                    arrayClientes.map((item) => {
-                                        console.log(item)
+                                    arrayClientes.map((item,index) => {
                                         return(
-                                            <Tr>
+                                            <Tr key={index}>
                                                 <Td>{item.codigo}</Td>
                                                 <Td>{item.nombre}</Td>
                                                 <Td>{item.razon_social}</Td>
+                                                <Td>{item.condicion_iva}</Td>
                                                 <Td>{item.cuit}</Td>
                                                 <Td>{item.direccion}</Td>
                                                 <Td>{item.correo}</Td>

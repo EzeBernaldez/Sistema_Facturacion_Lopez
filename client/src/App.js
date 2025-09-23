@@ -12,6 +12,7 @@ import Clientes from './pages/Clientes/index';
 import ClientesPost from './pages/Clientes/ClientesPost';
 import Proveedores from './pages/Proveedores/index';
 import ProveedoresPost from './pages/Proveedores/ProveedoresPost';
+import ClientesPatch from './pages/Clientes/ClientesPatch'; 
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
             <Route path='/repuestos/actualizar/:codigo' element={<RepuestosPatch />} />
             <Route path="/clientes" element={<Clientes />} />
             <Route path="/clientes/nuevo" element={<ClientesPost />} />
+            <Route path='/clientes/actualizar/:codigo' element={<ClientesPatch />} />
             <Route path='/proveedores' element={<Proveedores />} />
             <Route path='/proveedores/nuevo' element={<ProveedoresPost />} />
 

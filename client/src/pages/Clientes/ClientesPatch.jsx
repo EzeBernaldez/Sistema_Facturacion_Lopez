@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import Header from "../../components/Header";
 import * as Yup from 'yup';
-import { Field, FieldArray, useFormik, FormikProvider } from 'formik';
+import { useFormik, FormikProvider, FieldArray } from 'formik';
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useParams } from "react-router-dom";
 import {
     Box,
     VStack,
@@ -20,43 +22,60 @@ import {
     Stack,
     Select,
 } from '@chakra-ui/react';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import api from "../../utils/api";
 import BeatLoader from "react-spinners/BeatLoader";
 import { ToastContainer, toast } from 'react-toastify';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
 
 
-const ClientesPost = () => {
-
+const ClientesPatch = () => {
     const [loading,setLoading] = useState(false);
     const [error, setError] = useState("");
+    const { codigo } = useParams();
     const navigate = useNavigate();
+
+
+    useEffect(() => {
+        const fetchRepuesto = async () => {
+            try {
+                const response = await api.get(`/api/clientes/cliente/${codigo}`);
+                const { telefonos, ...datos } = response.data;
+                const cliente = {
+                    ...datos,
+                    telefonos_clientes: telefonos,
+                };
+                formik.setValues(cliente);
+            } catch (err) {
+                console.error("Error actualizando cliente:", err);
+            }
+        };
+        fetchRepuesto();
+    }, [codigo]);
 
     const formik = useFormik({
         initialValues: {
             codigo: '',
             correo: '',
-            condicion_iva: '',
             nombre: '',
+            condicion_iva: '',
             razon_social: '',
-            telefonos_clientes: [{numero:""}],
             cuit: '',
             direccion: '',
+            telefonos_clientes: [{numero: ''}],
         },
         onSubmit: async (values) => {
             setLoading(true);
             setError('');
             try{
-
                 const payload = {
                     ...values
                 };
-                await api.post('/api/clientes', payload);
+                await api.patch(`/api/clientes/cliente/${codigo}`, payload);
                 
                 setLoading(false);
                 formik.resetForm();
-                toast.success("Cliente cargado correctamente");
+                toast.success("El cliente se actualizó correctamente")
                 navigate('/clientes');
             }
             catch (err){
@@ -74,13 +93,12 @@ const ClientesPost = () => {
                         }
                     })
                 } else {
-                    setError('Error al crear el cliente. Intente nuevamente.');
+                    setError('Error al actualizar el cliente. Intente nuevamente.');
                 }
                 console.error('Error:', err.response?.data);
             }
         },
         validationSchema: Yup.object({
-            codigo: Yup.string().trim().max(30, 'Debe ingresar un código menor a 30 dígitos').required('Debe ingresar un código de repuesto.'),
             correo: Yup.string().email('Debe ingresar un correo válido').max(254,'Debe ingresar un email más acotado').required('Debe ingresar un correo.'),
             condicion_iva: Yup.string().trim().required('Debe ingresar una condicion de iva.'),
             nombre: Yup.string().trim(),
@@ -94,9 +112,9 @@ const ClientesPost = () => {
                     })
                 )
                 .min(1, "Debe ingresar al menos un teléfono"),
-                    })
-                });
-
+        })
+    });
+    
     return(
         <>
         <Collapse in={!!error} animateOpacity>
@@ -121,7 +139,7 @@ const ClientesPost = () => {
         <main>
             <Stack alignItems='center' justifyContent='center' width='100%' bg="#E8F1FF" p={5}>
                 <Box borderRadius='lg' boxShadow="md" p={8} width='80%' opacity='0.95' bg='#DAE8FD'>
-                    <Heading as='h2' fontSize='2xl' mb={4}>Nuevo Cliente</Heading>
+                    <Heading as='h2' fontSize='2xl' mb={4}>Actualizar Cliente</Heading>
                     <form onSubmit={formik.handleSubmit}>
                         <VStack gap="4" alignItems='flex-start'>
                             <FormControl width='100%' isInvalid={formik.touched.codigo && !!formik.errors.codigo}>
@@ -131,6 +149,7 @@ const ClientesPost = () => {
                                 width='100%'
                                 border='1px solid #A0BDE8'
                                 {...formik.getFieldProps("codigo")}
+                                disabled
                                 />
                                 <FormErrorMessage>{formik.errors.codigo}</FormErrorMessage>
                             </FormControl>
@@ -260,6 +279,6 @@ const ClientesPost = () => {
         </main>
         </>
     )
-};
+}
 
-export default ClientesPost;
+export default ClientesPatch;

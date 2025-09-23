@@ -82,6 +82,8 @@ class ProveedoresSerializer(serializers.ModelSerializer):
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         
+        instance.save()
+        
         if telefonos_proveedores is not None:
             Telefonos_Proveedores.objects.filter(proveedor=instance).delete()
             
@@ -139,6 +141,8 @@ class ClientesSerializer(serializers.ModelSerializer):
         
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
+        
+        instance.save()
         
         if telefonos_clientes is not None:
             Telefonos_Clientes.objects.filter(cliente=instance).delete()
