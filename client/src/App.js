@@ -20,7 +20,7 @@ import EmpleadosPatch from './pages/Empleados/EmpleadosPatch';
 
 function App() {
   return (
-      <Router>
+      <Router basename='/'>
         <div className="App" style={{
           backgroundColor: "#E8F1FF",
           height: '100vh'
