@@ -55,7 +55,7 @@ class VehiculosSerializer(serializers.ModelSerializer):
 class TelefonosProveedoresSerializer(serializers.ModelSerializer):
     class Meta:
         model = Telefonos_Proveedores
-        fields = ['numero', 'tipo']
+        fields = ['numero']
 
 class ProveedoresSerializer(serializers.ModelSerializer):
     telefonos = TelefonosProveedoresSerializer(many=True, read_only=True, source='telefonos_proveedores_set')
@@ -93,7 +93,7 @@ class ProveedoresSerializer(serializers.ModelSerializer):
 class TelefonosClientesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Telefonos_Clientes
-        fields = '__all__'
+        fields = ['numero']
 
 class ClientesSerializer(serializers.ModelSerializer):
     
@@ -154,7 +154,7 @@ class TelefonosEmpleadosSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class EmpleadosSerializer(serializers.ModelSerializer):
-    telefonos = TelefonosEmpleadosSerializer(many=True, read_only=True)
+    telefonos = TelefonosEmpleadosSerializer(many=True, read_only=True, source='telefonos_empleados_set')
     
     telefonos_empleados = TelefonosEmpleadosSerializer(many=True,write_only=True,required=False)
     

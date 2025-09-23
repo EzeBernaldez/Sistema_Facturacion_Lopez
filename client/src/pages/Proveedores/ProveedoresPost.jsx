@@ -40,7 +40,7 @@ const ProveedoresPost = () => {
             correo: '',
             nombre: '',
             nombre: '',
-            telefonos_proveedores: [{numero:"",tipo:""}],
+            telefonos_proveedores: [{numero:""}],
             direccion: '',
         },
         onSubmit: async (values) => {
@@ -87,7 +87,6 @@ const ProveedoresPost = () => {
                 .of(
                     Yup.object().shape({
                     numero: Yup.string().max(20,'Debe ingresar un número menor a 20 caracteres').required("Número obligatorio"),
-                    tipo: Yup.string().max(30,'Debe ingresar un tipo más acotado.').required("Tipo obligatorio"),
                     })
                 )
                 .min(1, "Debe ingresar al menos un teléfono"),
@@ -183,33 +182,17 @@ const ProveedoresPost = () => {
                                                     </FormErrorMessage>
                                                 </FormControl>
 
-                                                <FormControl 
-                                                    flex={1}
-                                                    isInvalid={
-                                                        formik.touched.telefonos_proveedores?.[index]?.tipo && 
-                                                        !!formik.errors.telefonos_proveedores?.[index]?.tipo
-                                                    }
-                                                >
-                                                    <FormLabel>Tipo {index + 1}</FormLabel>
-                                                    <Select
-                                                        placeholder="Seleccionar tipo"
-                                                        {...formik.getFieldProps(`telefonos_proveedores.${index}.tipo`)}
-                                                    >
-                                                        <option value="móvil">Móvil</option>
-                                                        <option value="oficina">Oficina</option>
-                                                    </Select>
-                                                    <FormErrorMessage>
-                                                        {formik.errors.telefonos_proveedores?.[index]?.tipo}
-                                                    </FormErrorMessage>
-                                                </FormControl>
-
                                                 <IconButton shadow='lg' colorScheme='grey' mt={8} ms={1} icon={<FontAwesomeIcon icon={faXmark} color='black' fade/> 
                                                         } 
                                                         onClick={ () => {
                                                         const nuevosTelefonos = formik.values.telefonos_proveedores.filter((_, i) => i !== index);
                                                         formik.setFieldValue('telefonos_proveedores', nuevosTelefonos);
                                                     }
-                                                        } />
+                                                        }
+                                                        isDisabled= {
+                                                            formik.values.telefonos_proveedores.length === 1
+                                                        }
+                                                    />
                                             </Box>
                                         ))}
 
@@ -219,7 +202,7 @@ const ProveedoresPost = () => {
                                             onClick={() => {
                                                 formik.setFieldValue('telefonos_proveedores', [
                                                     ...formik.values.telefonos_proveedores,
-                                                    { numero: '', tipo: '' }
+                                                    { numero: ''}
                                                 ]);
                                             }}
                                             mb={4}

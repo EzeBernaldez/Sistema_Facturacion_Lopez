@@ -15,18 +15,16 @@ import {
     Alert,
     AlertIcon,
     Textarea,
-    NumberInput,
-    NumberInputField,
-    NumberInputStepper,
-    NumberIncrementStepper,
-    NumberDecrementStepper,
+    IconButton,
     Heading,
     Stack,
-    Grid,
+    Select,
 } from '@chakra-ui/react';
 import api from "../../utils/api";
 import BeatLoader from "react-spinners/BeatLoader";
 import { ToastContainer, toast } from 'react-toastify';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
 
 
 const ClientesPost = () => {
@@ -42,7 +40,7 @@ const ClientesPost = () => {
             condicion_iva: '',
             nombre: '',
             razon_social: '',
-            telefonos_clientes: [{numero:"",tipo:""}],
+            telefonos_clientes: [{numero:""}],
             cuit: '',
             direccion: '',
         },
@@ -83,17 +81,16 @@ const ClientesPost = () => {
         },
         validationSchema: Yup.object({
             codigo: Yup.string().trim().max(30, 'Debe ingresar un código menor a 30 dígitos').required('Debe ingresar un código de repuesto.'),
-            correo: Yup.string().trim().min(5, 'Ingrese un correo valido.').max(70,'Debe ingresar un correo más acotado.').required('Debe ingresar un correo.'),
-            condicion_iva: Yup.string().trim().max(15,'Ingrese condicion de iva valido').required('Debe ingresar una condicion de iva.'),
-            nombre: Yup.string().trim().required("El nombre es obligatorio"),
-            razon_social: Yup.string().required("Debe ingresar una razon social"),
-            cuit: Yup.string().max(12, 'Debe ingresar un cuit valido.').required('Debe ingresar un cuit'),
+            correo: Yup.string().email('Debe ingresar un correo válido').max(254,'Debe ingresar un email más acotado').required('Debe ingresar un correo.'),
+            condicion_iva: Yup.string().trim().required('Debe ingresar una condicion de iva.'),
+            nombre: Yup.string().trim(),
+            razon_social: Yup.string().max(50,'Debe ingresar una razón social más corta').required("Debe ingresar una razon social"),
+            cuit: Yup.string().max(50, 'Debe ingresar un cuit válido.').required('Debe ingresar un cuit'),
             direccion: Yup.string().required('Debe ingresar una direccion'),
             telefonos_clientes: Yup.array()
                 .of(
                     Yup.object().shape({
                     numero: Yup.string().required("Número obligatorio"),
-                    tipo: Yup.string().required("Tipo obligatorio"),
                     })
                 )
                 .min(1, "Debe ingresar al menos un teléfono"),
@@ -148,10 +145,16 @@ const ClientesPost = () => {
                             </FormControl>
                             <FormControl width='100%' isInvalid={formik.touched.condicion_iva && !!formik.errors.condicion_iva}>
                                 <FormLabel htmlFor="condicion_iva">Condicion de IVA:</FormLabel>
-                                <Input
+                                <Select
                                     id='condicion_iva'
+                                    placeholder="Seleccione una condición"
                                     {...formik.getFieldProps('condicion_iva')}
-                                />
+                                >
+                                    <option value='Monotributo'>Monotributo</option>
+                                    <option value="Inscripto">Responsable Inscripto</option>
+                                    <option value="NoInscripto">Responsable No Inscripto</option>
+                                    <option value="Exento">Exento</option>
+                                </Select>
                                 <FormErrorMessage>{formik.errors.condicion_iva}</FormErrorMessage>
                             </FormControl>
                             <FormControl width='100%' isInvalid={formik.touched.nombre && !!formik.errors.nombre}>
@@ -186,28 +189,64 @@ const ClientesPost = () => {
                                 />
                                 <FormErrorMessage>{formik.errors.direccion}</FormErrorMessage>
                             </FormControl>
-                            <FormikProvider value={formik}>
-                                <form onSubmit={formik.handleSubmit}>
+                            <FormikProvider value={formik.getFieldProps('telefonos_clientes')}>
+                                <form onSubmit={formik.handleSubmit} style={{
+                                    width: '100%',
+                                }}>
                                     <FieldArray name="telefonos_clientes">
                                     {({ push, remove }) => (
                                         <>
-                                        {formik.values.telefonos_clientes.map((tel, i) => (
-                                            <div key={i}>
-                                            <input name="numero" {...formik.getFieldProps(`telefonos_clientes.${i}.numero`)} />
-                                            <input name="tipo" {...formik.getFieldProps(`telefonos_clientes.${i}.tipo`)} />
-                                            </div>
+                                        {formik.values.telefonos_clientes.map((tel, index) => (
+                                            <Box key={index} display="flex" gap={2} mb={3} width='100%'>
+                                                <FormControl 
+                                                    flex={1} 
+                                                    isInvalid={
+                                                        formik.touched.telefonos_clientes?.[index]?.numero && 
+                                                        !!formik.errors.telefonos_clientes?.[index]?.numero
+                                                    }
+                                                >
+                                                    <FormLabel>Número {index + 1}</FormLabel>
+                                                    <Input 
+                                                        placeholder="+541112345678"
+                                                        {...formik.getFieldProps(`telefonos_clientes.${index}.numero`)}
+                                                    />
+                                                    <FormErrorMessage>
+                                                        {formik.errors.telefonos_clientes?.[index]?.numero}
+                                                    </FormErrorMessage>
+                                                </FormControl>
+
+                                                <IconButton shadow='lg' colorScheme='grey' mt={8} ms={1} icon={<FontAwesomeIcon icon={faXmark} color='black' fade/> 
+                                                        } 
+                                                        onClick={ () => {
+                                                        const nuevosTelefonos = formik.values.telefonos_clientes.filter((_, i) => i !== index);
+                                                        formik.setFieldValue('telefonos_clientes', nuevosTelefonos);
+                                                    }
+                                                        }
+                                                        isDisabled= {
+                                                            formik.values.telefonos_clientes.length === 1
+                                                        }
+                                                    />
+                                            </Box>
                                         ))}
-                                        <button type="button" onClick={() => push({numero: "", tipo: "" })}>
-                                            Agregar teléfono
-                                        </button>
-                                        <button type="button" onClick={() => remove({numero: "", tipo: "" })}>
-                                            Eliminar teléfono
-                                        </button>
+
+                                        <Button
+                                            type="button"
+                                            colorScheme="blue"
+                                            onClick={() => {
+                                                formik.setFieldValue('telefonos_clientes', [
+                                                    ...formik.values.telefonos_clientes,
+                                                    { numero: ''}
+                                                ]);
+                                            }}
+                                            mb={4}
+                                        >
+                                            + Agregar Teléfono
+                                        </Button>
                                         </>
                                     )}
                                     </FieldArray>
                                 </form>
-                                </FormikProvider>
+                            </FormikProvider>
                         </VStack>
                         <VStack alignItems='flex-end' mt={6}>
                             <Button mt={4} colorScheme="teal" type="submit" isLoading={loading} spinner={<BeatLoader size={8} color="white" />}>

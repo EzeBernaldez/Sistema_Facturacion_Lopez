@@ -25,6 +25,7 @@ const Proveedores = () => {
     const navigate = useNavigate();
     const [isDeleted, setIsDeleted] = useState(true);
     const notify = () => toast("Wow so easy!");
+    const [success,setSuccess] = useState(false);
 
     const {
         cargarPagina: setPagina,
@@ -56,13 +57,14 @@ const Proveedores = () => {
             }
             fetchData();
         }
-    , [isDeleted]);
+    , [success]);
 
     const deleteProveedores = async (id) => {
         try{
             await api.delete(`api/proveedores/proveedor/${id}`);
             setIsDeleted(!isDeleted);
             toast.success("Proveedor eliminado correctamente");
+            setSuccess(!success);
         }catch (err){
             console.log('Error al eliminar el proveedor');
         }

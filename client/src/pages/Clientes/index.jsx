@@ -25,6 +25,8 @@ import { ToastContainer, toast } from 'react-toastify';
 const Clientes = (props) => {
 
     const navigate = useNavigate();
+    const [isDeleted,setIsDeleted] = useState(true);
+    const [success,setSuccess] = useState(false);
 
     const {
         cargarPagina: setPagina,
@@ -55,7 +57,18 @@ const Clientes = (props) => {
             }
             fetchData();
         }
-    , []);
+    , [success]);
+
+    const deleteClientes = async (id) => {
+        try{
+            await api.delete(`api/clientes/cliente/${id}`);
+            setIsDeleted(!isDeleted);
+            toast.success("Cliente eliminado correctamente");
+            setSuccess(!success);
+        }catch (err){
+            console.log('Error al eliminar el cliente');
+        }
+    };
 
     return(
         <>
@@ -79,6 +92,7 @@ const Clientes = (props) => {
                                     <Th>CUIT</Th>
                                     <Th>Direccion</Th>
                                     <Th>Correo</Th>
+                                    <Th>Teléfonos</Th>
                                     <Th>Acciones</Th>
                                 </Tr>
                             </Thead>
@@ -95,12 +109,35 @@ const Clientes = (props) => {
                                                 <Td>{item.direccion}</Td>
                                                 <Td>{item.correo}</Td>
                                                 <Td>
-                                                    <Button colorScheme='red'>
-                                                        Eliminar
+                                                    {
+                                                        item.telefonos.length > 0 ? (
+                                                            <>
+                                                            {
+                                                                item.telefonos.map((telefono,index) =>
+                                                                    `${index+1}: ${telefono.numero} ` )
+                                                            }
+                                                            </>
+                                                        ) : item.telefonos[0]
+                                                    }
+                                                </Td>
+                                                <Td>
+                                                    <Button colorScheme='red'
+                                                    onClick={() => setIsDeleted(false)}
+                                                    onDoubleClick={() => {
+                                                        deleteClientes(item.codigo)
+                                                    }}>
+                                                        { isDeleted ? `Eliminar` : `¿Desea eliminar el cliente?` }
                                                     </Button>
-                                                    <Button colorScheme='green' className='ms-3'>
+                                                    { isDeleted && (
+                                                    <Button colorScheme='green' className='ms-3' onClick={() => navigate(`/clientes/actualizar/${item.codigo}`)}>
                                                         Actualizar
                                                     </Button>
+                                                    )}
+                                                    { !isDeleted && (
+                                                        <IconButton ms={1} icon={<FontAwesomeIcon icon={faXmark} color='black' fade/> 
+                                                        } 
+                                                        onClick={() => setIsDeleted(true)}/>
+                                                    ) }
                                                 </Td>
                                             </Tr>
                                         );

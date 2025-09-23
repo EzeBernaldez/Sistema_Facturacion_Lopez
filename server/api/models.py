@@ -30,7 +30,6 @@ class Proveedores(models.Model):
 class Telefonos_Proveedores(models.Model):
     proveedor = models.ForeignKey(Proveedores, on_delete=models.CASCADE)
     numero = models.CharField(max_length=20)
-    tipo = models.CharField(max_length=30)
     
     class Meta:
         unique_together = [['proveedor', 'numero']]
@@ -57,7 +56,6 @@ class Clientes(models.Model):
 class Telefonos_Clientes(models.Model):
     cliente = models.ForeignKey(Clientes, on_delete=models.CASCADE)
     numero = models.CharField(max_length=20)
-    tipo = models.CharField(max_length=30)
     
     class Meta:
         unique_together = [['cliente', 'numero']]
@@ -70,4 +68,3 @@ class Empleados(models.Model):
 class Telefonos_Empleados(models.Model):
     empleado = models.ForeignKey(Empleados, on_delete=models.CASCADE)
     numero = models.CharField(max_length=20)
-    tipo = models.CharField(max_length=30)
