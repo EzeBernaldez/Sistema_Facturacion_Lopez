@@ -5,9 +5,10 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.generics import ListCreateAPIView, RetrieveDestroyAPIView, RetrieveUpdateDestroyAPIView
-from .serializers import UserSerializer, LoginSerializer, RepuestosSerializer, ProveedoresSerializer, ClientesSerializer, EmpleadosSerializer
-from .models import Repuestos, Proveedores, Clientes, Empleados
+from rest_framework.generics import ListCreateAPIView, RetrieveDestroyAPIView, RetrieveUpdateDestroyAPIView, RetrieveAPIView
+from .serializers import UserSerializer, LoginSerializer, RepuestosSerializer, ProveedoresSerializer, ClientesSerializer, EmpleadosSerializer, RemitoProveedoresSerializer, SuministraRetrieveSerializer
+from .models import Repuestos, Proveedores, Clientes, Empleados, Remito_Proveedores, Suministra
+from django.shortcuts import get_object_or_404
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -141,3 +142,38 @@ class RetrieveUpdateDestroyEmpleados(RetrieveUpdateDestroyAPIView):
     authentication_classes = [JWTAuthentication]
     queryset = Empleados.objects.all()
     lookup_field = 'dni_empleado'
+
+
+# -----------------------------------------RemitoProveedores
+
+class CreateRemitoProveedores(ListCreateAPIView):
+    serializer_class = RemitoProveedoresSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    queryset = Remito_Proveedores.objects.all()
+
+class RetrieveUpdateDestroyRemitoProveedores(RetrieveUpdateDestroyAPIView):
+    serializer_class = RemitoProveedoresSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    queryset = Remito_Proveedores.objects.all()
+    lookup_field = 'nro_remito'
+
+
+# -----------------------------------------Suministra
+
+class RetrieveSuministra(RetrieveAPIView):
+    serializer_class = SuministraRetrieveSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    queryset = Suministra.objects.all()
+    def get_object(self):
+        codigo_repuesto = self.kwargs['codigo_repuesto']
+        codigo_proveedor = self.kwargs['codigo_proveedor']
+        
+        # Buscar por los códigos de las FK
+        return get_object_or_404(
+            Suministra,
+            repuesto_suministra__codigo=codigo_repuesto,
+            proveedor_suministra__codigo_proveedores=codigo_proveedor
+        )

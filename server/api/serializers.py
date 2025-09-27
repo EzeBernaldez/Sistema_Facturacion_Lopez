@@ -1,8 +1,10 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
-from .models import Repuestos, Proveedores, Telefonos_Proveedores, Vehiculos, Clientes, Telefonos_Clientes, Empleados, Telefonos_Empleados 
+from .models import Repuestos, Proveedores, Telefonos_Proveedores, Vehiculos, Clientes, Telefonos_Clientes, Empleados, Telefonos_Empleados, Remito_Proveedores, Contiene, Pagos, Suministra
 from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
+from django.db import transaction
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -31,6 +33,18 @@ class LoginSerializer(serializers.Serializer):
 
         return data
 
+class SuministraRetrieveSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Suministra
+        fields = '__all__'
+
+
+class SuministraSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Suministra
+        fields = ['proveedor_suministra', 'codigo_origen', 'cantidad']
+
+
 class RepuestosSerializer(serializers.ModelSerializer):
     
     codigo = serializers.CharField(
@@ -42,10 +56,41 @@ class RepuestosSerializer(serializers.ModelSerializer):
         ]
     )
     
+    suministra = SuministraSerializer(many=True, write_only=True, required=False)
+    
+    suministra_read = SuministraSerializer(many=True, read_only=True, source='suministra_set')
+    
     class Meta:
         model = Repuestos
-        fields = '__all__'
+        fields = ['codigo', 'descripcion', 'marca', 'precio_venta', 'stock', 'tipo', 'porcentaje_recargo', 'suministra', 'suministra_read']
     
+    @transaction.atomic
+    def create(self, validated_data):
+        suministran = validated_data.pop('suministra', [])
+        
+        repuesto = Repuestos.objects.create(**validated_data)
+        
+        for suministra in suministran:
+            Suministra.objects.create(repuesto_suministra=repuesto, **suministra)
+        
+        return repuesto
+    
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        suministran = validated_data.pop('suministra', None)
+        
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        
+        instance.save()
+        
+        if suministran is not None:
+            Suministra.objects.filter(repuesto_suministra=instance).delete()
+            
+            for suministra in suministran:
+                Suministra.objects.create(repuesto_suministra=instance, **suministra) 
+            
+        return instance
 
 class VehiculosSerializer(serializers.ModelSerializer):
     class Meta:
@@ -191,3 +236,58 @@ class EmpleadosSerializer(serializers.ModelSerializer):
                 Telefonos_Empleados.objects.create(empleado=instance, **telefono) 
             
         return instance
+
+class ContieneSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Contiene
+        field = ['codigo_contiene', 'precio_stock', 'cantidad', 'subtotal']
+
+class RemitoProveedoresSerializer(serializers.ModelSerializer):
+    
+    contiene_write = ContieneSerializer(many=True, write_only=True, required=False)
+    
+    contiene_read = ContieneSerializer(many=True, read_only=True, source='contiene_set')
+    
+    class Meta:
+        model = Remito_Proveedores
+        fields = ['nro_remito', 'fecha', 'monto_total', 'pagado', 'proveedor_proviene_de' ,'contiene_read', 'contiene_write']
+    
+    @transaction.atomic
+    def create(self, validated_data):
+        contiene_list = validated_data.pop('contiene_write', [])
+        proveedor_proviene_de = (validated_data.get('proveedor_proviene_de')).get('codigo_proveedores')
+        
+        remito = Remito_Proveedores.objects.create(**validated_data)
+        
+        if Proveedores.objects.filter(codigo_proveedores=proveedor_proviene_de).exists():
+        
+            for contiene in contiene_list:
+                Contiene.objects.create(nro_remito_contiene=remito, **contiene)
+        
+            return remito
+        else:
+            raise serializers.ValidationError('Código de proveedor inexistente')
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        contiene_list = validated_data.pop('contiene_write', None)
+        proveedor_proviene_de = validated_data.get('proveedor_proviene_de').get('codigo_proveedores')
+        
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        
+        instance.save()
+        
+        if proveedor_proviene_de is not None:
+            if not Proveedores.objects.filter(codigo_proveedores=proveedor_proviene_de).exists():
+                raise serializers.ValidationError('Código de proveedor inexistente')
+            
+        if contiene_list is not None:
+            Contiene.objects.filter(nro_remito_contiene=instance).delete()
+            
+            for contiene in contiene_list:
+                Contiene.objects.create(nro_remito_contiene=instance, **contiene) 
+            
+        return instance
+        
+        
