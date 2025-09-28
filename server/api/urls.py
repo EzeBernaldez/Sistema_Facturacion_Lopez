@@ -20,5 +20,5 @@ urlpatterns = [
     path('empleados/empleado/<str:nro_remito>', views.RetrieveUpdateDestroyRemitoProveedores.as_view()),
     path('remito_proveedores', views.CreateEmpleados.as_view()),
     path('remito_proveedores/remito_proveedor/<str:nro_remito>', views.RetrieveUpdateDestroyRemitoProveedores.as_view()),
-    path('suministra/<str:codigo_repuesto>/<str:codigo_proveedor', views.RetrieveSuministra.as_view()),
+    path('suministra/<str:codigo_repuesto>/<str:codigo_proveedor>', views.RetrieveSuministra.as_view()),
 ]

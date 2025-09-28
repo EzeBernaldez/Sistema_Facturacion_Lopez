@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../../components/Header";
 import * as Yup from 'yup';
-import { useFormik } from 'formik';
+import { useFormik, FormikProvider, FieldArray } from 'formik';
 import { useNavigate } from "react-router-dom";
 import {
     Box,
@@ -22,10 +22,15 @@ import {
     NumberDecrementStepper,
     Heading,
     Stack,
+    IconButton
 } from '@chakra-ui/react';
 import api from "../../utils/api";
 import BeatLoader from "react-spinners/BeatLoader";
 import { ToastContainer, toast } from 'react-toastify';
+import { useContexto } from "../../contexts/GlobalContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
+
 
 const RepuestosPost = () => {
 
@@ -33,16 +38,48 @@ const RepuestosPost = () => {
     const [error, setError] = useState("");
     const navigate = useNavigate();
 
+    const {
+        estadoRepuestos,
+        dispatchRepuestos,
+        actionRepuestos,
+    } = useContexto();
+
+    const getInitialValues = () => {
+        if (!estadoRepuestos || (!estadoRepuestos.codigo && !estadoRepuestos.descripcion)) {
+            return {
+                codigo: '',
+                descripcion: '',
+                marca: '',
+                precio_venta: '',
+                stock: 0,
+                tipo: '',
+                porcentaje_recargo: 0,
+                suministra: [{
+                    proveedor_suministra: '',
+                    codigo_origen: '',
+                    cantidad: 0,
+                }]
+            };
+        }
+
+        return {
+            codigo: estadoRepuestos.codigo || '',
+            descripcion: estadoRepuestos.descripcion || '',
+            marca: estadoRepuestos.marca || '',
+            precio_venta: estadoRepuestos.precio_venta || '',
+            stock: estadoRepuestos.stock || 0,
+            tipo: estadoRepuestos.tipo || '',
+            porcentaje_recargo: estadoRepuestos.porcentaje_recargo || 0,
+            suministra: estadoRepuestos.suministra || [{
+                proveedor_suministra: '',
+                codigo_origen: '',
+                cantidad: 0,
+            }]
+        };
+    };
+
     const formik = useFormik({
-        initialValues: {
-            codigo: '',
-            descripcion: '',
-            marca: '',
-            precio_venta: '',
-            stock: 0,
-            tipo: '',
-            porcentaje_recargo: 0,
-        },
+        initialValues: getInitialValues(),
         onSubmit: async (values) => {
             setLoading(true);
             setError('');
@@ -55,9 +92,13 @@ const RepuestosPost = () => {
                         .toString(),
                 };
                 await api.post('/api/repuestos', payload);
+
                 
                 setLoading(false);
                 formik.resetForm();
+                dispatchRepuestos({
+                    type: actionRepuestos.REINICIARVALORES
+                });
                 toast.success("Repuesto cargado correctamente");
                 navigate('/repuestos');
             }
@@ -89,8 +130,24 @@ const RepuestosPost = () => {
             stock: Yup.number().min(0,"Debe ser un valor mayor o igual a 0").required("Debe ingresar un número de stock"),
             tipo: Yup.string().max(100, 'Debe ingresar un tipo con menos de 100 caracteres.').required('Debe ingresar un tipo'),
             porcentaje_recargo: Yup.number().min(0,'Debe ingresar un porcentaje de recargo mayor o igual a 0').required('Debe ingresar un porcentaje de recargo'),
+            suministra: Yup.array()
+                .of(
+                Yup.object().shape({
+                    proveedor_suministra: Yup.string().required('Debe seleccionar un proveedor'),
+                    codigo_origen: Yup.string().trim().min(1,'Debe ingresar un código más preciso').max(20,'Debe ingresar un código más acotado').required('Debe ingresar un código'),
+                    cantidad: Yup.number().min(0,'Debe ser un valor mayor a 0').required('Debe ingresar una cantidad'),
+                })
+            )
+            .min(1, "Debe ingresar al menos un proveedor que lo suministre"),
         })
     });
+
+    useEffect(() => {
+        dispatchRepuestos({
+            payload: formik.values,
+            type: actionRepuestos.SETREPUESTO,
+        })
+    }, [formik.values, dispatchRepuestos])
 
     return(
         <>
@@ -190,7 +247,116 @@ const RepuestosPost = () => {
                                 </NumberInput>
                                 <FormErrorMessage>{formik.errors.porcentaje_recargo}</FormErrorMessage>
                             </FormControl>
+                        <FormikProvider value={formik.getFieldProps('suministra')}>
+                            <form onSubmit={formik.handleSubmit} style={{
+                                width: '100%',
+                            }}>
+                                <FieldArray name="suministra">
+                                {({ push, remove }) => (
+                                    <>
+                                    {formik.values.suministra.map((prov, index) => (
+                                        <Box key={index} display="flex" gap={2} mb={3} width='100%'>
+                                            <FormControl 
+                                                flex={1} 
+                                                isInvalid={
+                                                    formik.touched.suministra?.[index]?.proveedor_suministra && 
+                                                    !!formik.errors.suministra?.[index]?.proveedor_suministra
+                                                }
+                                            >
+                                                <FormLabel>Seleccione el proveedor</FormLabel>
+                                                <Button 
+                                                    width='100%'
+                                                    type="button"
+                                                    colorScheme="green"
+                                                    onClick={() => {
+                                                        
+                                                        navigate('proveedores/seleccionar');
+                                                    }}
+                                                >
+                                                    Seleccione
+                                                </Button>
+                                                <FormErrorMessage>
+                                                    {formik.errors.suministra?.[index]?.proveedor_suministra}
+                                                </FormErrorMessage>
+                                            </FormControl>
+
+                                            <FormControl 
+                                                flex={1} 
+                                                isInvalid={
+                                                    formik.touched.suministra?.[index]?.codigo_origen && 
+                                                    !!formik.errors.suministra?.[index]?.codigo_origen
+                                                }
+                                            >
+                                                <FormLabel>Código origen del proveedor {formik.values.suministra?.[index]?.proveedor_suministra}</FormLabel>
+                                                <Input 
+                                                    placeholder="0123456789"
+                                                    {...formik.getFieldProps(`suministra.${index}.codigo_origen`)}
+                                                />
+                                                <FormErrorMessage>
+                                                    {formik.errors.suministra?.[index]?.codigo_origen}
+                                                </FormErrorMessage>
+                                            </FormControl>
+
+                                            <FormControl 
+                                                flex={1} 
+                                                isInvalid={
+                                                    formik.touched.suministra?.[index]?.cantidad && 
+                                                    !!formik.errors.suministra?.[index]?.cantidad
+                                                }
+                                            >
+                                                <FormLabel htmlFor="cantidad">Cantidad</FormLabel>
+                                                <NumberInput id="cantidad" min={1} step={1} value={formik.values.suministra?.[index]?.cantidad}
+                                                onChange={(value) => formik.setFieldValue(`suministra.${index}.cantidad`, value)}>
+                                                    <NumberInputField />
+                                                    <NumberInputStepper>
+                                                        <NumberIncrementStepper />
+                                                        <NumberDecrementStepper />
+                                                    </NumberInputStepper>
+                                                </NumberInput>
+                                                <FormErrorMessage>
+                                                    {formik.errors.suministra?.[index]?.cantidad}
+                                                </FormErrorMessage>
+                                            </FormControl>
+
+                                            <IconButton shadow='lg' colorScheme='grey' mt={8} ms={1} icon={<FontAwesomeIcon icon={faXmark} color='black' fade/> 
+                                                    } 
+                                                    onClick={ () => {
+                                                    const nuevoSuministra = formik.values.suministra.filter((_, i) => i !== index);
+                                                    formik.setFieldValue('suministra', nuevoSuministra);
+                                                }
+                                                    }
+                                                    isDisabled= {
+                                                        formik.values.suministra.length === 1
+                                                    }
+                                                />
+                                        </Box>
+                                    ))}
+
+                                    <Button
+                                        type="button"
+                                        colorScheme="blue"
+                                        onClick={() => {
+                                            formik.setFieldValue('suministra', [
+                                                ...formik.values.suministra,
+                                                {
+                                                    proveedor_suministra: {},
+                                                    codigo_origen: '',
+                                                    cantidad: 0,
+                                                }
+                                            ]);
+                                        }}
+                                        mb={4}
+                                    >
+                                        + Agregar Proveedor
+                                    </Button>
+                                    </>
+                                )}
+                                </FieldArray>
+                            </form>
+                            </FormikProvider>
                         </VStack>
+
+
                         <VStack alignItems='flex-end' mt={6}>
                             <Button mt={4} colorScheme="teal" type="submit" isLoading={loading} spinner={<BeatLoader size={8} color="white" />}>
                                 Confirmar
