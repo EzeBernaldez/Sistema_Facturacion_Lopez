@@ -22,7 +22,12 @@ import {
     NumberDecrementStepper,
     Heading,
     Stack,
-    IconButton
+    IconButton,
+    Accordion,
+    AccordionButton,
+    AccordionIcon,
+    AccordionItem,
+    AccordionPanel
 } from '@chakra-ui/react';
 import api from "../../utils/api";
 import BeatLoader from "react-spinners/BeatLoader";
@@ -44,25 +49,8 @@ const RepuestosPost = () => {
         actionRepuestos,
     } = useContexto();
 
-    const getInitialValues = () => {
-        if (!estadoRepuestos || (!estadoRepuestos.codigo && !estadoRepuestos.descripcion)) {
-            return {
-                codigo: '',
-                descripcion: '',
-                marca: '',
-                precio_venta: '',
-                stock: 0,
-                tipo: '',
-                porcentaje_recargo: 0,
-                suministra: [{
-                    proveedor_suministra: '',
-                    codigo_origen: '',
-                    cantidad: 0,
-                }]
-            };
-        }
-
-        return {
+    const formik = useFormik({
+        initialValues: {
             codigo: estadoRepuestos.codigo || '',
             descripcion: estadoRepuestos.descripcion || '',
             marca: estadoRepuestos.marca || '',
@@ -75,11 +63,7 @@ const RepuestosPost = () => {
                 codigo_origen: '',
                 cantidad: 0,
             }]
-        };
-    };
-
-    const formik = useFormik({
-        initialValues: getInitialValues(),
+        },
         onSubmit: async (values) => {
             setLoading(true);
             setError('');
@@ -148,6 +132,8 @@ const RepuestosPost = () => {
             type: actionRepuestos.SETREPUESTO,
         })
     }, [formik.values, dispatchRepuestos])
+
+    // hay que validar que el proveedor está bien puesto, solo cuando sale del foco del input
 
     return(
         <>
@@ -248,98 +234,124 @@ const RepuestosPost = () => {
                                 <FormErrorMessage>{formik.errors.porcentaje_recargo}</FormErrorMessage>
                             </FormControl>
                         <FormikProvider value={formik.getFieldProps('suministra')}>
-                            <form onSubmit={formik.handleSubmit} style={{
-                                width: '100%',
-                            }}>
                                 <FieldArray name="suministra">
                                 {({ push, remove }) => (
                                     <>
-                                    {formik.values.suministra.map((prov, index) => (
-                                        <Box key={index} display="flex" gap={2} mb={3} width='100%'>
-                                            <FormControl 
-                                                flex={1} 
-                                                isInvalid={
-                                                    formik.touched.suministra?.[index]?.proveedor_suministra && 
-                                                    !!formik.errors.suministra?.[index]?.proveedor_suministra
-                                                }
-                                            >
-                                                <FormLabel>Seleccione el proveedor</FormLabel>
-                                                <Button 
-                                                    width='100%'
-                                                    type="button"
-                                                    colorScheme="green"
-                                                    onClick={() => {
-                                                        
-                                                        navigate('proveedores/seleccionar');
-                                                    }}
-                                                >
-                                                    Seleccione
-                                                </Button>
-                                                <FormErrorMessage>
-                                                    {formik.errors.suministra?.[index]?.proveedor_suministra}
-                                                </FormErrorMessage>
-                                            </FormControl>
+                                    <Box gap={2} mb={3} width='100%'>
+                                        <Accordion allowMultiple defaultIndex={[0]}>
+                                            {formik.values.suministra.map((prov, index) => (
+                                                <>
+                                                <AccordionItem mb={3} borderRadius='lg'
+                                                boxShadow="md">
+                                                    <h2>
+                                                        <AccordionButton  _expanded={{ bg: 'teal', color: 'white' }} borderRadius='lg' >
+                                                            <IconButton size='sm' boxShadow='sm' colorScheme="red" icon={<FontAwesomeIcon icon={faXmark} color='black' fade/> 
+                                                                } 
+                                                                onClick={ () => {
+                                                                const nuevoSuministra = formik.values.suministra.filter((_, i) => i !== index);
+                                                                formik.setFieldValue('suministra', nuevoSuministra);
+                                                            }
+                                                                }
+                                                                isDisabled= {
+                                                                    formik.values.suministra.length === 1
+                                                                }
+                                                            />
+                                                            <Box as='span' flex='1' textAlign='center'>
+                                                                Proveedor {index + 1}
+                                                            </Box>
+                                                            <AccordionIcon />
+                                                        </AccordionButton>
+                                                    </h2>
+                                                    
+                                                    <AccordionPanel pb={4} >
+                                                        <FormControl 
+                                                            flex={1} 
+                                                            isInvalid={
+                                                                formik.touched.suministra?.[index]?.proveedor_suministra && 
+                                                                !!formik.errors.suministra?.[index]?.proveedor_suministra
+                                                            }
+                                                            mb={3}
+                                                        >
+                                                            <FormLabel>Proveedor</FormLabel>
+                                                                <Box display='flex' gap={2}>
+                                                                    <Input
+                                                                        placeholder="Seleccione un proveedor"
+                                                                        {...formik.getFieldProps(`suministra.${index}.proveedor_suministra`)}
+                                                                    ></Input>
+                                                                    <Button 
+                                                                        type="button"
+                                                                        colorScheme="blue"
+                                                                        boxShadow='md'
+                                                                        onClick={() => {
+                                                                            navigate('proveedores/seleccionar');
+                                                                        }}
+                                                                    >
+                                                                        Buscar
+                                                                    </Button>
+                                                                </Box>
+                                                                <FormErrorMessage>
+                                                                    {formik.errors.suministra?.[index]?.proveedor_suministra}
+                                                                </FormErrorMessage>
+                                                        </FormControl>
 
-                                            <FormControl 
-                                                flex={1} 
-                                                isInvalid={
-                                                    formik.touched.suministra?.[index]?.codigo_origen && 
-                                                    !!formik.errors.suministra?.[index]?.codigo_origen
-                                                }
-                                            >
-                                                <FormLabel>Código origen del proveedor {formik.values.suministra?.[index]?.proveedor_suministra}</FormLabel>
-                                                <Input 
-                                                    placeholder="0123456789"
-                                                    {...formik.getFieldProps(`suministra.${index}.codigo_origen`)}
-                                                />
-                                                <FormErrorMessage>
-                                                    {formik.errors.suministra?.[index]?.codigo_origen}
-                                                </FormErrorMessage>
-                                            </FormControl>
+                                                        <FormControl 
+                                                            flex={1} 
+                                                            isInvalid={
+                                                                formik.touched.suministra?.[index]?.codigo_origen && 
+                                                                !!formik.errors.suministra?.[index]?.codigo_origen
+                                                            }
+                                                            mb={3}
+                                                        >
+                                                            <FormLabel>Código origen del proveedor {formik.values.suministra?.[index]?.proveedor_suministra}</FormLabel>
+                                                            <Input 
+                                                                placeholder="0123456789"
+                                                                {...formik.getFieldProps(`suministra.${index}.codigo_origen`)}
+                                                            />
+                                                            <FormErrorMessage>
+                                                                {formik.errors.suministra?.[index]?.codigo_origen}
+                                                            </FormErrorMessage>
+                                                        </FormControl>
 
-                                            <FormControl 
-                                                flex={1} 
-                                                isInvalid={
-                                                    formik.touched.suministra?.[index]?.cantidad && 
-                                                    !!formik.errors.suministra?.[index]?.cantidad
-                                                }
-                                            >
-                                                <FormLabel htmlFor="cantidad">Cantidad</FormLabel>
-                                                <NumberInput id="cantidad" min={1} step={1} value={formik.values.suministra?.[index]?.cantidad}
-                                                onChange={(value) => formik.setFieldValue(`suministra.${index}.cantidad`, value)}>
-                                                    <NumberInputField />
-                                                    <NumberInputStepper>
-                                                        <NumberIncrementStepper />
-                                                        <NumberDecrementStepper />
-                                                    </NumberInputStepper>
-                                                </NumberInput>
-                                                <FormErrorMessage>
-                                                    {formik.errors.suministra?.[index]?.cantidad}
-                                                </FormErrorMessage>
-                                            </FormControl>
+                                                        <FormControl 
+                                                            flex={1} 
+                                                            isInvalid={
+                                                                formik.touched.suministra?.[index]?.cantidad && 
+                                                                !!formik.errors.suministra?.[index]?.cantidad
+                                                            }
+                                                            mb={3}
+                                                        >
+                                                            <FormLabel htmlFor="cantidad">Cantidad</FormLabel>
+                                                            <NumberInput id="cantidad" min={1} step={1} value={formik.values.suministra?.[index]?.cantidad}
+                                                            onChange={(value) => formik.setFieldValue(`suministra.${index}.cantidad`, value)}>
+                                                                <NumberInputField />
+                                                                <NumberInputStepper>
+                                                                    <NumberIncrementStepper />
+                                                                    <NumberDecrementStepper />
+                                                                </NumberInputStepper>
+                                                            </NumberInput>
+                                                            <FormErrorMessage>
+                                                                {formik.errors.suministra?.[index]?.cantidad}
+                                                            </FormErrorMessage>
+                                                        </FormControl>
 
-                                            <IconButton shadow='lg' colorScheme='grey' mt={8} ms={1} icon={<FontAwesomeIcon icon={faXmark} color='black' fade/> 
-                                                    } 
-                                                    onClick={ () => {
-                                                    const nuevoSuministra = formik.values.suministra.filter((_, i) => i !== index);
-                                                    formik.setFieldValue('suministra', nuevoSuministra);
-                                                }
-                                                    }
-                                                    isDisabled= {
-                                                        formik.values.suministra.length === 1
-                                                    }
-                                                />
-                                        </Box>
-                                    ))}
+                                                    </AccordionPanel>
+                                                    
+                                            </AccordionItem>
+                                            </>
+                                            ))}
+                                        </Accordion>
+                                    </Box>
+
 
                                     <Button
                                         type="button"
                                         colorScheme="blue"
+                                        width='100%'
                                         onClick={() => {
                                             formik.setFieldValue('suministra', [
                                                 ...formik.values.suministra,
                                                 {
-                                                    proveedor_suministra: {},
+                                                    proveedor_suministra: '',
                                                     codigo_origen: '',
                                                     cantidad: 0,
                                                 }
@@ -347,12 +359,11 @@ const RepuestosPost = () => {
                                         }}
                                         mb={4}
                                     >
-                                        + Agregar Proveedor
+                                        Agregar Proveedor
                                     </Button>
-                                    </>
+                                </>
                                 )}
                                 </FieldArray>
-                            </form>
                             </FormikProvider>
                         </VStack>
 

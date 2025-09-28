@@ -43,7 +43,34 @@ export const reducerRepuestos = (estado,action) => {
             })
         }
         case (actionRepuestos.SETSUMINISTRA): {
-            return ( {...estado, suministra: [...estado.suministra, payload]} );
+            if (!estado.suministra) {
+                return {
+                    ...estado,
+                    suministra: [payload] 
+                };
+            }
+
+            if (estado.suministra.length === 0) {
+                return {
+                    ...estado,
+                    suministra: [payload]
+                };
+            }
+
+            const suministraAux = [...estado.suministra];
+
+            const ultimo = suministraAux.length - 1;
+
+            suministraAux[ultimo] = {
+                ...suministraAux[ultimo],
+                ...payload
+            };
+
+            return ( 
+                {...estado, 
+                    suministra: suministraAux
+                } 
+            );
         }
         case (actionRepuestos.REINICIARVALORES): {
             return ( initialValueRepuestos );

@@ -69,9 +69,7 @@ const ProveedoresSeleccionar = () => {
         dispatchRepuestos({
             type: SETSUMINISTRA,
             payload: {
-            proveedor_suministra: item,
-            codigo_origen: "",
-            cantidad: 0,
+                proveedor_suministra: item,
             }
         });
 
