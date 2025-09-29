@@ -14,7 +14,6 @@ const AutoComplete = ({ para, value, onChange, onSelect, error, touched }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState(value);
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const [seleccionado, setSeleccionado] = useState(false);
 
     const debouncedSearch = useCallback(
         debounce(async (term) => {
@@ -40,33 +39,27 @@ const AutoComplete = ({ para, value, onChange, onSelect, error, touched }) => {
     );
 
     useEffect(() => {
-        if (!seleccionado) {
-            debouncedSearch(searchTerm);
-        }
+        debouncedSearch(searchTerm);
     }, [searchTerm, debouncedSearch]);
 
     const handleInputChange = (e) => {
-        setSeleccionado(false);
         const value = e.target.value;
         setSearchTerm(value);
         onChange(value);
     };
 
     const handleSelectProveedor = (proveedor) => {
-        setSeleccionado(true);
         setSearchTerm(proveedor.codigo_proveedores); 
         onSelect(proveedor.codigo_proveedores); 
         onClose();
     };
 
-    const handleInputBlur = () => setSeleccionado(true)
 
     return (
         <Box position="relative" width="100%">
             <Input
                 value={searchTerm}
                 onChange={handleInputChange}
-                onBlur={handleInputBlur}
                 placeholder="Buscar proveedor..."
                 isInvalid={touched && error}
                 onFocus={() => suggestions.length > 0 && onOpen()}
@@ -87,32 +80,29 @@ const AutoComplete = ({ para, value, onChange, onSelect, error, touched }) => {
                     maxHeight="200px"
                     overflowY="auto"
                 >
-                    {!seleccionado && (
-                        <>
-                            {isLoading ? (
-                                <Text p={2}>Buscando...</Text>
-                            ) : suggestions.length > 0 ? (
-                                <List>
-                                    {suggestions.map((proveedor) => (
-                                        <ListItem
-                                            key={proveedor.id}
-                                            p={2}
-                                            cursor="pointer"
-                                            _hover={{ bg: 'gray.100' }}
-                                            onClick={() => handleSelectProveedor(proveedor)}
-                                        >
-                                            <Text fontWeight="bold">{proveedor.nombre}</Text>
-                                            <Text fontSize="sm" color="gray.600">
-                                                {proveedor.codigo_proveedores} - {proveedor.direccion}
-                                            </Text>
-                                        </ListItem>
-                                    ))}
-                                </List>
-                            ) : (
-                                <Text p={2}>No se encontraron proveedores</Text>
-                            )}
-                        </>
+                    {isLoading ? (
+                        <Text p={2}>Buscando...</Text>
+                    ) : suggestions.length > 0 ? (
+                        <List>
+                            {suggestions.map((proveedor) => (
+                                <ListItem
+                                    key={proveedor.id}
+                                    p={2}
+                                    cursor="pointer"
+                                    _hover={{ bg: 'gray.100' }}
+                                    onClick={() => handleSelectProveedor(proveedor)}
+                                >
+                                    <Text fontWeight="bold">{proveedor.nombre}</Text>
+                                    <Text fontSize="sm" color="gray.600">
+                                        {proveedor.codigo_proveedores} - {proveedor.direccion}
+                                    </Text>
+                                </ListItem>
+                            ))}
+                        </List>
+                    ) : (
+                        <Text p={2}>No se encontraron proveedores</Text>
                     )}
+                    
                 </Box>
             )}
         </Box>
