@@ -35,6 +35,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import { useContexto } from "../../contexts/GlobalContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import AutoComplete   from '../../components/AutoComplete';
 
 
 const RepuestosPost = () => {
@@ -274,10 +275,18 @@ const RepuestosPost = () => {
                                                         >
                                                             <FormLabel>Proveedor</FormLabel>
                                                                 <Box display='flex' gap={2}>
-                                                                    <Input
-                                                                        placeholder="Seleccione un proveedor"
-                                                                        {...formik.getFieldProps(`suministra.${index}.proveedor_suministra`)}
-                                                                    ></Input>
+                                                                    <AutoComplete
+                                                                    para='proveedores'
+                                                                    value={formik.values.suministra?.[index]?.proveedor_suministra}
+                                                                    onChange={(value) => {
+                                                                        formik.setFieldValue(`suministra.${index}.proveedor_suministra`, value);
+                                                                    }}
+                                                                    onSelect={(value) => {
+                                                                        formik.setFieldValue(`suministra.${index}.proveedor_suministra`, value)
+                                                                    }}
+                                                                    error={formik.errors.suministra?.[index]?.proveedor_suministra}
+                                                                    touched={formik.touched.suministra?.[index]?.proveedor_suministra}
+                                                                    ></AutoComplete>
                                                                     <Button 
                                                                         type="button"
                                                                         colorScheme="blue"

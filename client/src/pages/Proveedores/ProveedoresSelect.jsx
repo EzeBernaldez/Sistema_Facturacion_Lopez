@@ -83,6 +83,10 @@ const ProveedoresSeleccionar = () => {
             <Header></Header>
         </header>
 
+        <Flex justifyContent='end' p={3} >
+            <IconButton colorScheme='blue' size='md' icon={<FontAwesomeIcon icon={faPlus}/>} onClick={() => navigate("/proveedores/nuevo")}/>
+        </Flex>
+        
         <Stack mt={6}>
             <TableContainer>
                 <Table variant='simple'>

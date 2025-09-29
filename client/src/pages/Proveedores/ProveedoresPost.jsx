@@ -25,6 +25,7 @@ import BeatLoader from "react-spinners/BeatLoader";
 import { ToastContainer, toast } from 'react-toastify';
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useContexto } from "../../contexts/GlobalContext";
 
 
 
@@ -33,6 +34,10 @@ const ProveedoresPost = () => {
     const [loading,setLoading] = useState(false);
     const [error, setError] = useState("");
     const navigate = useNavigate();
+
+    const {
+        pagina
+    } = useContexto();
 
     const formik = useFormik({
         initialValues: {
@@ -56,7 +61,14 @@ const ProveedoresPost = () => {
                 setLoading(false);
                 formik.resetForm();
                 toast.success("Proveedor cargado correctamente");
-                navigate('/proveedores');
+
+                if (pagina === 'ProveedoresSeleccionar'){
+                    navigate('/repuestos/nuevo/proveedores/seleccionar');
+                }
+                else{
+                    navigate('/proveedores');
+                }
+
             }
             catch (err){
 

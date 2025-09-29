@@ -184,7 +184,7 @@ class RetrieveSuministra(RetrieveAPIView):
 # -----------------------------------------Autocompletados
 
 
-@api_view(['POST'])
+@api_view(['GET'])
 @permission_classes([IsAuthenticated])
 @authentication_classes([JWTAuthentication])
 def autoCompleteProveedores(request):
