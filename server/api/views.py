@@ -1,5 +1,5 @@
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth.models import User
@@ -9,6 +9,8 @@ from rest_framework.generics import ListCreateAPIView, RetrieveDestroyAPIView, R
 from .serializers import UserSerializer, LoginSerializer, RepuestosSerializer, ProveedoresSerializer, ClientesSerializer, EmpleadosSerializer, RemitoProveedoresSerializer, SuministraRetrieveSerializer
 from .models import Repuestos, Proveedores, Clientes, Empleados, Remito_Proveedores, Suministra
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
+
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -177,3 +179,24 @@ class RetrieveSuministra(RetrieveAPIView):
             repuesto_suministra__codigo=codigo_repuesto,
             proveedor_suministra__codigo_proveedores=codigo_proveedor
         )
+
+
+# -----------------------------------------Autocompletados
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([JWTAuthentication])
+def autoCompleteProveedores(request):
+    search_term = request.GET.get('search', '').strip()
+    
+    if len(search_term) < 2:
+        return Response([])
+    
+    proveedores = Proveedores.objects.filter(
+        Q(nombre__icontains=search_term) | 
+        Q(codigo_proveedores__icontains=search_term)
+    )[:10]
+    
+    serializer = ProveedoresSerializer(proveedores, many=True)
+    return Response(serializer.data)
