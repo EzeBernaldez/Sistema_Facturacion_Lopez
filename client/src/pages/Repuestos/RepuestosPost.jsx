@@ -81,7 +81,7 @@ const RepuestosPost = () => {
                 
                 setLoading(false);
                 formik.resetForm();
-                dispatchRepuestos({
+                await dispatchRepuestos({
                     type: actionRepuestos.REINICIARVALORES
                 });
                 toast.success("Repuesto cargado correctamente");

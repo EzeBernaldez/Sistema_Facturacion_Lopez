@@ -43,7 +43,6 @@ const Repuestos = (props) => {
         SETARRAYREPUESTOS,
     } = actionRepuestos;
 
-    useEffect(() => console.log(estadoRepuestos), []);
 
     useEffect(
         () => {

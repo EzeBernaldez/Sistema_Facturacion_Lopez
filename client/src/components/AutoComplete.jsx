@@ -14,9 +14,17 @@ const AutoComplete = ({ para, value, onChange, onSelect, error, touched }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState(value);
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const [seleccionado, setSeleccionado] = useState(false);
 
     const debouncedSearch = useCallback(
         debounce(async (term) => {
+
+            if (seleccionado) {
+                setSuggestions([]);
+                onClose();
+                return;
+            }
+
             if (term.length < 2) {
                 setSuggestions([]);
                 onClose();
@@ -27,7 +35,10 @@ const AutoComplete = ({ para, value, onChange, onSelect, error, touched }) => {
             try {
                 const response = await api.get(`/api/${para}/autocomplete?search=${encodeURIComponent(term)}`);
                 setSuggestions(response.data);
-                onOpen();
+
+                if (!seleccionado){
+                    onOpen();
+                }
             } catch (error) {
                 console.error(`Error buscando ${para}: ${error}`);
                 setSuggestions([]);
@@ -35,7 +46,7 @@ const AutoComplete = ({ para, value, onChange, onSelect, error, touched }) => {
                 setIsLoading(false);
             }
         }, 300),
-        []
+        [seleccionado]
     );
 
     useEffect(() => {
@@ -46,26 +57,39 @@ const AutoComplete = ({ para, value, onChange, onSelect, error, touched }) => {
         const value = e.target.value;
         setSearchTerm(value);
         onChange(value);
+
+        if (value.length > 0){
+            setSeleccionado(false);
+        }
     };
 
     const handleSelectProveedor = (proveedor) => {
-        setSearchTerm(proveedor.codigo_proveedores); 
-        onSelect(proveedor.codigo_proveedores); 
+        const codigo = proveedor.codigo_proveedores;
+        setSearchTerm(codigo); 
+        onSelect(codigo); 
+        setSeleccionado(true);
+        setSuggestions([]);
         onClose();
     };
 
+    const handleInputFocus = () => {
+        if (suggestions.length > 0 && !seleccionado){
+            onOpen();
+        }
+    }
 
     return (
         <Box position="relative" width="100%">
             <Input
                 value={searchTerm}
                 onChange={handleInputChange}
+                onFocus={handleInputFocus}
                 placeholder="Buscar proveedor..."
                 isInvalid={touched && error}
-                onFocus={() => suggestions.length > 0 && onOpen()}
+                autoComplete='off'
             />
 
-            {isOpen && (
+            {isOpen && !seleccionado && (
                 <Box
                     position="absolute"
                     top="100%"
