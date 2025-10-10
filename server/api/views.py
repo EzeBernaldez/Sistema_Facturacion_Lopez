@@ -200,3 +200,22 @@ def autoCompleteProveedores(request):
     
     serializer = ProveedoresSerializer(proveedores, many=True)
     return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([JWTAuthentication])
+def autoCompleteRepuestos(request):
+    search_term = request.GET.get('search', '').strip()
+    proveedor = request.GET.get('proveedor', '').strip()
+    
+    if len(search_term) < 2:
+        return Response([])
+    
+    repuestos = Suministra.objects.filter(
+        Q(repuesto_suministra__icontains=search_term) | 
+        Q(proveedor_suministra__icontains=proveedor)
+    )[:10]
+    
+    serializer = RepuestosSerializer(repuestos, many=True)
+    return Response(serializer.data)

@@ -240,7 +240,7 @@ class EmpleadosSerializer(serializers.ModelSerializer):
 class ContieneSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contiene
-        field = ['codigo_contiene', 'precio_stock', 'cantidad', 'subtotal']
+        fields = ['codigo_contiene', 'precio_stock', 'cantidad', 'subtotal']
 
 class RemitoProveedoresSerializer(serializers.ModelSerializer):
     
@@ -248,46 +248,66 @@ class RemitoProveedoresSerializer(serializers.ModelSerializer):
     
     contiene_read = ContieneSerializer(many=True, read_only=True, source='contiene_set')
     
+    proveedor_proviene_de_write = serializers.PrimaryKeyRelatedField(
+        queryset=Proveedores.objects.all(),
+        write_only=True
+    )
+    
+    proveedor_proviene_de_read = ProveedoresSerializer(source='proveedor_proviene_de', read_only=True)
+    
     class Meta:
         model = Remito_Proveedores
-        fields = ['nro_remito', 'fecha', 'monto_total', 'pagado', 'proveedor_proviene_de' ,'contiene_read', 'contiene_write']
+        fields = ['nro_remito', 'fecha', 'monto_total', 'pagado', 'proveedor_proviene_de_read', 'proveedor_proviene_de_write' ,'contiene_read', 'contiene_write']
+    
+
+    def validate(self, data):
+        
+        proveedor = data.get('proveedor_proviene_de_write')
+        contiene_list = data.get('contiene_write', [])
+        
+        if not Proveedores.objects.filter(pk=proveedor.pk).exists():
+            raise serializers.ValidationError({
+                'proveedor_proviene_de': 'El proveedor especificado no existe'
+            })
+        
+        for contiene_data in contiene_list:
+            repuesto = contiene_data.get('codigo_contiene')
+            
+            if not Repuestos.objects.filter(pk=repuesto.pk).exists():
+                raise serializers.ValidationError({
+                    'contiene_write': f'El repuesto {repuesto} no existe'
+                })
+            
+            if not Suministra.objects.filter(proveedor_suministra=proveedor,repuesto_suministra=repuesto).exists():
+                raise serializers.ValidationError({
+                    'contiene_write': f'El repuesto {repuesto} no está asociado al proveedor {proveedor}'
+                })
+        
+        return data
     
     @transaction.atomic
     def create(self, validated_data):
         contiene_list = validated_data.pop('contiene_write', [])
-        proveedor_proviene_de = (validated_data.get('proveedor_proviene_de')).get('codigo_proveedores')
         
         remito = Remito_Proveedores.objects.create(**validated_data)
         
-        if Proveedores.objects.filter(codigo_proveedores=proveedor_proviene_de).exists():
+        for contiene_data in contiene_list:
+            Contiene.objects.create(nro_remito_contiene=remito, **contiene_data)
         
-            for contiene in contiene_list:
-                Contiene.objects.create(nro_remito_contiene=remito, **contiene)
-        
-            return remito
-        else:
-            raise serializers.ValidationError('Código de proveedor inexistente')
-
+        return remito
+    
     @transaction.atomic
     def update(self, instance, validated_data):
         contiene_list = validated_data.pop('contiene_write', None)
-        proveedor_proviene_de = validated_data.get('proveedor_proviene_de').get('codigo_proveedores')
-        
+
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
-        
         instance.save()
         
-        if proveedor_proviene_de is not None:
-            if not Proveedores.objects.filter(codigo_proveedores=proveedor_proviene_de).exists():
-                raise serializers.ValidationError('Código de proveedor inexistente')
-            
         if contiene_list is not None:
             Contiene.objects.filter(nro_remito_contiene=instance).delete()
             
-            for contiene in contiene_list:
-                Contiene.objects.create(nro_remito_contiene=instance, **contiene) 
+            for contiene_data in contiene_list:
+                Contiene.objects.create(nro_remito_contiene=instance, **contiene_data)
             
         return instance
-        
-        
