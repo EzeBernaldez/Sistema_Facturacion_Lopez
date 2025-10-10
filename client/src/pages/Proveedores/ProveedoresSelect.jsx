@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../../utils/api";
 import { useContexto } from "../../contexts/GlobalContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate , useLocation, useParams } from "react-router-dom";
 import  Header  from '../../components/Header';
 import {
     TableContainer,
@@ -22,7 +22,9 @@ import { ToastContainer, toast } from 'react-toastify';
 
 const ProveedoresSeleccionar = () => {
 
+    const params = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const {
         cargarPagina: setPagina,
@@ -65,15 +67,14 @@ const ProveedoresSeleccionar = () => {
     , []);
 
     const seleccionaProveedor = (item) => {
-        
-        dispatchRepuestos({
-            type: SETSUMINISTRA,
-            payload: {
-                proveedor_suministra: item,
-            }
-        });
 
-        navigate('/repuestos/nuevo');
+        const pathAnterior = location.pathname.replace(/\/proveedores\/seleccionar\/(\d+)$/,"");
+
+        navigate(pathAnterior, {
+            state: { proveedorSeleccionado: item,
+                index: params.index,
+            },
+            replace: true });
     };
 
 

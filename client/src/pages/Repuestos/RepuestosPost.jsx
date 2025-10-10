@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Header from "../../components/Header";
 import * as Yup from 'yup';
 import { useFormik, FormikProvider, FieldArray } from 'formik';
-import { useNavigate } from "react-router-dom";
+import { useNavigate , useLocation } from "react-router-dom";
 import {
     Box,
     VStack,
@@ -43,6 +43,7 @@ const RepuestosPost = () => {
     const [loading,setLoading] = useState(false);
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    const location = useLocation();
 
     const {
         estadoRepuestos,
@@ -135,6 +136,34 @@ const RepuestosPost = () => {
     }, [formik.values, dispatchRepuestos])
 
     // hay que validar que el proveedor está bien puesto, solo cuando sale del foco del input
+
+    useEffect(() => {
+
+    if (location.state?.proveedorSeleccionado){
+        const indice = Number(location.state.index);
+
+        const proveedorSeleccionado = location.state.proveedorSeleccionado;
+
+        const proveedorSeleccionadoLimpio = String(proveedorSeleccionado).trim();
+
+        const nuevosSuministra = formik.values.suministra.map((item, i) => {
+        if (i === indice) {
+            return {
+            ...item,
+            proveedor_suministra: proveedorSeleccionadoLimpio
+            };
+        }
+        return item;
+        });
+
+        dispatchRepuestos({type: actionRepuestos.SETSUMINISTRA, payload: nuevosSuministra});
+        
+        formik.setFieldValue('suministra', nuevosSuministra);
+
+        window.history.replaceState({}, document.title);
+    }
+    }, [location.state]);
+
 
     return(
         <>
@@ -292,7 +321,7 @@ const RepuestosPost = () => {
                                                                         colorScheme="blue"
                                                                         boxShadow='md'
                                                                         onClick={() => {
-                                                                            navigate('proveedores/seleccionar');
+                                                                            navigate(`proveedores/seleccionar/${index}`);
                                                                         }}
                                                                     >
                                                                         Buscar

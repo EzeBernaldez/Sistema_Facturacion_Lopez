@@ -12,13 +12,24 @@ import api from '../utils/api';
 const AutoComplete = ({ para, value, onChange, onSelect, error, touched }) => {
     const [suggestions, setSuggestions] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const valueAnterior = value;
     const [searchTerm, setSearchTerm] = useState(value);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [seleccionado, setSeleccionado] = useState(false);
 
+    useEffect(() => {
+        setSearchTerm(value);
+    }, [value])
+
     const debouncedSearch = useCallback(
         debounce(async (term) => {
 
+            if (term == valueAnterior){
+                setSuggestions([]);
+                onClose();
+                return;
+            };
+            
             if (seleccionado) {
                 setSuggestions([]);
                 onClose();
