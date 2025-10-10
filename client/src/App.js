@@ -18,6 +18,8 @@ import Empleados from './pages/Empleados';
 import EmpleadosPost from './pages/Empleados/EmpleadosPost';
 import EmpleadosPatch from './pages/Empleados/EmpleadosPatch';
 import ProveedoresSeleccionar from './pages/Proveedores/ProveedoresSelect';
+import RemitoProveedores from './pages/RemitosProveedores/index';
+import RemitoProveedoresPost from './pages/RemitosProveedores/RemitoPost';
 
 function App() {
   return (
@@ -41,8 +43,9 @@ function App() {
             <Route path='/empleados' element={<Empleados />} />
             <Route path='/empleados/nuevo' element={<EmpleadosPost />} />
             <Route path='/empleados/actualizar/:dni' element={<EmpleadosPatch />} />
-            <Route path='repuestos/nuevo/proveedores/seleccionar/:index' element={<ProveedoresSeleccionar />} />
-            <Route path='repuestos/actualizar/:codigo/proveedores/seleccionar/:index' element={<ProveedoresSeleccionar />} />
+            <Route path=':tipo/:accion?/:codigo?/proveedores/seleccionar/:index?' element={<ProveedoresSeleccionar />} />
+            <Route path='/remito_proveedores' element={<RemitoProveedores />} />
+            <Route path='/remito_proveedores/nuevo' element={<RemitoProveedoresPost />} />
 
 
 

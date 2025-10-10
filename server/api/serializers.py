@@ -248,21 +248,22 @@ class RemitoProveedoresSerializer(serializers.ModelSerializer):
     
     contiene_read = ContieneSerializer(many=True, read_only=True, source='contiene_set')
     
-    proveedor_proviene_de_write = serializers.PrimaryKeyRelatedField(
+    proveedor_proviene_de = serializers.PrimaryKeyRelatedField(
         queryset=Proveedores.objects.all(),
-        write_only=True
+        write_only=True,
+        required=False,
     )
     
     proveedor_proviene_de_read = ProveedoresSerializer(source='proveedor_proviene_de', read_only=True)
     
     class Meta:
         model = Remito_Proveedores
-        fields = ['nro_remito', 'fecha', 'monto_total', 'pagado', 'proveedor_proviene_de_read', 'proveedor_proviene_de_write' ,'contiene_read', 'contiene_write']
+        fields = ['nro_remito', 'fecha', 'monto_total', 'pagado', 'proveedor_proviene_de_read', 'proveedor_proviene_de' ,'contiene_read', 'contiene_write']
     
 
     def validate(self, data):
         
-        proveedor = data.get('proveedor_proviene_de_write')
+        proveedor = data.get('proveedor_proviene_de')
         contiene_list = data.get('contiene_write', [])
         
         if not Proveedores.objects.filter(pk=proveedor.pk).exists():

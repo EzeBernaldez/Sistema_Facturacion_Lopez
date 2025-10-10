@@ -187,7 +187,7 @@ useEffect(() => {
 
   useEffect(() => {
 
-    if (location.state?.proveedorSeleccionado){
+    if (location.state?.proveedorSeleccionado && location.state?.index){
         const indice = Number(location.state.index);
 
         const proveedorSeleccionado = location.state.proveedorSeleccionado;

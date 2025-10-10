@@ -8,6 +8,7 @@ import {
 import { initialValueClientes,reducerClientes,actionClientes } from "../utils/reducers/reducer_clientes";
 import { actionProveedores, initialValueProveedores, reducerProveedores } from "../utils/reducers/reducer_proveedores";
 import { actionEmpleados, initialValueEmpleados, reducerEmpleados } from "../utils/reducers/reducer_empleados";
+import { actionRemitoProveedores, initialValueRemitoProveedores, reducerRemitoProveedores } from "../utils/reducers/reducer_remitos_proveedores";
 
 const Context = createContext();
 
@@ -37,6 +38,11 @@ export const ContextProvider = ({children}) => {
         initialValueEmpleados
     )
 
+    const [estadoRemitoProveedores, dispatchRemitoProveedores] = useReducer(
+        reducerRemitoProveedores,
+        initialValueRemitoProveedores
+    )
+
     return <Context.Provider value={{
         pagina, 
         cargarPagina, 
@@ -52,6 +58,9 @@ export const ContextProvider = ({children}) => {
         estadoEmpleados,
         dispatchEmpleados,
         actionEmpleados,
+        estadoRemitoProveedores,
+        dispatchRemitoProveedores,
+        actionRemitoProveedores,
     }}> {children}</Context.Provider>;
 }
 

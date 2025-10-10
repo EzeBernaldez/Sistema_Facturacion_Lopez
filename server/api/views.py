@@ -207,15 +207,30 @@ def autoCompleteProveedores(request):
 @authentication_classes([JWTAuthentication])
 def autoCompleteRepuestos(request):
     search_term = request.GET.get('search', '').strip()
-    proveedor = request.GET.get('proveedor', '').strip()
+    proveedor_id = request.GET.get('proveedor', '').strip()
     
     if len(search_term) < 2:
         return Response([])
     
-    repuestos = Suministra.objects.filter(
-        Q(repuesto_suministra__icontains=search_term) | 
-        Q(proveedor_suministra__icontains=proveedor)
-    )[:10]
+    if not proveedor_id:
+        return Response({"error": "Proveedor requerido"}, status=400)
     
-    serializer = RepuestosSerializer(repuestos, many=True)
-    return Response(serializer.data)
+    try:
+        
+        suministras = Suministra.objects.filter(
+            proveedor_suministra=proveedor_id, 
+        ).filter(
+            Q(repuesto_suministra__codigo__icontains=search_term) |
+            Q(repuesto_suministra__descripcion__icontains=search_term) |
+            Q(repuesto_suministra__marca__icontains=search_term)
+        ).select_related('repuesto_suministra')[:10]  
+        
+        
+        repuestos = [suministra.repuesto_suministra for suministra in suministras]
+        
+        
+        serializer = RepuestosSerializer(repuestos, many=True)
+        return Response(serializer.data)
+        
+    except Exception as e:
+        return Response([])

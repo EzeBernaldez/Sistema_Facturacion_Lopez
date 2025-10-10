@@ -68,11 +68,11 @@ const ProveedoresSeleccionar = () => {
 
     const seleccionaProveedor = (item) => {
 
-        const pathAnterior = location.pathname.replace(/\/proveedores\/seleccionar\/(\d+)$/,"");
+        const pathAnterior = location.pathname.replace(/\/proveedores\/seleccionar\/?.*$/,"");
 
         navigate(pathAnterior, {
             state: { proveedorSeleccionado: item,
-                index: params.index,
+                ...(params.index != undefined && { index: params.index })
             },
             replace: true });
     };

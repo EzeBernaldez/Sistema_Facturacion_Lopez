@@ -9,13 +9,25 @@ import {
 } from '@chakra-ui/react';
 import api from '../utils/api';
 
-const AutoComplete = ({ para, value, onChange, onSelect, error, touched }) => {
+const AutoComplete = ({ para, value, onChange, onSelect, error, touched , proveedor}) => {
     const [suggestions, setSuggestions] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const valueAnterior = value;
     const [searchTerm, setSearchTerm] = useState(value);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [seleccionado, setSeleccionado] = useState(false);
+    const [objeto, setObjeto] = useState('');
+
+    useEffect(() => {
+        if (para === 'repuestos'){
+            setObjeto('repuesto')
+        }
+        else{
+            if (para === 'proveedores'){
+                setObjeto('proveedor')
+            }
+        }
+    }, [para])
 
     useEffect(() => {
         setSearchTerm(value);
@@ -44,8 +56,17 @@ const AutoComplete = ({ para, value, onChange, onSelect, error, touched }) => {
 
             setIsLoading(true);
             try {
-                const response = await api.get(`/api/${para}/autocomplete?search=${encodeURIComponent(term)}`);
+
+                let url = `/api/${para}/autocomplete/?search=${encodeURIComponent(term)}`
+
+                if (proveedor) {
+                    url += `&proveedor=${encodeURIComponent(proveedor)}`
+                    console.log(url)
+                }
+
+                const response = await api.get(url);
                 setSuggestions(response.data);
+                console.log(response.data)
 
                 if (!seleccionado){
                     onOpen();
@@ -74,8 +95,8 @@ const AutoComplete = ({ para, value, onChange, onSelect, error, touched }) => {
         }
     };
 
-    const handleSelectProveedor = (proveedor) => {
-        const codigo = proveedor.codigo_proveedores;
+    const handleSelectObjeto = (obj) => {
+        const codigo = objeto == 'repuesto' ? obj.codigo : obj.codigo_proveedores;
         setSearchTerm(codigo); 
         onSelect(codigo); 
         setSeleccionado(true);
@@ -95,7 +116,7 @@ const AutoComplete = ({ para, value, onChange, onSelect, error, touched }) => {
                 value={searchTerm}
                 onChange={handleInputChange}
                 onFocus={handleInputFocus}
-                placeholder="Buscar proveedor..."
+                placeholder="Buscar..." 
                 isInvalid={touched && error}
                 autoComplete='off'
             />
@@ -119,17 +140,17 @@ const AutoComplete = ({ para, value, onChange, onSelect, error, touched }) => {
                         <Text p={2}>Buscando...</Text>
                     ) : suggestions.length > 0 ? (
                         <List>
-                            {suggestions.map((proveedor) => (
+                            {suggestions.map((item) => (
                                 <ListItem
-                                    key={proveedor.id}
+                                    key={item.id}
                                     p={2}
                                     cursor="pointer"
                                     _hover={{ bg: 'gray.100' }}
-                                    onClick={() => handleSelectProveedor(proveedor)}
+                                    onClick={() => handleSelectObjeto(item)}
                                 >
-                                    <Text fontWeight="bold">{proveedor.nombre}</Text>
+                                    <Text fontWeight="bold">{objeto == 'proveedor' ? item.nombre : item.descripcion}</Text>
                                     <Text fontSize="sm" color="gray.600">
-                                        {proveedor.codigo_proveedores} - {proveedor.direccion}
+                                        {objeto == 'proveedor' ? item.codigo_proveedores : item.codigo} - {objeto == 'proveedor' ? item.direccion : item.marca}
                                     </Text>
                                 </ListItem>
                             ))}
