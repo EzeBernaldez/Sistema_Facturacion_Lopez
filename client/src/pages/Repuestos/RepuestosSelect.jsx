@@ -79,7 +79,7 @@ const RepuestosSeleccionar = () => {
         <Stack mt={6}>
             <TableContainer>
                 <Table variant='simple'>
-                    {arrayProveedores.length > 0 ? (
+                    {arrayRepuestos.length > 0 ? (
                         <>
                             <Thead>
                                 <Tr>
