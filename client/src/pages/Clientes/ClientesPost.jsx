@@ -57,7 +57,12 @@ const ClientesPost = () => {
                 setLoading(false);
                 formik.resetForm();
                 toast.success("Cliente cargado correctamente");
-                navigate('/clientes');
+                if (pagina === 'ClientesSeleccionar'){
+                    navigate('/facturas/nuevo/clientes/seleccionar');
+                }
+                else{
+                    navigate('/clientes');
+                }
             }
             catch (err){
 

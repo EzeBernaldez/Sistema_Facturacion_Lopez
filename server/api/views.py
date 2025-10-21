@@ -222,7 +222,8 @@ def autoCompleteRepuestos(request):
         ).filter(
             Q(repuesto_suministra__codigo__icontains=search_term) |
             Q(repuesto_suministra__descripcion__icontains=search_term) |
-            Q(repuesto_suministra__marca__icontains=search_term)
+            Q(repuesto_suministra__marca__icontains=search_term) |
+            Q(codigo_origen__icontains=search_term)
         ).select_related('repuesto_suministra')[:10]  
         
         
@@ -234,3 +235,41 @@ def autoCompleteRepuestos(request):
         
     except Exception as e:
         return Response([])
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([JWTAuthentication])
+def autoCompleteClientes(request):
+    search_term = request.GET.get('search', '').strip()
+    
+    if len(search_term) < 2:
+        return Response([])
+    
+    clientes = Clientes.objects.filter(
+        Q(nombre__icontains=search_term) | 
+        Q(codigo_clientes__icontains=search_term) |
+        Q(cuit__icontains=search_term)
+    )[:10]
+    
+    serializer = ClientesSerializer(clientes, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([JWTAuthentication])
+def autoCompleteEmpleados(request):
+    search_term = request.GET.get('search', '').strip()
+    
+    if len(search_term) < 2:
+        return Response([])
+    
+    empleados = Empleados.objects.filter(
+        Q(nombre__icontains=search_term) | 
+        Q(dni_empleado__icontains=search_term) |
+        Q(apellido__icontains=search_term)
+    )[:10]
+    
+    serializer = EmpleadosSerializer(empleados, many=True)
+    return Response(serializer.data)

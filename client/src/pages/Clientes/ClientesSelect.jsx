@@ -19,8 +19,9 @@ import {
 import { faPlus, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ToastContainer, toast } from 'react-toastify';
+import { array } from "yup";
 
-const ProveedoresSeleccionar = () => {
+const EmpleadosSeleccionar = () => {
 
     const params = useParams();
     const navigate = useNavigate();
@@ -28,32 +29,29 @@ const ProveedoresSeleccionar = () => {
 
     const {
         cargarPagina: setPagina,
-        estadoProveedores,
-        dispatchProveedores: dispatch,
-        actionProveedores,
-        estadoRepuestos,
-        dispatchRepuestos,
-        actionRepuestos,
+        estadoClientes,
+        dispatchClientes: dispatch,
+        actionClientes,
     } = useContexto();
 
     const {
-        arrayProveedores,
-    } = estadoProveedores;
+        arrayClientes,
+    } = estadoClientes;
 
     const {
-        SETARRAYPROVEEDORES,
-    } = actionProveedores;
+        SETARRAYCLIENTES,
+    } = actionClientes;
 
 
     useEffect(
         () => {
-            setPagina('ProveedoresSeleccionar');
+            setPagina('ClientesSeleccionar');
             const fetchData = async () => {
-                const response = await api.get('api/proveedores')
+                const response = await api.get('api/clientes')
                 dispatch(
                     {
                         payload: Array.isArray(response.data) ? response.data : [],
-                        type: SETARRAYPROVEEDORES,
+                        type: SETARRAYCLIENTES,
                     }
                 )
             }
@@ -61,12 +59,12 @@ const ProveedoresSeleccionar = () => {
         }
     , []);
 
-    const seleccionaProveedor = (item) => {
+    const seleccionaCliente = (item) => {
 
-        const pathAnterior = location.pathname.replace(/\/proveedores\/seleccionar\/?.*$/,"");
+        const pathAnterior = location.pathname.replace(/\/clientes\/seleccionar\/?.*$/,"");
 
         navigate(pathAnterior, {
-            state: { proveedorSeleccionado: item,
+            state: { clienteSeleccionado: item,
                 ...(params.index != undefined && { index: params.index })
             },
             replace: true });
@@ -80,7 +78,7 @@ const ProveedoresSeleccionar = () => {
         </header>
 
         <Flex justifyContent='end' p={3} >
-            <IconButton colorScheme='blue' size='md' icon={<FontAwesomeIcon icon={faPlus}/>} onClick={() => navigate("/proveedores/nuevo")}/>
+            <IconButton colorScheme='blue' size='md' icon={<FontAwesomeIcon icon={faPlus}/>} onClick={() => navigate("/clientes/nuevo")}/>
         </Flex>
         
         <Stack mt={6}>
@@ -90,22 +88,26 @@ const ProveedoresSeleccionar = () => {
                         <>
                             <Thead>
                                 <Tr>
-                                    <Th>Código de proveedor</Th>
+                                    <Th>Código</Th>
                                     <Th>Correo</Th>
                                     <Th>Nombre</Th>
+                                    <Th>Condición Iva</Th>
+                                    <Th>Razón social</Th>
+                                    <Th>Telefonos</Th>
+                                    <Th>Cuit</Th>
                                     <Th>Dirección</Th>
-                                    <Th>Teléfonos</Th>
                                 </Tr>
                             </Thead>
                             <Tbody>
                                 {
-                                    arrayProveedores.map((item, index) => {
+                                    arrayClientes.map((item, index) => {
                                         return(
                                             <Tr key={index}>
-                                                <Td>{item.codigo_proveedores}</Td>
+                                                <Td>{item.codigo}</Td>
                                                 <Td>{item.correo}</Td>
                                                 <Td>{item.nombre}</Td>
-                                                <Td>{item.direccion}</Td>
+                                                <Td>{item.condicion_iva}</Td>
+                                                <Td>{item.razon_social}</Td>
                                                 <Td>
                                                     {
                                                         item.telefonos.length > 0 ? (
@@ -118,10 +120,12 @@ const ProveedoresSeleccionar = () => {
                                                         ) : item.telefonos[0]
                                                     }
                                                 </Td>
+                                                <Td>{item.cuit}</Td>
+                                                <Td>{item.direccion}</Td>
                                                 <Td>
                                                     <Button colorScheme='blue' 
                                                     onClick={
-                                                        () => seleccionaProveedor(item.codigo_proveedores)
+                                                        () => seleccionaCliente(item.codigo)
                                                     }
                                                     >
                                                         Seleccionar 
@@ -139,7 +143,7 @@ const ProveedoresSeleccionar = () => {
                             <Tr>
                                 <Td>No hay elementos para mostrar</Td>
                             </Tr>
-                            <Button onClick={() => navigate('/repuestos/nuevo')}>Volver</Button>
+                            <Button onClick={() => navigate('/facturas/nuevo')}>Volver</Button>
                         </Tbody>
                     )}
                 </Table>
@@ -152,4 +156,4 @@ const ProveedoresSeleccionar = () => {
 }
 
 
-export default ProveedoresSeleccionar;
+export default EmpleadosSeleccionar;

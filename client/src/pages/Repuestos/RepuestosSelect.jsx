@@ -28,32 +28,29 @@ const ProveedoresSeleccionar = () => {
 
     const {
         cargarPagina: setPagina,
-        estadoProveedores,
-        dispatchProveedores: dispatch,
-        actionProveedores,
         estadoRepuestos,
-        dispatchRepuestos,
+        dispatchRepuestos: dispatch,
         actionRepuestos,
     } = useContexto();
 
     const {
-        arrayProveedores,
-    } = estadoProveedores;
+        arrayRepuestos,
+    } = estadoRepuestos;
 
     const {
-        SETARRAYPROVEEDORES,
-    } = actionProveedores;
+        SETARRAYREPUESTOS,
+    } = actionRepuestos;
 
 
     useEffect(
         () => {
-            setPagina('ProveedoresSeleccionar');
+            setPagina('RepuestosSeleccionar');
             const fetchData = async () => {
-                const response = await api.get('api/proveedores')
+                const response = await api.get('api/repuestos')
                 dispatch(
                     {
                         payload: Array.isArray(response.data) ? response.data : [],
-                        type: SETARRAYPROVEEDORES,
+                        type: SETARRAYREPUESTOS,
                     }
                 )
             }
@@ -61,12 +58,12 @@ const ProveedoresSeleccionar = () => {
         }
     , []);
 
-    const seleccionaProveedor = (item) => {
+    const seleccionaRepuesto = (item) => {
 
-        const pathAnterior = location.pathname.replace(/\/proveedores\/seleccionar\/?.*$/,"");
+        const pathAnterior = location.pathname.replace(/\/repuestos\/seleccionar\/?.*$/,"");
 
         navigate(pathAnterior, {
-            state: { proveedorSeleccionado: item,
+            state: { repuestoSeleccionado: item,
                 ...(params.index != undefined && { index: params.index })
             },
             replace: true });
@@ -78,10 +75,6 @@ const ProveedoresSeleccionar = () => {
         <header>
             <Header></Header>
         </header>
-
-        <Flex justifyContent='end' p={3} >
-            <IconButton colorScheme='blue' size='md' icon={<FontAwesomeIcon icon={faPlus}/>} onClick={() => navigate("/proveedores/nuevo")}/>
-        </Flex>
         
         <Stack mt={6}>
             <TableContainer>
@@ -90,38 +83,43 @@ const ProveedoresSeleccionar = () => {
                         <>
                             <Thead>
                                 <Tr>
-                                    <Th>Código de proveedor</Th>
-                                    <Th>Correo</Th>
-                                    <Th>Nombre</Th>
-                                    <Th>Dirección</Th>
-                                    <Th>Teléfonos</Th>
+                                    <Th>Código</Th>
+                                    <Th>Descripción</Th>
+                                    <Th>Marca</Th>
+                                    <Th>Precio de Venta</Th>
+                                    <Th>Stock</Th>
+                                    <Th>Tipo</Th>
+                                    <Th>Proveedores</Th>
+
                                 </Tr>
                             </Thead>
                             <Tbody>
                                 {
-                                    arrayProveedores.map((item, index) => {
+                                    arrayRepuestos.map((item, index) => {
                                         return(
                                             <Tr key={index}>
-                                                <Td>{item.codigo_proveedores}</Td>
-                                                <Td>{item.correo}</Td>
-                                                <Td>{item.nombre}</Td>
-                                                <Td>{item.direccion}</Td>
+                                                <Td>{item.codigo}</Td>
+                                                <Td>{item.descripcion}</Td>
+                                                <Td>{item.marca}</Td>
+                                                <Td>{item.precio_venta}</Td>
+                                                <Td>{item.stock}</Td>
+                                                <Td>{item.tipo}</Td>
                                                 <Td>
                                                     {
-                                                        item.telefonos.length > 0 ? (
+                                                        item.suministra_read.length > 0 ? (
                                                             <>
                                                             {
-                                                                item.telefonos.map((telefono,index) =>
-                                                                    `${index+1}: ${telefono.numero} ` )
+                                                                item.suministra_read.map((proveedor,index) =>
+                                                                    `${index+1}: ${proveedor.proveedor_suministra} ` )
                                                             }
                                                             </>
-                                                        ) : item.telefonos[0]
+                                                        ) : item.suministra[0]
                                                     }
                                                 </Td>
                                                 <Td>
                                                     <Button colorScheme='blue' 
                                                     onClick={
-                                                        () => seleccionaProveedor(item.codigo_proveedores)
+                                                        () => seleccionaRepuesto(item.codigo)
                                                     }
                                                     >
                                                         Seleccionar 
@@ -139,7 +137,7 @@ const ProveedoresSeleccionar = () => {
                             <Tr>
                                 <Td>No hay elementos para mostrar</Td>
                             </Tr>
-                            <Button onClick={() => navigate('/repuestos/nuevo')}>Volver</Button>
+                            <Button onClick={() => navigate('/facturas/nuevo')}>Volver</Button>
                         </Tbody>
                     )}
                 </Table>

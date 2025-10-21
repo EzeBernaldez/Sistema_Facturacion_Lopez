@@ -19,8 +19,9 @@ import {
 import { faPlus, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ToastContainer, toast } from 'react-toastify';
+import { array } from "yup";
 
-const ProveedoresSeleccionar = () => {
+const EmpleadosSeleccionar = () => {
 
     const params = useParams();
     const navigate = useNavigate();
@@ -28,32 +29,29 @@ const ProveedoresSeleccionar = () => {
 
     const {
         cargarPagina: setPagina,
-        estadoProveedores,
-        dispatchProveedores: dispatch,
-        actionProveedores,
-        estadoRepuestos,
-        dispatchRepuestos,
-        actionRepuestos,
+        estadoEmpleados,
+        dispatchEmpleados: dispatch,
+        actionEmpleados,
     } = useContexto();
 
     const {
-        arrayProveedores,
-    } = estadoProveedores;
+        arrayEmpleados,
+    } = estadoEmpleados;
 
     const {
-        SETARRAYPROVEEDORES,
-    } = actionProveedores;
+        SETARRAYEMPLEADOS,
+    } = actionEmpleados;
 
 
     useEffect(
         () => {
-            setPagina('ProveedoresSeleccionar');
+            setPagina('EmpleadosSeleccionar');
             const fetchData = async () => {
-                const response = await api.get('api/proveedores')
+                const response = await api.get('api/empleados')
                 dispatch(
                     {
                         payload: Array.isArray(response.data) ? response.data : [],
-                        type: SETARRAYPROVEEDORES,
+                        type: SETARRAYEMPLEADOS,
                     }
                 )
             }
@@ -61,12 +59,12 @@ const ProveedoresSeleccionar = () => {
         }
     , []);
 
-    const seleccionaProveedor = (item) => {
+    const seleccionaEmpleado = (item) => {
 
-        const pathAnterior = location.pathname.replace(/\/proveedores\/seleccionar\/?.*$/,"");
+        const pathAnterior = location.pathname.replace(/\/empleados\/seleccionar\/?.*$/,"");
 
         navigate(pathAnterior, {
-            state: { proveedorSeleccionado: item,
+            state: { empleadoSeleccionado: item,
                 ...(params.index != undefined && { index: params.index })
             },
             replace: true });
@@ -80,7 +78,7 @@ const ProveedoresSeleccionar = () => {
         </header>
 
         <Flex justifyContent='end' p={3} >
-            <IconButton colorScheme='blue' size='md' icon={<FontAwesomeIcon icon={faPlus}/>} onClick={() => navigate("/proveedores/nuevo")}/>
+            <IconButton colorScheme='blue' size='md' icon={<FontAwesomeIcon icon={faPlus}/>} onClick={() => navigate("/empleados/nuevo")}/>
         </Flex>
         
         <Stack mt={6}>
@@ -90,22 +88,20 @@ const ProveedoresSeleccionar = () => {
                         <>
                             <Thead>
                                 <Tr>
-                                    <Th>Código de proveedor</Th>
-                                    <Th>Correo</Th>
+                                    <Th>DNI</Th>
                                     <Th>Nombre</Th>
-                                    <Th>Dirección</Th>
+                                    <Th>Apellido</Th>
                                     <Th>Teléfonos</Th>
                                 </Tr>
                             </Thead>
                             <Tbody>
                                 {
-                                    arrayProveedores.map((item, index) => {
+                                    arrayEmpleados.map((item, index) => {
                                         return(
                                             <Tr key={index}>
-                                                <Td>{item.codigo_proveedores}</Td>
-                                                <Td>{item.correo}</Td>
+                                                <Td>{item.dni_empleado}</Td>
                                                 <Td>{item.nombre}</Td>
-                                                <Td>{item.direccion}</Td>
+                                                <Td>{item.apellido}</Td>
                                                 <Td>
                                                     {
                                                         item.telefonos.length > 0 ? (
@@ -121,7 +117,7 @@ const ProveedoresSeleccionar = () => {
                                                 <Td>
                                                     <Button colorScheme='blue' 
                                                     onClick={
-                                                        () => seleccionaProveedor(item.codigo_proveedores)
+                                                        () => seleccionaEmpleado(item.dni_empleado)
                                                     }
                                                     >
                                                         Seleccionar 
@@ -139,7 +135,7 @@ const ProveedoresSeleccionar = () => {
                             <Tr>
                                 <Td>No hay elementos para mostrar</Td>
                             </Tr>
-                            <Button onClick={() => navigate('/repuestos/nuevo')}>Volver</Button>
+                            <Button onClick={() => navigate('/facturas/nuevo')}>Volver</Button>
                         </Tbody>
                     )}
                 </Table>
@@ -152,4 +148,4 @@ const ProveedoresSeleccionar = () => {
 }
 
 
-export default ProveedoresSeleccionar;
+export default EmpleadosSeleccionar;

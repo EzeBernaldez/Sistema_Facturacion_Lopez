@@ -86,7 +86,12 @@ const RepuestosPost = () => {
                     type: actionRepuestos.REINICIARVALORES
                 });
                 toast.success("Repuesto cargado correctamente");
-                navigate('/repuestos');
+                if (pagina === 'RepuestosSeleccionar'){
+                    navigate('/facturas/nuevo/repuestos/seleccionar');
+                }
+                else{
+                    navigate('/repuestos');
+                }
             }
             catch (err){
 

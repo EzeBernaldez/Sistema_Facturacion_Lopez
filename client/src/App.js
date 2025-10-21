@@ -44,6 +44,7 @@ function App() {
             <Route path='/empleados/nuevo' element={<EmpleadosPost />} />
             <Route path='/empleados/actualizar/:dni' element={<EmpleadosPatch />} />
             <Route path=':tipo/:accion?/:codigo?/proveedores/seleccionar/:index?' element={<ProveedoresSeleccionar />} />
+            <Route path=':tipo/:accion?/:codigo?/empleados/seleccionar/:index?' element={<EmpleadosSeleccionar />} />
             <Route path='/remito_proveedores' element={<RemitoProveedores />} />
             <Route path='/remito_proveedores/nuevo' element={<RemitoProveedoresPost />} />
 

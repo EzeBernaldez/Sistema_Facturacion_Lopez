@@ -23,4 +23,6 @@ urlpatterns = [
     path('suministra/<str:codigo_repuesto>/<str:codigo_proveedor>', views.RetrieveSuministra.as_view()),
     path('proveedores/autocomplete/', views.autoCompleteProveedores, name='autocompleteProveedores'),
     path('repuestos/autocomplete/', views.autoCompleteRepuestos, name='autocompleteRepuestos'),
+    path('clientes/autocomplete/', views.autoCompleteClientes, name='autocompleteClientes'),
+    path('empleados/autocomplete/', views.autoCompleteEmpleados, name='autocompleteEmpleados'),
 ]

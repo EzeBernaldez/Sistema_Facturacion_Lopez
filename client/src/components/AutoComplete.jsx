@@ -26,6 +26,16 @@ const AutoComplete = ({ para, value, onChange, onSelect, error, touched , provee
             if (para === 'proveedores'){
                 setObjeto('proveedor')
             }
+            else{
+                if (para === 'clientes'){
+                    setObjeto('cliente')
+                }
+                else{
+                    if (para === 'empleados'){
+                        setObjeto('empleado')
+                    }
+                }
+            }
         }
     }, [para])
 
@@ -96,7 +106,20 @@ const AutoComplete = ({ para, value, onChange, onSelect, error, touched , provee
     };
 
     const handleSelectObjeto = (obj) => {
-        const codigo = objeto == 'repuesto' ? obj.codigo : obj.codigo_proveedores;
+        let codigo;
+        if (objeto === 'repuesto' || objeto === 'cliente'){
+            codigo = obj.codigo;
+        } 
+        else{
+            if (objeto === 'proveedor'){
+                codigo = obj.codigo_proveedores;
+            }
+            else{
+                if (objeto === 'empleado'){
+                    codigo = obj.dni_empleado;
+                }
+            }
+        }
         setSearchTerm(codigo); 
         onSelect(codigo); 
         setSeleccionado(true);
@@ -148,15 +171,15 @@ const AutoComplete = ({ para, value, onChange, onSelect, error, touched , provee
                                     _hover={{ bg: 'gray.100' }}
                                     onClick={() => handleSelectObjeto(item)}
                                 >
-                                    <Text fontWeight="bold">{objeto == 'proveedor' ? item.nombre : item.descripcion}</Text>
+                                    <Text fontWeight="bold">{objeto == 'proveedor' || objeto == 'empleado' || objeto == 'cliente' ? item.nombre : item.descripcion}</Text>
                                     <Text fontSize="sm" color="gray.600">
-                                        {objeto == 'proveedor' ? item.codigo_proveedores : item.codigo} - {objeto == 'proveedor' ? item.direccion : item.marca}
+                                        {objeto == 'proveedor' ? item.codigo_proveedores : objeto == 'repuesto' || objeto == 'cliente' ?item.codigo : item.dni_empleado} - {objeto == 'proveedor' ? item.direccion : objeto == 'repuesto' ? item.marca : objeto == 'cliente' ? item.condicion_iva : item.apellido}
                                     </Text>
                                 </ListItem>
                             ))}
                         </List>
                     ) : (
-                        <Text p={2}>No se encontraron proveedores</Text>
+                        <Text p={2}>No se encontraron {para}</Text>
                     )}
                     
                 </Box>

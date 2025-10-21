@@ -53,7 +53,13 @@ const EmpleadosPost = () => {
                 setLoading(false);
                 formik.resetForm();
                 toast.success("Empleado cargado correctamente");
-                navigate('/empleados');
+
+                if (pagina === 'EmpleadosSeleccionar'){
+                    navigate('/facturas/nuevo/empleados/seleccionar');
+                }
+                else{
+                    navigate('/empleados');
+                }
             }
             catch (err){
 
