@@ -47,7 +47,7 @@ function App() {
             <Route path='/empleados/actualizar/:dni' element={<EmpleadosPatch />} />
             <Route path=':tipo/:accion?/:codigo?/proveedores/seleccionar/:index?' element={<ProveedoresSeleccionar />} />
             <Route path=':tipo/:accion?/:codigo?/empleados/seleccionar/:index?' element={<EmpleadosSeleccionar />} />
-            <Route path=':tipo/:accion?/:codigo?/repuestos/seleccionar/:index?' element={<RepuestosSeleccionar />} />
+            <Route path=':tipo/:accion?/:codigo?/repuestos/seleccionar/:proveedor?/:index?' element={<RepuestosSeleccionar />} />
             <Route path='/remito_proveedores' element={<RemitoProveedores />} />
             <Route path='/remito_proveedores/nuevo' element={<RemitoProveedoresPost />} />
 

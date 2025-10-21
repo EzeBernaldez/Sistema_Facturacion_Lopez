@@ -70,6 +70,10 @@ const RepuestosSeleccionar = () => {
     };
 
 
+    const repuestosFiltrados = arrayRepuestos.filter((item) => item.suministra_read?.some(
+        (proveedor) => proveedor.proveedor_suministra === params.proveedor
+    ));
+
     return(
         <>
         <header>
@@ -79,7 +83,7 @@ const RepuestosSeleccionar = () => {
         <Stack mt={6}>
             <TableContainer>
                 <Table variant='simple'>
-                    {arrayRepuestos.length > 0 ? (
+                    {repuestosFiltrados.length > 0 ? (
                         <>
                             <Thead>
                                 <Tr>
@@ -95,7 +99,7 @@ const RepuestosSeleccionar = () => {
                             </Thead>
                             <Tbody>
                                 {
-                                    arrayRepuestos.map((item, index) => {
+                                    repuestosFiltrados.map((item, index) => {
                                         return(
                                             <Tr key={index}>
                                                 <Td>{item.codigo}</Td>

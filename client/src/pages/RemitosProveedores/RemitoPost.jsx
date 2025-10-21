@@ -162,6 +162,30 @@ const RemitoProveedoresPost = () => {
 
             window.history.replaceState({}, document.title);
         }
+
+        if (location.state?.repuestoSeleccionado && location.state?.index){
+            const indice = Number(location.state.index);
+
+            const repuestoSeleccionado = location.state.repuestoSeleccionado;
+
+            const repuestoSeleccionadoLimpio = String(repuestoSeleccionado).trim();
+
+            const nuevosRepuestos = formik.values.repuestos.map((item, i) => {
+            if (i === indice) {
+                return {
+                ...item,
+                codigo_contiene: repuestoSeleccionadoLimpio
+                };
+            }
+            return item;
+            });
+
+            dispatchRemitoProveedores({type: actionRemitoProveedores.SETREPUESTOS, payload: nuevosRepuestos});
+            
+            formik.setFieldValue('repuestos', nuevosRepuestos);
+
+            window.history.replaceState({}, document.title);
+        }
     }, [location.state]);
 
 
@@ -310,7 +334,7 @@ const RemitoProveedoresPost = () => {
                                                                             colorScheme="blue"
                                                                             boxShadow='md'
                                                                             onClick={() => {
-                                                                                navigate(`repuestos/seleccionar/${index}`);
+                                                                                navigate(`repuestos/seleccionar/${formik.values.proveedor}/${index}`);
                                                                             }}
                                                                         >
                                                                             Buscar
