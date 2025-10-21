@@ -25,6 +25,7 @@ import BeatLoader from "react-spinners/BeatLoader";
 import { ToastContainer, toast } from 'react-toastify';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import { useContexto } from "../../contexts/GlobalContext";
 
 
 const ClientesPost = () => {
@@ -32,6 +33,8 @@ const ClientesPost = () => {
     const [loading,setLoading] = useState(false);
     const [error, setError] = useState("");
     const navigate = useNavigate();
+
+    const { pagina } = useContexto();
 
     const formik = useFormik({
         initialValues: {

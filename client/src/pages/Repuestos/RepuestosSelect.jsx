@@ -20,7 +20,7 @@ import { faPlus, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ToastContainer, toast } from 'react-toastify';
 
-const ProveedoresSeleccionar = () => {
+const RepuestosSeleccionar = () => {
 
     const params = useParams();
     const navigate = useNavigate();
@@ -150,4 +150,4 @@ const ProveedoresSeleccionar = () => {
 }
 
 
-export default ProveedoresSeleccionar;
+export default RepuestosSeleccionar;

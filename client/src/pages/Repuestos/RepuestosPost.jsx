@@ -51,6 +51,9 @@ const RepuestosPost = () => {
         actionRepuestos,
     } = useContexto();
 
+    const { pagina } = useContexto();
+
+
     const formik = useFormik({
         initialValues: {
             codigo: estadoRepuestos.codigo || '',
