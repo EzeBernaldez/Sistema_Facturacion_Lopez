@@ -6,8 +6,8 @@ from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.generics import ListCreateAPIView, RetrieveDestroyAPIView, RetrieveUpdateDestroyAPIView, RetrieveAPIView
-from .serializers import UserSerializer, LoginSerializer, RepuestosSerializer, ProveedoresSerializer, ClientesSerializer, EmpleadosSerializer, RemitoProveedoresSerializer, SuministraRetrieveSerializer
-from .models import Repuestos, Proveedores, Clientes, Empleados, Remito_Proveedores, Suministra
+from .serializers import UserSerializer, LoginSerializer, RepuestosSerializer, ProveedoresSerializer, ClientesSerializer, EmpleadosSerializer, RemitoProveedoresSerializer, SuministraRetrieveSerializer, FacturasSerializer, SeFacturanEnSerializer
+from .models import Repuestos, Proveedores, Clientes, Empleados, Remito_Proveedores, Suministra, Facturas, SeFacturanEn
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
@@ -179,6 +179,22 @@ class RetrieveSuministra(RetrieveAPIView):
             repuesto_suministra__codigo=codigo_repuesto,
             proveedor_suministra__codigo_proveedores=codigo_proveedor
         )
+
+
+# -----------------------------------------Facturas
+
+class CreateFacturas(ListCreateAPIView):
+    serializer_class = FacturasSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    queryset = Facturas.objects.all()
+
+class RetrieveUpdateDestroyFacturas(RetrieveUpdateDestroyAPIView):
+    serializer_class = Facturas
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    queryset = Facturas.objects.all()
+    lookup_field = 'nro_factura'
 
 
 # -----------------------------------------Autocompletados

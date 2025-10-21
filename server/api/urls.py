@@ -21,8 +21,11 @@ urlpatterns = [
     path('remito_proveedores', views.CreateRemitoProveedores.as_view()),
     path('remito_proveedores/remito_proveedor/<str:nro_remito>', views.RetrieveUpdateDestroyRemitoProveedores.as_view()),
     path('suministra/<str:codigo_repuesto>/<str:codigo_proveedor>', views.RetrieveSuministra.as_view()),
+    path('facturas', views.CreateFacturas.as_view()),
+    path('facturas/factura/<str:nro_factura>', views.RetrieveUpdateDestroyFacturas.as_view()),
     path('proveedores/autocomplete/', views.autoCompleteProveedores, name='autocompleteProveedores'),
     path('repuestos/autocomplete/', views.autoCompleteRepuestos, name='autocompleteRepuestos'),
     path('clientes/autocomplete/', views.autoCompleteClientes, name='autocompleteClientes'),
     path('empleados/autocomplete/', views.autoCompleteEmpleados, name='autocompleteEmpleados'),
+    
 ]
