@@ -173,7 +173,7 @@ const AutoComplete = ({ para, value, onChange, onSelect, error, touched , provee
                                 >
                                     <Text fontWeight="bold">{objeto == 'proveedor' || objeto == 'empleado' || objeto == 'cliente' ? item.nombre : item.descripcion}</Text>
                                     <Text fontSize="sm" color="gray.600">
-                                        {objeto == 'proveedor' ? item.codigo_proveedores : objeto == 'repuesto' || objeto == 'cliente' ?item.codigo : item.dni_empleado} - {objeto == 'proveedor' ? item.direccion : objeto == 'repuesto' ? item.marca : objeto == 'cliente' ? item.condicion_iva : item.apellido}
+                                        {objeto == 'proveedor' ? item.codigo_proveedores : objeto == 'repuesto' || objeto == 'cliente' ?item.codigo : item.dni_empleado} - {objeto == 'proveedor' ? item.direccion : objeto == 'repuesto' ? item.marca : objeto == 'cliente' ? item.condicion_iva : item.apellido} - {objeto == 'repuesto' ? `Origen: ${item.suministra_read.map((proveedores) => " " + proveedores.codigo_origen)}` : ''}
                                     </Text>
                                 </ListItem>
                             ))}
