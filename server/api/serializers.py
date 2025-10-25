@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
-from .models import Repuestos, Proveedores, Telefonos_Proveedores, Vehiculos, Clientes, Telefonos_Clientes, Empleados, Telefonos_Empleados, Remito_Proveedores, Contiene, Pagos, Suministra
+from .models import Repuestos, Proveedores, Telefonos_Proveedores, Vehiculos, Clientes, Telefonos_Clientes, Empleados, Telefonos_Empleados, Remito_Proveedores, Contiene, Pagos, Suministra, SeFacturanEn, Facturas
 from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
 from django.db import transaction
 
@@ -327,5 +327,98 @@ class RemitoProveedoresSerializer(serializers.ModelSerializer):
             
             for contiene_data in contiene_list:
                 Contiene.objects.create(nro_remito_contiene=instance, **contiene_data)
+            
+        return instance
+
+class SeFacturanEnSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SeFacturanEn
+        fields = ['codigo_repuesto', 'cantidad', 'precio', 'subtotal']
+
+
+class FacturasSerializer(serializers.ModelSerializer):
+    
+    codigo = serializers.CharField(
+        validators=[
+            UniqueValidator(
+                queryset=Facturas.objects.all(),
+                message='El número de factura ya existe. Utilice otro número o modifique la factura existente'
+            )
+        ]
+    )
+    
+    empleado_hace = serializers.PrimaryKeyRelatedField(
+        queryset=Empleados.objects.all(),
+        write_only=True,
+        required=False,
+    )
+    
+    empleado_hace_read = EmpleadosSerializer(source='empleado_hace', read_only=True)
+    
+    cliente_participa = serializers.PrimaryKeyRelatedField(
+        queryset=Clientes.objects.all(),
+        write_only=True,
+        required=False,
+    )
+    
+    cliente_participa_read = ClientesSerializer(source='cliente_participa', read_only=True)
+    
+    se_facturan_en = SeFacturanEnSerializer(many=True, write_only=True, required=False)
+    
+    se_facturan_en_read = SeFacturanEnSerializer(many=True, read_only=True, source='sefacturanen_set') #Duda, capaz necesito hacer un serializer que contenga todos los atributos
+    
+    class Meta:
+        model = Repuestos
+        fields = ['nro_factura', 'total', 'fecha', 'metodo_pago', 'empleado_hace', 'empleado_hace_read', 'cliente_participa', 'cliente_participa_read', 'se_facturan_en', 'se_facturan_en_read']
+    
+    def validate(self, data):
+        
+        empleado_hace = data.get('empleado_hace')
+        cliente_participa = data.get('cliente_participa')
+        repuestos_se_facturan = data.get('se_facturan_en', [])
+        
+        if not Empleados.objects.filter(dni_empleado=empleado_hace).exists():
+            raise serializers.ValidationError({
+                'empleado_hace': f'El empleado {empleado_hace} no existe.'
+            })
+        
+        if not Clientes.objects.filter(codigo_clientes=cliente_participa).exists():
+            raise serializers.ValidationError({
+                'cliente_participa': f'El cliente {cliente_participa} no existe.'
+            })
+        
+        for repuesto in repuestos_se_facturan:
+            if not Repuestos.objects.filter(codigo=repuesto.codigo_repuesto).exists():
+                raise serializers.ValidationError({
+                    'se_facturan_en': f'El repuesto {repuesto} no existe.'
+                })
+        
+        return data
+    
+    @transaction.atomic
+    def create(self, validated_data):
+        repuestos_se_facturan = validated_data.pop('se_facturan_en', [])
+        
+        factura = Facturas.objects.create(**validated_data)
+        
+        for repuesto in repuestos_se_facturan:
+            SeFacturanEn.objects.create(nro_factura=factura, **repuesto)
+        
+        return factura
+    
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        repuestos_se_facturan = validated_data.pop('se_facturan_en', None)
+        
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        
+        instance.save()
+        
+        if repuestos_se_facturan is not None:
+            SeFacturanEn.objects.filter(nro_factura=instance).delete()
+            
+            for repuesto in repuestos_se_facturan:
+                SeFacturanEn.objects.create(nro_factura=instance, **repuesto) 
             
         return instance

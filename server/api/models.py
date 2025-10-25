@@ -122,3 +122,32 @@ class Suministra(models.Model):
         indexes = [
             models.Index(fields=['repuesto_suministra', 'proveedor_suministra']),
         ]
+
+class Facturas(models.Model):
+    metodo_pago_choices = [
+        ('efectivo', 'efectivo'),
+        ('cheque', 'cheque'),
+        ('transferencia', 'transferencia'),
+        ('credito','credito'),
+        ('debito', 'debito'),
+    ]
+    
+    nro_factura = models.CharField(max_length=15, primary_key=True, db_index=True)
+    total = models.DecimalField(max_digits=20, decimal_places=2)
+    fecha = models.DateField()
+    metodo_pago = models.CharField(max_length=15, choices=metodo_pago_choices)
+    empleado_hace = models.ForeignKey(Empleados, on_delete=models.CASCADE)
+    cliente_participa = models.ForeignKey(Clientes, on_delete=models.CASCADE)
+
+class SeFacturanEn(models.Model):
+    nro_factura = models.ForeignKey(Facturas, on_delete=models.CASCADE)
+    codigo_repuesto = models.ForeignKey(Repuestos, on_delete=models.CASCADE)
+    cantidad = models.IntegerField()
+    precio = models.DecimalField(max_digits=15, decimal_places=2)
+    subtotal = models.DecimalField(max_digits=15, decimal_places=2)
+    
+    class Meta:
+        unique_together = [['nro_factura', 'codigo_repuesto']]
+        indexes = [
+            models.Index(fields=['nro_factura', 'codigo_repuesto'])
+        ]
