@@ -6,8 +6,8 @@ from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.generics import ListCreateAPIView, RetrieveDestroyAPIView, RetrieveUpdateDestroyAPIView, RetrieveAPIView
-from .serializers import UserSerializer, LoginSerializer, RepuestosSerializer, ProveedoresSerializer, ClientesSerializer, EmpleadosSerializer, RemitoProveedoresSerializer, SuministraRetrieveSerializer
-from .models import Repuestos, Proveedores, Clientes, Empleados, Remito_Proveedores, Suministra
+from .serializers import UserSerializer, LoginSerializer, RepuestosSerializer, ProveedoresSerializer, ClientesSerializer, EmpleadosSerializer, RemitoProveedoresSerializer, SuministraRetrieveSerializer, VehiculosSerializer
+from .models import Repuestos, Proveedores, Clientes, Empleados, Remito_Proveedores, Suministra, Vehiculos
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
@@ -116,6 +116,27 @@ class RetrieveUpdateDestroyProveedores(RetrieveUpdateDestroyAPIView):
     queryset = Proveedores.objects.all()
     lookup_field = 'codigo_proveedores'
         
+
+# ----------------------------------------Vehiculos
+class CreateVehiculos(ListCreateAPIView):
+    serializer_class = VehiculosSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    queryset = Vehiculos.objects.all()
+
+class RetrieveDestroyVehiculos(RetrieveDestroyAPIView):
+    serializer_class = VehiculosSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    queryset = Vehiculos.objects.all()
+    lookup_field = 'codigo_vehiculos'
+
+class RetrieveUpdateDestroyVehiculos(RetrieveUpdateDestroyAPIView):
+    serializer_class = VehiculosSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    queryset = Vehiculos.objects.all()
+    lookup_field = 'codigo_vehiculos'
 
 # ----------------------------------------Clientes
 class CreateClientes(ListCreateAPIView):

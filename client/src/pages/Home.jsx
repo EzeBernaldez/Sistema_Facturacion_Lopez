@@ -18,7 +18,7 @@ import {
 } from '@chakra-ui/react';
 import { useContexto } from '../contexts/GlobalContext.jsx';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faWrench, faFileInvoiceDollar, faCommentDollar, faFileInvoice, faParachuteBox, faUsers, faUserTie } from '@fortawesome/free-solid-svg-icons';
+import {faWrench, faFileInvoiceDollar, faCommentDollar, faFileInvoice, faParachuteBox, faUsers, faUserTie, faTruck} from '@fortawesome/free-solid-svg-icons';
 
 
 const Home = () => {
@@ -135,6 +135,16 @@ const Home = () => {
                                 <FontAwesomeIcon icon={faWrench} fontSize='2rem
                                 '/>
                                 <Text>Repuestos</Text>
+                            </Button>
+
+                            <Button size='lg'  shadow='lg' borderRadius='lg' p={4} bgColor='#C4DAFA' _hover={{
+                                bgColor:'#A0BDE8'
+                            }}
+                            display='flex' flexDirection='column' height='auto' alignItems='center' justifyContent='center' gap={2}
+                            onClick={ () => navigate("/vehiculos") }>
+                                <FontAwesomeIcon icon={faTruck} fontSize='2rem
+                                '/>
+                                <Text>Vehiculos</Text>
                             </Button>
 
                             <Button size='lg'  shadow='lg' borderRadius='lg' p={4} bgColor='#C4DAFA' 

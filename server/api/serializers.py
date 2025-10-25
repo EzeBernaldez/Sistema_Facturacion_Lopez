@@ -96,6 +96,23 @@ class VehiculosSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vehiculos
         fields = '__all__'
+    
+    @transaction.atomic
+    def create(self, validated_data):
+        
+        vehiculo = Vehiculos.objects.create(**validated_data)
+        
+        return vehiculo
+    
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+                setattr(instance, attr, value)
+            
+        instance.save()
+        
+        return instance
+
 
 class TelefonosProveedoresSerializer(serializers.ModelSerializer):
     class Meta:

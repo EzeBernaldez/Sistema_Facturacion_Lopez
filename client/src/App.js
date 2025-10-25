@@ -22,6 +22,12 @@ import ProveedoresSeleccionar from './pages/Proveedores/ProveedoresSelect';
 import RemitoProveedores from './pages/RemitosProveedores/index';
 import RemitoProveedoresPost from './pages/RemitosProveedores/RemitoPost';
 import RepuestosSeleccionar from './pages/Repuestos/RepuestosSelect';
+import Vehiculos from "./pages/Vehiculos/index"
+import CamionPost from './pages/Vehiculos/CamionPost';
+import SemirremolquePost from './pages/Vehiculos/SemirremolquePost';
+import CamionPatch from './pages/Vehiculos/CamionPatch';
+import SemirremolquePatch from './pages/Vehiculos/SemirremolquePatch';
+
 
 function App() {
   return (
@@ -50,9 +56,11 @@ function App() {
             <Route path=':tipo/:accion?/:codigo?/repuestos/seleccionar/:proveedor?/:index?' element={<RepuestosSeleccionar />} />
             <Route path='/remito_proveedores' element={<RemitoProveedores />} />
             <Route path='/remito_proveedores/nuevo' element={<RemitoProveedoresPost />} />
-
-
-
+            <Route path='/vehiculos' element={<Vehiculos />}/>
+            <Route path='/vehiculos/camion_nuevo' element={<CamionPost />}/>
+            <Route path='/vehiculos/semirremolque_nuevo' element={<SemirremolquePost />}/>
+            <Route path='/vehiculos/actualizar/camion/:codigo' element={<CamionPatch />}/>
+            <Route path='/vehiculos/actualizar/semirremolque/:codigo' element={<SemirremolquePatch />}/>
 
           </Routes>
         </div>
