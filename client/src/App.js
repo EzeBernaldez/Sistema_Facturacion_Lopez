@@ -27,6 +27,8 @@ import CamionPost from './pages/Vehiculos/CamionPost';
 import SemirremolquePost from './pages/Vehiculos/SemirremolquePost';
 import CamionPatch from './pages/Vehiculos/CamionPatch';
 import SemirremolquePatch from './pages/Vehiculos/SemirremolquePatch';
+import RepuestosVehiculos from './pages/RepuestosVehiculos';
+import RepuestosVehiculosPatch from './pages/RepuestosVehiculos/RepuestosVehiculosPatch';
 
 
 function App() {
@@ -61,6 +63,8 @@ function App() {
             <Route path='/vehiculos/semirremolque_nuevo' element={<SemirremolquePost />}/>
             <Route path='/vehiculos/actualizar/camion/:codigo' element={<CamionPatch />}/>
             <Route path='/vehiculos/actualizar/semirremolque/:codigo' element={<SemirremolquePatch />}/>
+            <Route path='/repuestos/:codigo/vehiculo' element={<RepuestosVehiculos />}/>
+            <Route path='/repuestos/:codigo/vehiculo/nuevo' element={<RepuestosVehiculosPatch />}/>
 
           </Routes>
         </div>

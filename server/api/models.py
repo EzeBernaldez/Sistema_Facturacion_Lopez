@@ -151,3 +151,13 @@ class SeFacturanEn(models.Model):
         indexes = [
             models.Index(fields=['nro_factura', 'codigo_repuesto'])
         ]
+
+class Pertenece(models.Model):
+    V_Codigo_pertenece = models.ForeignKey(Vehiculos, on_delete=models.CASCADE)
+    R_Codigo_pertenece = models.ForeignKey(Repuestos, on_delete=models.CASCADE)
+    
+    class Meta:    
+        unique_together = [['V_Codigo_pertenece', 'R_Codigo_pertenece']]
+        indexes = [
+            models.Index(fields=['V_Codigo_pertenece','R_Codigo_pertenece'])
+        ]

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
-from .models import Repuestos, Proveedores, Telefonos_Proveedores, Vehiculos, Clientes, Telefonos_Clientes, Empleados, Telefonos_Empleados, Remito_Proveedores, Contiene, Pagos, Suministra, SeFacturanEn, Facturas
+from .models import Repuestos, Proveedores, Telefonos_Proveedores, Vehiculos, Clientes, Telefonos_Clientes, Empleados, Telefonos_Empleados, Remito_Proveedores, Contiene, Pagos, Suministra, SeFacturanEn, Facturas, Pertenece
 from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
 from django.db import transaction
 
@@ -422,3 +422,48 @@ class FacturasSerializer(serializers.ModelSerializer):
                 SeFacturanEn.objects.create(nro_factura=instance, **repuesto) 
             
         return instance
+    
+
+
+#si ves esto y no entendes, yo menos
+#puse detalle ahi porque (segun geminis) estás creando un campo en tu serializador con un nombre que ya existe en el modelo y, además, le estás especificando source con ese mismo nombre. Django REST Framework (DRF) te dice que no hace falta, ya que ya conoce el mapeo
+class PerteneceSerializer(serializers.ModelSerializer):
+    V_Codigo_pertenece_detalle = VehiculosSerializer(source='V_Codigo_pertenece', read_only=True)
+    R_Codigo_pertenece_detalle = RepuestosSerializer(source='R_Codigo_pertenece', read_only=True)
+
+
+    codigo_repuesto = serializers.CharField(write_only=True)
+    codigos_vehiculos = serializers.ListField(
+        child=serializers.CharField(),
+        write_only=True
+    )
+    
+    class Meta:
+        model = Pertenece
+        fields = [
+            'R_Codigo_pertenece_detalle', 'V_Codigo_pertenece_detalle',
+            'codigo_repuesto', 'codigos_vehiculos'
+        ]
+
+    @transaction.atomic
+    def create(self, validated_data):
+        repuesto_id = validated_data.get('codigo_repuesto')
+        vehiculos_ids = validated_data.get('codigos_vehiculos', [])
+        
+        try:
+            repuesto = Repuestos.objects.get(codigo=repuesto_id)
+        except Repuestos.DoesNotExist:
+            raise serializers.ValidationError({"codigo_repuesto": "El repuesto no existe."})
+
+        vehiculos = Vehiculos.objects.filter(pk__in=vehiculos_ids)
+        
+        if len(vehiculos) != len(vehiculos_ids):
+            raise serializers.ValidationError({"codigos_vehiculos": "Algunos vehículos no existen."})
+
+        pertenencias = [
+            Pertenece(V_Codigo_pertenece=v, R_Codigo_pertenece=repuesto)
+            for v in vehiculos
+        ]
+
+        Pertenece.objects.bulk_create(pertenencias)
+        return pertenencias[0] if pertenencias else None

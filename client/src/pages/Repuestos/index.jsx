@@ -17,7 +17,7 @@ import {
     Button,
     background
 } from '@chakra-ui/react';
-import { faPlus, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faXmark, faTruck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
@@ -113,9 +113,12 @@ const Repuestos = (props) => {
                                                         { isDeleted ? `Eliminar` : `¿Desea eliminar el repuesto?` } 
                                                     </Button>
                                                     { isDeleted && (
-                                                    <Button colorScheme='green' className='ms-3' onClick={() => navigate(`/repuestos/actualizar/${item.codigo}`)}>
-                                                        Actualizar
-                                                    </Button>
+                                                    <>
+                                                        <Button colorScheme='green' className='ms-3' onClick={() => navigate(`/repuestos/actualizar/${item.codigo}`)}>
+                                                            Actualizar
+                                                        </Button>
+                                                        <IconButton className='ms-3' colorScheme='blue' size='md' icon={<FontAwesomeIcon icon={faTruck}/>} onClick={() => navigate(`/repuestos/${item.codigo}/vehiculo`)}/>
+                                                    </>
                                                     )}
                                                     { !isDeleted && (
                                                         <IconButton ms={1} icon={<FontAwesomeIcon icon={faXmark} color='black' fade/> 

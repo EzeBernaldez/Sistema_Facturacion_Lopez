@@ -8,8 +8,8 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.generics import ListCreateAPIView, RetrieveDestroyAPIView, RetrieveUpdateDestroyAPIView, RetrieveAPIView
 from .serializers import UserSerializer, LoginSerializer, RepuestosSerializer, ProveedoresSerializer, ClientesSerializer, EmpleadosSerializer, RemitoProveedoresSerializer, SuministraRetrieveSerializer, VehiculosSerializer
 from .models import Repuestos, Proveedores, Clientes, Empleados, Remito_Proveedores, Suministra, Vehiculos
-from .serializers import UserSerializer, LoginSerializer, RepuestosSerializer, ProveedoresSerializer, ClientesSerializer, EmpleadosSerializer, RemitoProveedoresSerializer, SuministraRetrieveSerializer, FacturasSerializer, SeFacturanEnSerializer
-from .models import Repuestos, Proveedores, Clientes, Empleados, Remito_Proveedores, Suministra, Facturas, SeFacturanEn
+from .serializers import UserSerializer, LoginSerializer, RepuestosSerializer, ProveedoresSerializer, ClientesSerializer, EmpleadosSerializer, RemitoProveedoresSerializer, SuministraRetrieveSerializer, FacturasSerializer, SeFacturanEnSerializer, PerteneceSerializer
+from .models import Repuestos, Proveedores, Clientes, Empleados, Remito_Proveedores, Suministra, Facturas, SeFacturanEn, Pertenece
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
@@ -218,6 +218,64 @@ class RetrieveUpdateDestroyFacturas(RetrieveUpdateDestroyAPIView):
     authentication_classes = [JWTAuthentication]
     queryset = Facturas.objects.all()
     lookup_field = 'nro_factura'
+
+
+# -----------------------------------------Pertenece
+
+class CreatePertenece(ListCreateAPIView):
+    serializer_class = PerteneceSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    queryset = Pertenece.objects.all()
+    
+    def post(self, request):
+        serializer = PerteneceSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'mensaje': 'Relaciones creadas correctamente'}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([JWTAuthentication])
+def get_vehiculos_repuesto(request, codigo_repuesto):
+    try:
+        repuesto = Repuestos.objects.get(codigo=codigo_repuesto)
+    except Repuestos.DoesNotExist:
+        return Response({'error': 'Repuesto no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+    vehiculos = Vehiculos.objects.filter(pertenece__R_Codigo_pertenece=repuesto).distinct()
+
+    serializer = VehiculosSerializer(vehiculos, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def get_vehiculos_no_pertenece(request, codigo_repuesto):
+    try:
+        repuesto = Repuestos.objects.get(codigo=codigo_repuesto)
+    except Repuestos.DoesNotExist:
+        return Response({'error': 'Repuesto no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+    vehiculos = Vehiculos.objects.exclude(pertenece__R_Codigo_pertenece=repuesto).distinct()
+
+    serializer = VehiculosSerializer(vehiculos, many=True)
+    return Response(serializer.data)
+
+class RetrieveUpdateDestroyPertenece(RetrieveUpdateDestroyAPIView):
+    serializer_class = Pertenece
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    queryset = Pertenece.objects.all()
+    
+    def get_object(self):
+        vehiculo_id = self.kwargs.get('V_Codigo_pertenece')
+        repuesto_id = self.kwargs.get('R_Codigo_pertenece')
+        return Pertenece.objects.get(
+            V_Codigo_pertenece__codigo_vehiculos=vehiculo_id,
+            R_Codigo_pertenece__codigo=repuesto_id
+)
 
 
 # -----------------------------------------Autocompletados

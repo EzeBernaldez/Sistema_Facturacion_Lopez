@@ -29,5 +29,10 @@ urlpatterns = [
     path('empleados/autocomplete/', views.autoCompleteEmpleados, name='autocompleteEmpleados'),
     path('vehiculos', views.CreateVehiculos.as_view()),
     path('vehiculos/<str:codigo_vehiculos>', views.RetrieveDestroyVehiculos.as_view()),
-    path('vehiculos/vehiculo/<str:codigo_vehiculos>', views.RetrieveUpdateDestroyVehiculos.as_view()), 
+    path('vehiculos/vehiculo/<str:codigo_vehiculos>', views.RetrieveUpdateDestroyVehiculos.as_view()),
+    path('repuestos/<str:codigo_repuesto>/vehiculo/', views.get_vehiculos_repuesto), 
+    path('repuestos/<str:codigo_repuesto>/vehiculo/nuevo', views.get_vehiculos_no_pertenece),
+    path('pertenece/<str:V_Codigo_pertenece>/<str:R_Codigo_pertenece>/', views.RetrieveUpdateDestroyPertenece.as_view(), name='pertenece-detail'),    
+    path('pertenece/', views.CreatePertenece.as_view()),  
+     
 ]
