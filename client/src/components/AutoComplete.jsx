@@ -71,12 +71,10 @@ const AutoComplete = ({ para, value, onChange, onSelect, error, touched , provee
 
                 if (proveedor) {
                     url += `&proveedor=${encodeURIComponent(proveedor)}`
-                    console.log(url)
                 }
 
                 const response = await api.get(url);
                 setSuggestions(response.data);
-                console.log(response.data)
 
                 if (!seleccionado){
                     onOpen();

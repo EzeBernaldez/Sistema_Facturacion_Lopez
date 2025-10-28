@@ -245,7 +245,7 @@ def get_vehiculos_repuesto(request, codigo_repuesto):
     except Repuestos.DoesNotExist:
         return Response({'error': 'Repuesto no encontrado'}, status=status.HTTP_404_NOT_FOUND)
 
-    vehiculos = Vehiculos.objects.filter(pertenece__R_Codigo_pertenece=repuesto).distinct()
+    vehiculos = Vehiculos.objects.filter(pertenece__r_codigo_pertenece=repuesto).distinct()
 
     serializer = VehiculosSerializer(vehiculos, many=True)
     return Response(serializer.data)
@@ -258,7 +258,7 @@ def get_vehiculos_no_pertenece(request, codigo_repuesto):
     except Repuestos.DoesNotExist:
         return Response({'error': 'Repuesto no encontrado'}, status=status.HTTP_404_NOT_FOUND)
 
-    vehiculos = Vehiculos.objects.exclude(pertenece__R_Codigo_pertenece=repuesto).distinct()
+    vehiculos = Vehiculos.objects.exclude(pertenece__r_codigo_pertenece=repuesto).distinct()
 
     serializer = VehiculosSerializer(vehiculos, many=True)
     return Response(serializer.data)
@@ -270,11 +270,11 @@ class RetrieveUpdateDestroyPertenece(RetrieveUpdateDestroyAPIView):
     queryset = Pertenece.objects.all()
     
     def get_object(self):
-        vehiculo_id = self.kwargs.get('V_Codigo_pertenece')
-        repuesto_id = self.kwargs.get('R_Codigo_pertenece')
+        vehiculo_id = self.kwargs.get('v_codigo_pertenece')
+        repuesto_id = self.kwargs.get('r_codigo_pertenece')
         return Pertenece.objects.get(
-            V_Codigo_pertenece__codigo_vehiculos=vehiculo_id,
-            R_Codigo_pertenece__codigo=repuesto_id
+            v_codigo_pertenece__codigo_vehiculos=vehiculo_id,
+            r_codigo_pertenece__codigo=repuesto_id
 )
 
 

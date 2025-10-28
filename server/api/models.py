@@ -5,7 +5,7 @@ class Repuestos(models.Model):
     descripcion = models.TextField()
     marca = models.CharField(max_length=100)
     precio_venta = models.DecimalField(max_digits=10 ,decimal_places=2)
-    stock = models.IntegerField()
+    stock = models.IntegerField(default=0)
     tipo = models.CharField(max_length=100, null=True)
     porcentaje_recargo = models.IntegerField()
     
@@ -13,7 +13,7 @@ class Repuestos(models.Model):
         return f'Repuesto con código {self.codigo} y precio {self.precio_venta}'
 
 class Vehiculos(models.Model):
-    codigo_vehiculos = models.CharField(primary_key=True, max_length=30, db_index=True)
+    codigo_vehiculos = models.AutoField(primary_key=True)
     modelo = models.CharField(max_length=30)
     ano_fabricacion = models.DateField()
     marca = models.CharField(max_length=30)
@@ -115,7 +115,7 @@ class Suministra(models.Model):
     repuesto_suministra = models.ForeignKey(Repuestos, on_delete=models.CASCADE)
     proveedor_suministra = models.ForeignKey(Proveedores, on_delete=models.CASCADE)
     codigo_origen = models.CharField(primary_key=True, max_length=20, db_index=True)
-    cantidad = models.IntegerField()
+    cantidad = models.IntegerField(default=0)
     
     class Meta:
         unique_together = [['repuesto_suministra', 'proveedor_suministra']]
@@ -153,11 +153,11 @@ class SeFacturanEn(models.Model):
         ]
 
 class Pertenece(models.Model):
-    V_Codigo_pertenece = models.ForeignKey(Vehiculos, on_delete=models.CASCADE)
-    R_Codigo_pertenece = models.ForeignKey(Repuestos, on_delete=models.CASCADE)
+    v_codigo_pertenece = models.ForeignKey(Vehiculos, on_delete=models.CASCADE)
+    r_codigo_pertenece = models.ForeignKey(Repuestos, on_delete=models.CASCADE)
     
     class Meta:    
-        unique_together = [['V_Codigo_pertenece', 'R_Codigo_pertenece']]
+        unique_together = [['v_codigo_pertenece', 'r_codigo_pertenece']]
         indexes = [
-            models.Index(fields=['V_Codigo_pertenece','R_Codigo_pertenece'])
+            models.Index(fields=['v_codigo_pertenece','r_codigo_pertenece'])
         ]

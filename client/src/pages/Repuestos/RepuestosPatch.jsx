@@ -80,7 +80,6 @@ useEffect(() => {
       descripcion: estadoRepuestos.descripcion || "",
       marca: estadoRepuestos.marca || "",
       precio_venta: estadoRepuestos.precio_venta || "",
-      stock: estadoRepuestos.stock || 0,
       tipo: estadoRepuestos.tipo || "",
       porcentaje_recargo: estadoRepuestos.porcentaje_recargo || 0,
       suministra: estadoRepuestos.suministra || [
@@ -95,11 +94,24 @@ useEffect(() => {
       setLoading(true);
       setError("");
       try {
+        let stock = 0 ;
+        const repuestoStockTotal = values.suministra.map(item => {
+            const stockParcial = (parseInt(item.cantidad) || 0);
+            stock += stockParcial;
+            return {
+                ...item,
+                stockParcial: stockParcial
+            };
+        });
+
+
         const payload = {
           ...values,
+          stock: stock,
           precio_venta: parseFloat(values.precio_venta).toFixed(2).toString(),
         };
-        console.log('Actualización' , payload);
+
+        console.log(payload)
         await api.patch(`/api/repuestos/actualizar/${codigo}`, payload);
 
         dispatchRepuestos( {type: actionRepuestos.REINICIARVALORES});
@@ -144,9 +156,6 @@ useEffect(() => {
       precio_venta: Yup.string()
         .matches(/^\d{1,10}(\.\d+)?$/, "Debe tener hasta 10 dígitos")
         .required("El precio de venta es obligatorio"),
-      stock: Yup.number()
-        .min(0, "Debe ser un valor mayor o igual a 0")
-        .required("Debe ingresar un número de stock"),
       tipo: Yup.string()
         .max(100, "Debe ingresar un tipo con menos de 100 caracteres.")
         .required("Debe ingresar un tipo"),
@@ -324,26 +333,6 @@ useEffect(() => {
                   <FormErrorMessage>
                     {formik.errors.precio_venta}
                   </FormErrorMessage>
-                </FormControl>
-                <FormControl
-                  width="100%"
-                  isInvalid={formik.touched.stock && !!formik.errors.stock}
-                >
-                  <FormLabel htmlFor="stock">Stock:</FormLabel>
-                  <NumberInput
-                    id="stock"
-                    min={0}
-                    step={1}
-                    value={formik.values.stock}
-                    onChange={(value) => formik.setFieldValue("stock", value)}
-                  >
-                    <NumberInputField />
-                    <NumberInputStepper>
-                      <NumberIncrementStepper />
-                      <NumberDecrementStepper />
-                    </NumberInputStepper>
-                  </NumberInput>
-                  <FormErrorMessage>{formik.errors.stock}</FormErrorMessage>
                 </FormControl>
                 <FormControl
                   width="100%"

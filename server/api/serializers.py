@@ -43,6 +43,9 @@ class SuministraSerializer(serializers.ModelSerializer):
     class Meta:
         model = Suministra
         fields = ['proveedor_suministra', 'codigo_origen', 'cantidad']
+        extra_kwargs = {
+            'codigo_origen' : {'validators': []} 
+        }
 
 
 class RepuestosSerializer(serializers.ModelSerializer):
@@ -63,7 +66,7 @@ class RepuestosSerializer(serializers.ModelSerializer):
     class Meta:
         model = Repuestos
         fields = ['codigo', 'descripcion', 'marca', 'precio_venta', 'stock', 'tipo', 'porcentaje_recargo', 'suministra', 'suministra_read']
-    
+
     @transaction.atomic
     def create(self, validated_data):
         suministran = validated_data.pop('suministra', [])
@@ -71,8 +74,12 @@ class RepuestosSerializer(serializers.ModelSerializer):
         repuesto = Repuestos.objects.create(**validated_data)
         
         for suministra in suministran:
-            Suministra.objects.create(repuesto_suministra=repuesto, **suministra)
-        
+            if not Suministra.objects.filter(codigo_origen=suministra['codigo_origen']).exists():
+                Suministra.objects.create(repuesto_suministra=repuesto, **suministra)
+            else:
+                raise serializers.ValidationError({
+                    'suministra': f'Código origen duplicado: {suministra['codigo_origen']}'
+                })
         return repuesto
     
     @transaction.atomic
@@ -88,7 +95,12 @@ class RepuestosSerializer(serializers.ModelSerializer):
             Suministra.objects.filter(repuesto_suministra=instance).delete()
             
             for suministra in suministran:
-                Suministra.objects.create(repuesto_suministra=instance, **suministra) 
+                if not Suministra.objects.filter(codigo_origen=suministra['codigo_origen']).exists():
+                    Suministra.objects.create(repuesto_suministra=instance, **suministra) 
+                else:
+                    raise serializers.ValidationError({
+                        'suministra': f'Código origen duplicado: {suministra['codigo_origen']}'
+                    })
             
         return instance
 
@@ -428,8 +440,8 @@ class FacturasSerializer(serializers.ModelSerializer):
 #si ves esto y no entendes, yo menos
 #puse detalle ahi porque (segun geminis) estás creando un campo en tu serializador con un nombre que ya existe en el modelo y, además, le estás especificando source con ese mismo nombre. Django REST Framework (DRF) te dice que no hace falta, ya que ya conoce el mapeo
 class PerteneceSerializer(serializers.ModelSerializer):
-    V_Codigo_pertenece_detalle = VehiculosSerializer(source='V_Codigo_pertenece', read_only=True)
-    R_Codigo_pertenece_detalle = RepuestosSerializer(source='R_Codigo_pertenece', read_only=True)
+    V_Codigo_pertenece_detalle = VehiculosSerializer(source='v_codigo_pertenece', read_only=True)
+    R_Codigo_pertenece_detalle = RepuestosSerializer(source='r_codigo_pertenece', read_only=True)
 
 
     codigo_repuesto = serializers.CharField(write_only=True)
@@ -461,7 +473,7 @@ class PerteneceSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"codigos_vehiculos": "Algunos vehículos no existen."})
 
         pertenencias = [
-            Pertenece(V_Codigo_pertenece=v, R_Codigo_pertenece=repuesto)
+            Pertenece(v_codigo_pertenece=v, r_codigo_pertenece=repuesto)
             for v in vehiculos
         ]
 
