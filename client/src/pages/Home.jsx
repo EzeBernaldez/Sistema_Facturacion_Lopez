@@ -92,7 +92,8 @@ const Home = () => {
                             <Button size='lg'  shadow='lg' borderRadius='lg' p={4} bgColor='#C4DAFA' _hover={{
                                 bgColor:'#A0BDE8'
                             }}
-                            display='flex' flexDirection='column' height='auto' alignItems='center' justifyContent='center' gap={2}>
+                            display='flex' flexDirection='column' height='auto' alignItems='center' justifyContent='center' gap={2}
+                            onClick={ () => navigate("/facturas") }>
                                 <FontAwesomeIcon icon={faFileInvoiceDollar} fontSize='2rem
                                 '/>
                                 <Text>Facturas</Text>

@@ -19,6 +19,7 @@ import EmpleadosPost from './pages/Empleados/EmpleadosPost';
 import EmpleadosPatch from './pages/Empleados/EmpleadosPatch';
 import EmpleadosSeleccionar from './pages/Empleados/EmpleadosSelect';
 import ProveedoresSeleccionar from './pages/Proveedores/ProveedoresSelect';
+import ClientesSelect from './pages/Clientes/ClientesSelect';
 import RemitoProveedores from './pages/RemitosProveedores/index';
 import RemitoProveedoresPost from './pages/RemitosProveedores/RemitoPost';
 import RepuestosSeleccionar from './pages/Repuestos/RepuestosSelect';
@@ -29,6 +30,8 @@ import CamionPatch from './pages/Vehiculos/CamionPatch';
 import SemirremolquePatch from './pages/Vehiculos/SemirremolquePatch';
 import RepuestosVehiculos from './pages/RepuestosVehiculos';
 import RepuestosVehiculosPatch from './pages/RepuestosVehiculos/RepuestosVehiculosPatch';
+import Facturas from "./pages/Facturas/index";
+import FacturasPost from "./pages/Facturas/FacturasPost"
 
 
 function App() {
@@ -56,6 +59,7 @@ function App() {
             <Route path=':tipo/:accion?/:codigo?/proveedores/seleccionar/:index?' element={<ProveedoresSeleccionar />} />
             <Route path=':tipo/:accion?/:codigo?/empleados/seleccionar/:index?' element={<EmpleadosSeleccionar />} />
             <Route path=':tipo/:accion?/:codigo?/repuestos/seleccionar/:proveedor?/:index?' element={<RepuestosSeleccionar />} />
+            <Route path=':tipo/:accion?/:codigo?/clientes/seleccionar/:index?' element={<ClientesSelect />} />
             <Route path='/remito_proveedores' element={<RemitoProveedores />} />
             <Route path='/remito_proveedores/nuevo' element={<RemitoProveedoresPost />} />
             <Route path='/vehiculos' element={<Vehiculos />}/>
@@ -65,6 +69,10 @@ function App() {
             <Route path='/vehiculos/actualizar/semirremolque/:codigo' element={<SemirremolquePatch />}/>
             <Route path='/repuestos/:codigo/vehiculo' element={<RepuestosVehiculos />}/>
             <Route path='/repuestos/:codigo/vehiculo/nuevo' element={<RepuestosVehiculosPatch />}/>
+            <Route path='/facturas' element={<Facturas />}/>
+            <Route path='/facturas/nuevo' element={<FacturasPost />}/>
+
+
 
           </Routes>
         </div>

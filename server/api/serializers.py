@@ -353,7 +353,7 @@ class SeFacturanEnSerializer(serializers.ModelSerializer):
 
 class FacturasSerializer(serializers.ModelSerializer):
     
-    codigo = serializers.CharField(
+    nro_factura = serializers.CharField(
         validators=[
             UniqueValidator(
                 queryset=Facturas.objects.all(),

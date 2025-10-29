@@ -21,6 +21,7 @@ export const initialValueRepuestos = {
         proveedor_suministra: '',
         codigo_origen: '',
         cantidad: 0,
+        fecha_repuesto_suministrado:'',
     }],
 }
 

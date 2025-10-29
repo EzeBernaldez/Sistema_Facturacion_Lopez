@@ -84,7 +84,7 @@ const EmpleadosSeleccionar = () => {
         <Stack mt={6}>
             <TableContainer>
                 <Table variant='simple'>
-                    {arrayProveedores.length > 0 ? (
+                    {arrayClientes.length > 0 ? (
                         <>
                             <Thead>
                                 <Tr>
