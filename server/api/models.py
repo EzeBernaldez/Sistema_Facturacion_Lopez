@@ -116,6 +116,7 @@ class Suministra(models.Model):
     proveedor_suministra = models.ForeignKey(Proveedores, on_delete=models.CASCADE)
     codigo_origen = models.CharField(primary_key=True, max_length=20, db_index=True)
     cantidad = models.IntegerField(default=0)
+    fecha_repuesto_suministrado = models.DateField(default='2010-01-01')
     
     class Meta:
         unique_together = [['repuesto_suministra', 'proveedor_suministra']]

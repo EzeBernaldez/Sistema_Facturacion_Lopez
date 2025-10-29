@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from .models import Repuestos, Proveedores, Telefonos_Proveedores, Vehiculos, Clientes, Telefonos_Clientes, Empleados, Telefonos_Empleados, Remito_Proveedores, Contiene, Pagos, Suministra, SeFacturanEn, Facturas, Pertenece
 from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
-from django.db import transaction
+from django.db import transaction, connection
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -346,6 +346,9 @@ class SeFacturanEnSerializer(serializers.ModelSerializer):
     class Meta:
         model = SeFacturanEn
         fields = ['codigo_repuesto', 'cantidad', 'precio', 'subtotal']
+        extra_kwargs = {
+            'codigo_repuesto' : {'validators': []} 
+        }
 
 
 class FacturasSerializer(serializers.ModelSerializer):
@@ -380,7 +383,7 @@ class FacturasSerializer(serializers.ModelSerializer):
     se_facturan_en_read = SeFacturanEnSerializer(many=True, read_only=True, source='sefacturanen_set') #Duda, capaz necesito hacer un serializer que contenga todos los atributos
     
     class Meta:
-        model = Repuestos
+        model = Facturas
         fields = ['nro_factura', 'total', 'fecha', 'metodo_pago', 'empleado_hace', 'empleado_hace_read', 'cliente_participa', 'cliente_participa_read', 'se_facturan_en', 'se_facturan_en_read']
     
     def validate(self, data):
@@ -400,7 +403,7 @@ class FacturasSerializer(serializers.ModelSerializer):
             })
         
         for repuesto in repuestos_se_facturan:
-            if not Repuestos.objects.filter(codigo=repuesto.codigo_repuesto).exists():
+            if not Repuestos.objects.filter(codigo=repuesto['codigo_repuesto']).exists():
                 raise serializers.ValidationError({
                     'se_facturan_en': f'El repuesto {repuesto} no existe.'
                 })
@@ -414,26 +417,56 @@ class FacturasSerializer(serializers.ModelSerializer):
         factura = Facturas.objects.create(**validated_data)
         
         for repuesto in repuestos_se_facturan:
-            SeFacturanEn.objects.create(nro_factura=factura, **repuesto)
+            if not SeFacturanEn.objects.filter(codigo_repuesto=repuesto['codigo_repuesto'], nro_factura=factura).exists():
+                SeFacturanEn.objects.create(nro_factura=factura, **repuesto)
+                
+                with connection.cursor() as cursor:
+                    cursor.callproc('sp_actualizar_stock', [repuesto['codigo_repuesto'], repuesto['cantidad']])
+                    cursor.execute( "select @_sp_actualizar_stock")
+                    resultado = cursor.fetchone()[0]
+                
+                if resultado == 'Error al actualizar stock':
+                    raise serializers.ValidationError({
+                        'SeFacturanEn': f'Hay un error con el stock en el repuesto {repuesto['codigo_origen']} con cantidad {repuesto['cantidad']}'
+                    })
+            else:
+                raise serializers.ValidationError({
+                    'sefacturanen': f'Repuesto {repuesto['codigo_origen']} duplicado en la factura'
+                })
         
         return factura
     
-    @transaction.atomic
-    def update(self, instance, validated_data):
-        repuestos_se_facturan = validated_data.pop('se_facturan_en', None)
+    # @transaction.atomic
+    # def update(self, instance, validated_data):
+    #     repuestos_se_facturan = validated_data.pop('se_facturan_en', None)
         
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
+    #     for attr, value in validated_data.items():
+    #         setattr(instance, attr, value)
         
-        instance.save()
+    #     instance.save()
         
-        if repuestos_se_facturan is not None:
-            SeFacturanEn.objects.filter(nro_factura=instance).delete()
+    #     if repuestos_se_facturan is not None:
+    #         SeFacturanEn.objects.filter(nro_factura=instance).delete()
             
-            for repuesto in repuestos_se_facturan:
-                SeFacturanEn.objects.create(nro_factura=instance, **repuesto) 
+    #         for repuesto in repuestos_se_facturan:
+    #             if not SeFacturanEn.objects.filter(codigo_repuesto=repuesto['codigo_repuesto'], nro_factura=instance).exists():
+    #                 SeFacturanEn.objects.create(nro_factura=instance, **repuesto)
+                    
+    #                 with connection.cursor() as cursor:
+    #                     cursor.callproc('sp_actualizar_stock', [repuesto['codigo_repuesto'], repuesto['cantidad']])
+    #                     cursor.execute( "select @_sp_actualizar_stock")
+    #                     resultado = cursor.fetchone()[0]
+                    
+    #                 if resultado == 'Error al actualizar stock':
+    #                     raise serializers.ValidationError({
+    #                         'SeFacturanEn': f'Hay un error con el stock en el repuesto {repuesto['codigo_origen']} con cantidad {repuesto['cantidad']}'
+    #                     })
+    #             else:
+    #                 raise serializers.ValidationError({
+    #                     'sefacturanen': f'Repuesto {repuesto['codigo_origen']} duplicado en la factura'
+    #                 })
             
-        return instance
+    #     return instance
     
 
 
