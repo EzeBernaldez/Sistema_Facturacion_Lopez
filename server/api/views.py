@@ -310,8 +310,22 @@ def autoCompleteRepuestos(request):
         return Response([])
     
     if not proveedor_id:
-        return Response({"error": "Proveedor requerido"}, status=400)
-    
+        try:
+            suministras = Suministra.objects.filter(
+                Q(repuesto_suministra__codigo__icontains=search_term) |
+                Q(repuesto_suministra__descripcion__icontains=search_term) |
+                Q(repuesto_suministra__marca__icontains=search_term)
+            ).select_related('repuesto_suministra')[:10]  
+            
+            
+            repuestos = [suministra.repuesto_suministra for suministra in suministras]
+            
+            
+            serializer = RepuestosSerializer(repuestos, many=True)
+            return Response(serializer.data)
+        except Exception as e:
+            return Response([])
+        
     try:
         
         suministras = Suministra.objects.filter(
@@ -346,7 +360,8 @@ def autoCompleteClientes(request):
     clientes = Clientes.objects.filter(
         Q(nombre__icontains=search_term) | 
         Q(codigo_clientes__icontains=search_term) |
-        Q(cuit__icontains=search_term)
+        Q(cuit__icontains=search_term) |
+        Q(razon_social=search_term)
     )[:10]
     
     serializer = ClientesSerializer(clientes, many=True)

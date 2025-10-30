@@ -39,7 +39,7 @@ function App() {
       <Router basename='/'>
         <div className="App" style={{
           backgroundColor: "#E8F1FF",
-          height: '100vh'
+          minHeight: '100vh'
         }}>
           <Routes>
             <Route path="/" element={<Home />} />

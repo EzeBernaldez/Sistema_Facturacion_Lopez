@@ -133,7 +133,7 @@ class Facturas(models.Model):
         ('debito', 'debito'),
     ]
     
-    nro_factura = models.CharField(max_length=15, primary_key=True, db_index=True)
+    nro_factura = models.AutoField(primary_key=True, db_index=True)
     total = models.DecimalField(max_digits=20, decimal_places=2)
     fecha = models.DateField()
     metodo_pago = models.CharField(max_length=15, choices=metodo_pago_choices)

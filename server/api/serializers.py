@@ -353,15 +353,6 @@ class SeFacturanEnSerializer(serializers.ModelSerializer):
 
 class FacturasSerializer(serializers.ModelSerializer):
     
-    nro_factura = serializers.CharField(
-        validators=[
-            UniqueValidator(
-                queryset=Facturas.objects.all(),
-                message='El número de factura ya existe. Utilice otro número o modifique la factura existente'
-            )
-        ]
-    )
-    
     empleado_hace = serializers.PrimaryKeyRelatedField(
         queryset=Empleados.objects.all(),
         write_only=True,
@@ -384,7 +375,7 @@ class FacturasSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Facturas
-        fields = ['nro_factura', 'total', 'fecha', 'metodo_pago', 'empleado_hace', 'empleado_hace_read', 'cliente_participa', 'cliente_participa_read', 'se_facturan_en', 'se_facturan_en_read']
+        fields = ['total', 'fecha', 'metodo_pago', 'empleado_hace', 'empleado_hace_read', 'cliente_participa', 'cliente_participa_read', 'se_facturan_en', 'se_facturan_en_read']
     
     def validate(self, data):
         
@@ -392,18 +383,20 @@ class FacturasSerializer(serializers.ModelSerializer):
         cliente_participa = data.get('cliente_participa')
         repuestos_se_facturan = data.get('se_facturan_en', [])
         
-        if not Empleados.objects.filter(dni_empleado=empleado_hace).exists():
+        
+        if not Empleados.objects.filter(dni_empleado=empleado_hace.pk).exists():
             raise serializers.ValidationError({
                 'empleado_hace': f'El empleado {empleado_hace} no existe.'
             })
         
-        if not Clientes.objects.filter(codigo_clientes=cliente_participa).exists():
+        if not Clientes.objects.filter(codigo_clientes=cliente_participa.pk).exists():
             raise serializers.ValidationError({
                 'cliente_participa': f'El cliente {cliente_participa} no existe.'
             })
         
         for repuesto in repuestos_se_facturan:
-            if not Repuestos.objects.filter(codigo=repuesto['codigo_repuesto']).exists():
+            
+            if not Repuestos.objects.filter(codigo=repuesto['codigo_repuesto'].pk).exists():
                 raise serializers.ValidationError({
                     'se_facturan_en': f'El repuesto {repuesto} no existe.'
                 })
@@ -421,9 +414,9 @@ class FacturasSerializer(serializers.ModelSerializer):
                 SeFacturanEn.objects.create(nro_factura=factura, **repuesto)
                 
                 with connection.cursor() as cursor:
-                    cursor.callproc('sp_actualizar_stock', [repuesto['codigo_repuesto'], repuesto['cantidad']])
+                    resultado = ''
+                    cursor.callproc('sp_actualizar_stock', [repuesto['codigo_repuesto'].pk, repuesto['cantidad'], resultado])
                     cursor.execute( "select @_sp_actualizar_stock")
-                    resultado = cursor.fetchone()[0]
                 
                 if resultado == 'Error al actualizar stock':
                     raise serializers.ValidationError({

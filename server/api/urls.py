@@ -17,7 +17,7 @@ urlpatterns = [
     path('proveedores', views.CreateProveedores.as_view()),
     path('proveedores/proveedor/<str:codigo_proveedores>', views.RetrieveUpdateDestroyProveedores.as_view()),
     path('empleados', views.CreateEmpleados.as_view()),
-    path('empleados/empleado/<str:nro_remito>', views.RetrieveUpdateDestroyRemitoProveedores.as_view()),
+    path('empleados/empleado/<str:dni_empleado>', views.RetrieveUpdateDestroyEmpleados.as_view()),
     path('remito_proveedores', views.CreateRemitoProveedores.as_view()),
     path('remito_proveedores/remito_proveedor/<str:nro_remito>', views.RetrieveUpdateDestroyRemitoProveedores.as_view()),
     path('suministra/<str:codigo_repuesto>/<str:codigo_proveedor>', views.RetrieveSuministra.as_view()),
