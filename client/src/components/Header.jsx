@@ -59,7 +59,7 @@ const Header = () => {
               <div className="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
                   <ul className="navbar-nav">
                     <li className="nav-item">
-                        <Link className="nav-link" aria-current="page" to="/">
+                        <Link className="nav-link" aria-current="page" to="/facturas">
                         Factura
                         </Link>
                     </li>

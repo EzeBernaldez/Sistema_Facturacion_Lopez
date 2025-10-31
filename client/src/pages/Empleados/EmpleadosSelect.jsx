@@ -62,7 +62,6 @@ const EmpleadosSeleccionar = () => {
     const seleccionaEmpleado = (item) => {
 
         const pathAnterior = location.pathname.replace(/\/empleados\/seleccionar\/?.*$/,"");
-
         navigate(pathAnterior, {
             state: { empleadoSeleccionado: item,
                 ...(params.index != undefined && { index: params.index })

@@ -152,7 +152,6 @@ const RemitoProveedoresPost = () => {
         if (location.state?.proveedorSeleccionado && !location.state?.index){
 
             const proveedorSeleccionado = location.state.proveedorSeleccionado;
-            console.log('entra', proveedorSeleccionado)
 
             const proveedorSeleccionadoLimpio = String(proveedorSeleccionado).trim();
 

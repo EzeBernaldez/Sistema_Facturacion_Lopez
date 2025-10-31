@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Header from "../../components/Header";
 import * as Yup from 'yup';
 import { useFormik, FormikProvider, FieldArray } from 'formik';
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import {
@@ -28,7 +28,11 @@ import {
     NumberDecrementStepper,
     NumberIncrementStepper,
     NumberInputStepper,
-    VStack
+    VStack,
+    HStack,
+    Select,
+    Flex,
+    Grid
 } from '@chakra-ui/react';
 import { FontAwesomeIcon, } from "@fortawesome/react-fontawesome";
 import { faXmark, faMagnifyingGlass, faPlus } from "@fortawesome/free-solid-svg-icons";
@@ -36,22 +40,33 @@ import api from "../../utils/api";
 import BeatLoader from "react-spinners/BeatLoader";
 import { ToastContainer, toast } from 'react-toastify';
 import AutoComplete from "../../components/AutoComplete";
+import { useContexto } from "../../contexts/GlobalContext";
+import { icon } from "@fortawesome/fontawesome-svg-core";
 
 
-const ClientesPatch = () => {
+const FacturasPost = () => {
     const [loading,setLoading] = useState(false);
     const [error, setError] = useState("");
-    const { codigo } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
+
     let [dataClientes, setDataClientes] = useState('');
     let [dataEmpleados, setDataEmpleados] = useState('');
 
+    const {
+        estadoFacturas,
+        actionFacturas,
+        dispatchFacturas: dispatch,
+        cargarPagina: setPagina,
+        pagina,
+    } = useContexto();
+
     const formik = useFormik({
         initialValues: {
-            metodo_pago: '',
-            cliente_participa: '',
-            empleado_hace: '',
-            se_facturan_en: [{
+            metodo_pago: estadoFacturas.metodo_pago || '',
+            cliente_participa: estadoFacturas.cliente_participa || '',
+            empleado_hace: estadoFacturas.empleado_hace || '',
+            se_facturan_en: estadoFacturas.se_facturan_en || [{
                 codigo_repuesto: '',
                 cantidad: 0,
                 precio: 0,
@@ -76,7 +91,6 @@ const ClientesPatch = () => {
                     ...values,
                     fecha: fechaActual,
                     total: total,
-                    metodo_pago: 'efectivo',
                 };
 
                 console.log(payload)
@@ -85,6 +99,9 @@ const ClientesPatch = () => {
                 
                 setLoading(false);
                 formik.resetForm();
+                dispatch({
+                    type: actionFacturas.REINICIARVALORES, 
+                })
                 toast.success("La factura se cargó correctamente")
                 navigate('/facturas');
             }
@@ -123,41 +140,109 @@ const ClientesPatch = () => {
         })
     });
     
+    // Para traer información de clientes
     useEffect(
         () => {
+            let timeout;
             const fetchData = async () =>{
                 try{
-    
-                    const response = await api.get(`api/clientes/cliente/${formik.values.cliente_participa}`);
-                    setDataClientes(JSON.stringify(response.data));
-                
+                    if (formik.values.cliente_participa.length > 1){
+                        const response = await api.get(`api/clientes/cliente/${formik.values.cliente_participa}`);
+                        setDataClientes(response.data);
+                    }
                 }
                 catch(err){
                     setDataClientes('');
                 }
             }
-            fetchData();
+
+            timeout = setTimeout(() => {
+                fetchData();
+            }, 300)
+
+            return () => {
+                clearTimeout(timeout);
+            }
         },
         [formik.values.cliente_participa]
     )
 
+    // Para traer información de empleados
     useEffect(
         () => {
+            let timeout;
             const fetchData = async () =>{
                 try{
-    
-                    const response = await api.get(`api/empleados/empleado/${formik.values.empleado_hace}`);
-                    setDataEmpleados(JSON.stringify(response.data));
-                
+                    if (formik.values.empleado_hace.length > 1){
+                        const response = await api.get(`api/empleados/empleado/${formik.values.empleado_hace}`);
+                        setDataEmpleados(response.data);
+                    }
                 }
                 catch(err){
                     setDataEmpleados('');
                 }
             }
-            fetchData();
+
+            timeout = setTimeout(() => {
+                fetchData();
+            }, 300);
+
+            return () => {
+                clearTimeout(timeout)
+            };
         },
         [formik.values.empleado_hace]
     );
+
+    useEffect(() => {
+        dispatch({
+            payload: formik.values,
+            type: actionFacturas.SETFACTURA, 
+        });
+    }, [formik.values, dispatch]);
+
+    useEffect(() => {
+
+        setPagina('Facturas')
+
+        if (location.state?.clienteSeleccionado){
+            const clienteAux = location.state.clienteSeleccionado;
+
+            formik.setFieldValue('cliente_participa', String(clienteAux).trim());
+
+            window.history.replaceState({}, document.title);
+        }
+
+        if (location.state?.empleadoSeleccionado){
+            const empleadoAux = location.state.empleadoSeleccionado;
+
+            formik.setFieldValue('empleado_hace', String(empleadoAux).trim());
+
+            window.history.replaceState({}, document.title);
+        }
+
+        if (location.state?.repuestoSeleccionado && location.state?.index){
+            const indice = Number(location.state.index);
+
+            const repuestoSeleccionado = location.state.repuestoSeleccionado;
+
+            const repuestoSeleccionadoLimpio = String(repuestoSeleccionado).trim();
+
+            const nuevosRepuestos = formik.values.se_facturan_en.map((item, i) => {
+            if (i === indice) {
+                return {
+                ...item,
+                codigo_repuesto: repuestoSeleccionadoLimpio
+                };
+            }
+            return item;
+            });
+            
+            formik.setFieldValue('se_facturan_en', nuevosRepuestos);
+
+            window.history.replaceState({}, document.title);
+        }
+    }, [location.state])
 
 
     return(
@@ -182,73 +267,43 @@ const ClientesPatch = () => {
             <Header />
         </header>
         <main>
-            <Stack alignItems='center' justifyContent='center' width='100%' bg="#E8F1FF" p={5}>
-                <form onSubmit={formik.handleSubmit}>
-                    <Box borderRadius='lg' boxShadow="md" p={8} width='90%' opacity='0.95' bg='#DAE8FD' mt={4}>
-                        <Heading as='h2' fontSize='2xl' mb={4}>Cliente</Heading>
-                        <Box>
-                            <FormControl 
-                                flex={1} 
-                                isInvalid={
-                                    formik.touched.cliente_participa && 
-                                    !!formik.errors.cliente_participa
-                                }
-                                mb={3}
-                            >
-                                <FormLabel>Cliente</FormLabel>
-                                    <Box display='flex' gap={2}>
-                                        <AutoComplete
-                                        para='clientes'
-                                        value={formik.values.cliente_participa}
-                                        onChange={(value) => {
-                                            formik.setFieldValue('cliente_participa', value);
-                                        }}
-                                        onSelect={(value) => {
-                                            formik.setFieldValue('cliente_participa', value)
-                                        }}
-                                        error={formik.errors.cliente_participa}
-                                        touched={formik.touched.cliente_participa}
-                                        ></AutoComplete>
-                                        <Button 
-                                            type="button"
-                                            colorScheme="blue"
-                                            boxShadow='md'
-                                            onClick={() => {
-                                                navigate(`clientes/seleccionar/`);
-                                            }}
-                                        >
-                                            Buscar
-                                        </Button>
-                                    </Box>
-                                    <FormErrorMessage>
-                                        {formik.errors.cliente_participa}
-                                    </FormErrorMessage>
-                            </FormControl>
-                            {dataClientes && (
-                            <Accordion defaultIndex={[0]} allowToggle>
-                                <AccordionItem>
-                                    <h3>
-                                        <AccordionButton _expanded={{ bg: 'teal', color: 'white' }} borderRadius='lg'>
-                                            <Box as='span' flex={1} textAlign='left' >
-                                                Ver Detalle del Cliente
-                                            </Box>
-                                            <AccordionIcon />
-                                        </AccordionButton>
-                                    </h3>
-                                    <AccordionPanel pb={2}>
-                                            <Text>
-                                                {dataClientes}
-                                            </Text>
-                                    </AccordionPanel>
-                                </AccordionItem>
-                            </Accordion>
-                            )}
-                        </Box>
-                    </Box>
+            <VStack justifyContent='start' alignItems='start' width='100%' bg="#E8F1FF" p={5} >
+                <form onSubmit={formik.handleSubmit} style={{width: '100%'}}>
+                <Box width='100%'>
+                    <Heading as='h2' textAlign='start' color='teal'>Factura</Heading>
+                    <Flex align='center' justify='space-between' gap={4} p={3} mt={2} ms={5}>
+                        <Text textAlign='start' whiteSpace='pre' p={3} mt={2} ms={5}>
+                            <Text display='inline' fontWeight='bold'>Fecha de factura:</Text>                {new Date().toISOString().split('T')[0]}
+                        </Text>
 
-
-                    <Box borderRadius='lg' boxShadow="md" p={8} width='90%' opacity='0.95' bg='#DAE8FD' mt={4}>
-                        <Heading as='h2' fontSize='2xl' mb={4}>Empleado</Heading>
+                        <FormControl 
+                            display='flex'
+                            alignItems='center'
+                            width='auto'
+                            isInvalid={
+                                formik.touched.metodo_pago && 
+                                !!formik.errors.metodo_pago
+                            }
+                        >
+                            <FormLabel htmlFor="metodo_pago" minW='120px' mb={0}>Método de Pago:</FormLabel>
+                            <Select placeholder="Seleccione una opción" width='200px' id='metodo_pago' name="metodo_pago" value={formik.values.metodo_pago} onChange={formik.handleChange}>
+                                <option value="efectivo">Efectivo</option>
+                                <option value="debito">Débito</option>
+                                <option value="cheque">Cheque</option>
+                                <option value="transferencia">Transferencia</option>
+                                <option value="credito">Crédito</option>
+                            </Select>
+                            <FormErrorMessage>
+                                {formik.errors.metodo_pago}
+                            </FormErrorMessage>
+                        </FormControl>
+                    </Flex>
+                </Box>
+                    <Box width='100%' mb={5}>
+                        <Flex mb={5} borderBottom='1px solid #777' ms={1} width='100%'>
+                            <Heading as='h3' fontSize='2xl' width='50%' textAlign='start' color='teal'>Empleado</Heading>
+                            <Text width='50%' textAlign='end' me={2}>{dataEmpleados.nombre}</Text>
+                        </Flex>
                         <Box>
                             <FormControl 
                                 flex={1} 
@@ -258,179 +313,221 @@ const ClientesPatch = () => {
                                 }
                                 mb={3}
                             >
-                                <FormLabel>Empleado</FormLabel>
-                                    <Box display='flex' gap={2}>
-                                        <AutoComplete
-                                        para='empleados'
-                                        value={formik.values.empleado_hace}
-                                        onChange={(value) => {
-                                            formik.setFieldValue('empleado_hace', value);
+                                <Box display='flex' gap={2}>
+                                    <AutoComplete
+                                    para='empleados'
+                                    value={formik.values.empleado_hace}
+                                    onChange={(value) => {
+                                        formik.setFieldValue('empleado_hace', value);
+                                    }}
+                                    onSelect={(value) => {
+                                        formik.setFieldValue('empleado_hace', value)
+                                    }}
+                                    error={formik.errors.empleado_hace}
+                                    touched={formik.touched.empleado_hace}
+                                    ></AutoComplete>
+                                    <Button 
+                                        type="button"
+                                        colorScheme="blue"
+                                        boxShadow='md'
+                                        onClick={() => {
+                                            navigate(`empleados/seleccionar/`);
                                         }}
-                                        onSelect={(value) => {
-                                            formik.setFieldValue('empleado_hace', value)
-                                        }}
-                                        error={formik.errors.empleado_hace}
-                                        touched={formik.touched.empleado_hace}
-                                        ></AutoComplete>
-                                        <Button 
-                                            type="button"
-                                            colorScheme="blue"
-                                            boxShadow='md'
-                                            onClick={() => {
-                                                navigate(`empleados/seleccionar/`);
-                                            }}
-                                        >
-                                            Buscar
-                                        </Button>
-                                    </Box>
-                                    <FormErrorMessage>
-                                        {formik.errors.empleado_hace}
-                                    </FormErrorMessage>
+                                    >
+                                        Buscar
+                                    </Button>
+                                </Box>
+                                <FormErrorMessage>
+                                    {formik.errors.empleado_hace}
+                                </FormErrorMessage>
                             </FormControl>
                             {dataEmpleados && (
-                            <Accordion defaultIndex={[0]} allowMultiple>
-                                <AccordionItem>
-                                    <h3>
-                                        <AccordionButton _expanded={{ bg: 'teal', color: 'white' }} borderRadius='lg'>
-                                            <Box as='span' flex={1} textAlign='left' >
-                                                Ver Detalle del Empleado
-                                            </Box>
-                                            <AccordionIcon />
-                                        </AccordionButton>
-                                    </h3>
-                                    <AccordionPanel pb={2}>
-                                            <Text>
-                                                {dataEmpleados}
-                                            </Text>
-                                    </AccordionPanel>
-                                </AccordionItem>
-                            </Accordion>
+                                <VStack alignItems='start' mt={2} ms={4}>
+                                    <Text>DNI: {dataEmpleados.dni_empleado}</Text>
+                                    <Text>Nombre: {dataEmpleados.nombre}</Text>
+                                    <Text>Apellido: {dataEmpleados.apellido}</Text>
+                                </VStack>
                             )}
                         </Box>
                     </Box>
 
-                    <Box borderRadius='lg' boxShadow="md" p={8} width='90%' opacity='0.95' bg='#DAE8FD' mt={4}>
+
+                    <Box width='100%' mb={5}>
+                        <Flex mb={5} borderBottom='1px solid #777' ms={1} width='100%'>
+                            <Heading as='h3' fontSize='2xl' width='50%' textAlign='start' color='teal'>Cliente</Heading>
+                            <Text width='50%' textAlign='end' me={2}>{dataClientes.razon_social}</Text>
+                        </Flex>
+                        <Box>
+                            <FormControl 
+                                flex={1} 
+                                isInvalid={
+                                    formik.touched.cliente_participa && 
+                                    !!formik.errors.cliente_participa
+                                }
+                                
+                            >
+                                <Box display='flex' gap={2}>
+                                    <AutoComplete
+                                    para='clientes'
+                                    value={formik.values.cliente_participa}
+                                    onChange={(value) => {
+                                        formik.setFieldValue('cliente_participa', value);
+                                    }}
+                                    onSelect={(value) => {
+                                        formik.setFieldValue('cliente_participa', value)
+                                    }}
+                                    error={formik.errors.cliente_participa}
+                                    touched={formik.touched.cliente_participa}
+                                    ></AutoComplete>
+                                    <Button 
+                                        type="button"
+                                        colorScheme="blue"
+                                        boxShadow='md'
+                                        onClick={() => {
+                                            navigate(`clientes/seleccionar/`);
+                                        }}
+                                    >
+                                        Buscar
+                                    </Button>
+                                </Box>
+                                <FormErrorMessage>
+                                    {formik.errors.cliente_participa}
+                                </FormErrorMessage>
+                            </FormControl>
+                            {dataClientes && (
+                            <VStack alignItems='start' mt={2} ms={4}>
+                                <Text>Domicilio: {dataClientes.direccion}</Text>
+                                <Text>CUIT: {dataClientes.cuit}</Text>
+                                <Text>Condición IVA: {dataClientes.condicion_iva}</Text>
+                                <Text>Nombre: {dataClientes.nombre}</Text>
+
+                            </VStack>
+                            )}
+                        </Box>
+                    </Box>
+
+
+
+                    <Box width='100%' mb={2}>
+                        <Flex mb={5} borderBottom='1px solid #777' ms={1} width='100%'>
+                            <Heading as='h3' fontSize='2xl' width='50%' textAlign='start' color='teal'>Repuestos</Heading>
+                        </Flex>
                         <FormikProvider value={formik.getFieldProps('se_facturan_en')}>
                             <FieldArray name="se_facturan_en">
                             {({ push, remove }) => (
                                 <>
                                 <Box gap={2} mb={3} width='100%'>
-                                    <Accordion allowMultiple defaultIndex={[0]}>
-                                        {formik.values.se_facturan_en.map((item, index) => (
-                                            <>
-                                            <AccordionItem mb={3} borderRadius='lg'
-                                            boxShadow="md">
-                                                <h2>
-                                                    <AccordionButton  _expanded={{ bg: 'teal', color: 'white' }} borderRadius='lg' >
-                                                        <IconButton size='sm' boxShadow='sm' colorScheme="red" icon={<FontAwesomeIcon icon={faXmark} color='black' fade/> 
-                                                            } 
-                                                            onClick={ () => {
-                                                            const nuevoRepuesto = formik.values.se_facturan_en.filter((_, i) => i !== index);
-                                                            formik.setFieldValue('se_facturan_en', nuevoRepuesto);
-                                                        }
-                                                            }
-                                                            isDisabled= {
-                                                                formik.values.se_facturan_en.length === 1
-                                                            }
-                                                        />
-                                                        <Box as='span' flex='1' textAlign='center'>
-                                                            Repuesto {index + 1}
-                                                        </Box>
-                                                        <AccordionIcon />
-                                                    </AccordionButton>
-                                                </h2>
-                                                
-                                                <AccordionPanel pb={4} >
-                                                    <FormControl 
-                                                        flex={1} 
-                                                        isInvalid={
-                                                            formik.touched.se_facturan_en?.[index]?.codigo_repuesto && 
-                                                            !!formik.errors.repuestos?.[index]?.codigo_repuesto
-                                                        }
-                                                        mb={3}
-                                                    >
-                                                        <FormLabel>Repuesto</FormLabel>
-                                                            <Box display='flex' gap={2}>
-                                                                <AutoComplete
-                                                                para='repuestos'
-                                                                value={formik.values.se_facturan_en?.[index]?.codigo_repuesto}
-                                                                onChange={(value) => {
-                                                                    formik.setFieldValue(`se_facturan_en.${index}.codigo_repuesto`, value);
-                                                                }}
-                                                                onSelect={(value) => {
-                                                                    formik.setFieldValue(`se_facturan_en.${index}.codigo_repuesto`, value)
-                                                                }}
-                                                                error={formik.errors.se_facturan_en?.[index]?.codigo_repuesto}
-                                                                touched={formik.touched.se_facturan_en?.[index]?.codigo_repuesto}
-                                                                ></AutoComplete>
-                                                                <Button 
-                                                                    type="button"
-                                                                    colorScheme="blue"
-                                                                    boxShadow='md'
-                                                                    onClick={() => {
-                                                                        navigate(`repuestos/seleccionar/${formik.values.proveedor}/${index}`);
-                                                                    }}
-                                                                >
-                                                                    Buscar
-                                                                </Button>
-                                                            </Box>
-                                                            <FormErrorMessage>
-                                                                {formik.errors.se_facturan_en?.[index]?.codigo_repuesto}
-                                                            </FormErrorMessage>
-                                                    </FormControl>
-
-                                                    <FormControl 
-                                                        flex={1} 
-                                                        isInvalid={
-                                                            formik.touched.se_facturan_en?.[index]?.precio && 
-                                                            !!formik.errors.se_facturan_en?.[index]?.precio
-                                                        }
-                                                        mb={3}
-                                                    >
-                                                        <FormLabel htmlFor="precio">Precio:</FormLabel>
-                                                        <NumberInput id="precio" min={0} precision={2} step={0.05} value={formik.values.se_facturan_en?.[index].precio}
-                                                        onChange={(value) => formik.setFieldValue(`se_facturan_en.${index}.precio`, value)}>
-                                                            <NumberInputField />
-                                                            <NumberInputStepper>
-                                                                <NumberIncrementStepper />
-                                                                <NumberDecrementStepper />
-                                                            </NumberInputStepper>
-                                                        </NumberInput>
+                                    <Grid templateColumns='auto 20% 20% 10%' gap={3} borderBottom='1px solid #777' m={2} mt={8}>
+                                        <Box color='teal'>Repuesto</Box>
+                                        <Box color='teal'>Cantidad</Box>
+                                        <Box color='teal'>Precio</Box>
+                                        <Box color='teal'>Acciones</Box>
+                                    </Grid>
+                                    {formik.values.se_facturan_en.map((item, index) => (
+                                        <>
+                                        <Grid templateColumns='auto 20% 20% 5%' gap={3}>
+                                            <Box justifySelf='center' alignSelf='center' width='100%'>
+                                                <FormControl 
+                                                    flex={1} 
+                                                    isInvalid={
+                                                        formik.touched.se_facturan_en?.[index]?.codigo_repuesto && 
+                                                        !!formik.errors.repuestos?.[index]?.codigo_repuesto
+                                                    }
+                                                    mb={3}
+                                                >
+                                                    <Box display='flex' gap={2}>
+                                                        <AutoComplete
+                                                        para='repuestos'
+                                                        value={formik.values.se_facturan_en?.[index]?.codigo_repuesto}
+                                                        onChange={(value) => {
+                                                            formik.setFieldValue(`se_facturan_en.${index}.codigo_repuesto`, value);
+                                                        }}
+                                                        onSelect={(value) => {
+                                                            formik.setFieldValue(`se_facturan_en.${index}.codigo_repuesto`, value)
+                                                        }}
+                                                        error={formik.errors.se_facturan_en?.[index]?.codigo_repuesto}
+                                                        touched={formik.touched.se_facturan_en?.[index]?.codigo_repuesto}
+                                                        ></AutoComplete>
+                                                        <IconButton 
+                                                            type="button"
+                                                            colorScheme="blue"
+                                                            boxShadow='md'
+                                                            size='md'
+                                                            onClick={() => {
+                                                                navigate(`repuestos/seleccionar/${index}`);
+                                                            }}
+                                                            icon={<FontAwesomeIcon icon={faMagnifyingGlass} size="sm"/>}
+                                                        >
+                                                        </IconButton>
+                                                    </Box>
                                                         <FormErrorMessage>
-                                                            {formik.errors.se_facturan_en?.[index]?.precio}
+                                                            {formik.errors.se_facturan_en?.[index]?.codigo_repuesto}
                                                         </FormErrorMessage>
-                                                    </FormControl>
+                                                </FormControl>
+                                            </Box>
 
-                                                    <FormControl 
-                                                        flex={1} 
-                                                        isInvalid={
-                                                            formik.touched.se_facturan_en?.[index]?.cantidad && 
-                                                            !!formik.errors.se_facturan_en?.[index]?.cantidad
-                                                        }
-                                                        mb={3}
-                                                    >
-                                                        <FormLabel htmlFor="cantidad">Cantidad</FormLabel>
-                                                        <NumberInput id="cantidad" min={1} step={1} value={formik.values.se_facturan_en?.[index]?.cantidad}
-                                                        onChange={(value) => formik.setFieldValue(`se_facturan_en.${index}.cantidad`, value)}>
-                                                            <NumberInputField />
-                                                            <NumberInputStepper>
-                                                                <NumberIncrementStepper />
-                                                                <NumberDecrementStepper />
-                                                            </NumberInputStepper>
-                                                        </NumberInput>
-                                                        <FormErrorMessage>
-                                                            {formik.errors.se_facturan_en?.[index]?.cantidad}
-                                                        </FormErrorMessage>
-                                                    </FormControl>
+                                            <Box justifySelf='center' alignSelf='center' width='100%'>
+                                                <FormControl 
+                                                    flex={1} 
+                                                    isInvalid={
+                                                        formik.touched.se_facturan_en?.[index]?.cantidad && 
+                                                        !!formik.errors.se_facturan_en?.[index]?.cantidad
+                                                    }
+                                                    mb={3}
+                                                >
+                                                    <NumberInput id="cantidad" min={1} step={1} value={formik.values.se_facturan_en?.[index]?.cantidad}
+                                                    onChange={(value) => formik.setFieldValue(`se_facturan_en.${index}.cantidad`, value)}>
+                                                        <NumberInputField />
+                                                        <NumberInputStepper>
+                                                            <NumberIncrementStepper />
+                                                            <NumberDecrementStepper />
+                                                        </NumberInputStepper>
+                                                    </NumberInput>
+                                                    <FormErrorMessage>
+                                                        {formik.errors.se_facturan_en?.[index]?.cantidad}
+                                                    </FormErrorMessage>
+                                                </FormControl>
+                                            </Box>
 
-
-
-                                                </AccordionPanel>
-                                                
-                                        </AccordionItem>
-                                        </>
-                                        ))}
-                                    </Accordion>
+                                            <Box justifySelf='center' alignSelf='center' width='100%'>
+                                                <FormControl 
+                                                    flex={1} 
+                                                    isInvalid={
+                                                        formik.touched.se_facturan_en?.[index]?.precio && 
+                                                        !!formik.errors.se_facturan_en?.[index]?.precio
+                                                    }
+                                                    mb={3}
+                                                >
+                                                    <NumberInput id="precio" min={0} precision={2} step={100} value={formik.values.se_facturan_en?.[index].precio}
+                                                    onChange={(value) => formik.setFieldValue(`se_facturan_en.${index}.precio`, value)}>
+                                                        <NumberInputField />
+                                                        <NumberInputStepper>
+                                                            <NumberIncrementStepper />
+                                                            <NumberDecrementStepper />
+                                                        </NumberInputStepper>
+                                                    </NumberInput>
+                                                    <FormErrorMessage>
+                                                        {formik.errors.se_facturan_en?.[index]?.precio}
+                                                    </FormErrorMessage>
+                                                </FormControl>
+                                            </Box>        
+                                            
+                                            <Box justifySelf='start' alignSelf='baseline' width='100%'>
+                                                <IconButton size='sm' boxShadow='sm' colorScheme="red" icon={<FontAwesomeIcon icon={faXmark} color='black' fade/> 
+                                                    } 
+                                                    onClick={ () => {
+                                                    const nuevoRepuesto = formik.values.se_facturan_en.filter((_, i) => i !== index);
+                                                    formik.setFieldValue('se_facturan_en', nuevoRepuesto);
+                                                }
+                                                    }
+                                                    isDisabled= {
+                                                        formik.values.se_facturan_en.length === 1
+                                                    }
+                                                />
+                                            </Box>
+                                        </Grid>
+                                    </>
+                                    ))}
                                 </Box>
 
 
@@ -467,10 +564,10 @@ const ClientesPatch = () => {
 
             </form>
 
-            </Stack>
+            </VStack>
         </main>
         </>
     )
 }
 
-export default ClientesPatch;
+export default FacturasPost;

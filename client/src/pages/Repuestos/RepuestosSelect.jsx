@@ -25,13 +25,16 @@ const RepuestosSeleccionar = () => {
     const params = useParams();
     const navigate = useNavigate();
     const location = useLocation();
-
+    let repuestosFiltrados = [];
     const {
-        cargarPagina: setPagina,
-        estadoRepuestos,
-        dispatchRepuestos: dispatch,
-        actionRepuestos,
-    } = useContexto();
+            cargarPagina: setPagina,
+            pagina,
+            estadoRepuestos,
+            dispatchRepuestos: dispatch,
+            actionRepuestos,
+        } = useContexto();
+    const [paginaAnterior, setPaginaAnterior] = useState(pagina);
+
 
     const {
         arrayRepuestos,
@@ -62,17 +65,31 @@ const RepuestosSeleccionar = () => {
 
         const pathAnterior = location.pathname.replace(/\/repuestos\/seleccionar\/?.*$/,"");
 
-        navigate(pathAnterior, {
-            state: { repuestoSeleccionado: item,
-                ...(params.index != undefined && { index: params.index })
-            },
-            replace: true });
+
+        if (paginaAnterior === 'Facturas'){ 
+            navigate(pathAnterior, {
+                state: { repuestoSeleccionado: item,
+                    index: params.proveedor 
+                }
+            })
+        }
+        // Esto es porque el primer parámetro es proveedor dentro del link, por lo tanto cuando no le mandamos un proveedor toma a index como primer parámetro y se sigue llamando
+        else{
+            navigate(pathAnterior, {
+                state: { repuestoSeleccionado: item,
+                    ...(params.index != undefined && { index: params.index })
+                },
+                replace: true });
+        }
     };
 
-
-    const repuestosFiltrados = arrayRepuestos.filter((item) => item.suministra_read?.some(
+    if (paginaAnterior !== 'Facturas'){
+        repuestosFiltrados = arrayRepuestos.filter((item) => item.suministra_read?.some(
         (proveedor) => proveedor.proveedor_suministra === params.proveedor
-    ));
+        ));
+    } else{
+        repuestosFiltrados = arrayRepuestos;
+    }
 
     return(
         <>
