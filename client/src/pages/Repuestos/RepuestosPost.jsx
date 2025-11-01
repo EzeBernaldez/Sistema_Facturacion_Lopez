@@ -128,7 +128,7 @@ const RepuestosPost = () => {
                         toastC({
                             status: 'error',
                             isClosable: true,
-                            title: `Error al crear el repuesto en ${field == 'suministra' ? 'proveedor' : `${field}`}`,
+                            title: `404 - Error al crear el repuesto en ${field == 'suministra' ? 'proveedor' : `${field}`}`,
                         })
                     })
                 } else {

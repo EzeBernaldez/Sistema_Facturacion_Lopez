@@ -96,7 +96,7 @@ const ProveedoresPatch = () => {
                         toastC({
                             status: 'error',
                             isClosable: true,
-                            title: `Error al actualizar el proveedor en ${field}`,
+                            title: `404 - Error al actualizar el proveedor en ${field}`,
                         })
                     })
                 } else {

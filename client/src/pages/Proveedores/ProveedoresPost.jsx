@@ -90,7 +90,7 @@ const ProveedoresPost = () => {
                         toastC({
                             status: 'error',
                             isClosable: true,
-                            title: `Error al crear el proveedor en ${field}`,
+                            title: `404 - Error al crear el proveedor en ${field}`,
                         })
                     })
                 } else {
