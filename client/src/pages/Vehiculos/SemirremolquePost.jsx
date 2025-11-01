@@ -38,7 +38,6 @@ const SemirremolquePost = () => {
 
     const formik = useFormik({
         initialValues: {
-            codigo_vehiculos: '',
             modelo: '',
             ano_fabricacion: '',
             marca: '',

@@ -83,7 +83,7 @@ const RepuestosVehiculos = () => {
           <TabPanels>
             <TabPanel>
               <Flex justifyContent="end" p={0}>
-                <IconButton colorScheme='blue' size='md' me="94%" height="2rem" icon={<FontAwesomeIcon icon={faLeftLong}/>} onClick={() => navigate(-1)}/>
+                <IconButton colorScheme='blue' size='md' me="94%" height="2rem" icon={<FontAwesomeIcon icon={faLeftLong}/>} onClick={() => navigate("/repuestos")}/>
                 <IconButton
                   colorScheme="blue"
                   size="md"
