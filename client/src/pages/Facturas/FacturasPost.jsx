@@ -32,7 +32,8 @@ import {
     HStack,
     Select,
     Flex,
-    Grid
+    Grid,
+    useToast,
 } from '@chakra-ui/react';
 import { FontAwesomeIcon, } from "@fortawesome/react-fontawesome";
 import { faXmark, faMagnifyingGlass, faPlus } from "@fortawesome/free-solid-svg-icons";
@@ -49,6 +50,10 @@ const FacturasPost = () => {
     const [error, setError] = useState("");
     const navigate = useNavigate();
     const location = useLocation();
+    const toast = useToast({
+        position: 'top',
+
+    });
 
     let [dataClientes, setDataClientes] = useState('');
     let [dataEmpleados, setDataEmpleados] = useState('');
@@ -118,6 +123,12 @@ const FacturasPost = () => {
                         else{
                             setError(errorMessage);
                         }
+
+                        toast({
+                            status: 'error',
+                            isClosable: true,
+                            title: errorMessage,
+                        })
                     })
                 } else {
                     setError('Error al actualizar el cliente. Intente nuevamente.');
@@ -136,7 +147,13 @@ const FacturasPost = () => {
                     precio: Yup.number().required('Debe ingresar el precio del repuesto'),
                     })
                 )
-                .min(1, "Debe ingresar al menos un teléfono"),
+                .min(1, "Debe ingresar al menos un teléfono")
+                .test('codigos-unicos', 'No pueden haber repuestos repetidos', function (value) {
+                    if (!value) return true;
+                    const codigos = value.map(item => item.codigo_repuesto);
+                    const codigosUnicos = [...new Set(codigos)];
+                    return codigos.length === codigosUnicos.length;
+                }),
         })
     });
     
@@ -247,22 +264,6 @@ const FacturasPost = () => {
 
     return(
         <>
-        <Collapse in={!!error} animateOpacity>
-                <Box
-                    position="fixed"
-                    top="1rem"
-                    left='50%'
-                    transform="translateX(-50%)"
-                    zIndex={9999}
-                    w="90%"
-                    maxW="lg"
-                >
-                    <Alert status='error' variant="left-accent" borderRadius="md" boxShadow="md">
-                    <AlertIcon />
-                        {error}
-                    </Alert>
-                </Box>
-        </Collapse>
         <header>
             <Header />
         </header>
@@ -431,7 +432,7 @@ const FacturasPost = () => {
                                                     flex={1} 
                                                     isInvalid={
                                                         formik.touched.se_facturan_en?.[index]?.codigo_repuesto && 
-                                                        !!formik.errors.repuestos?.[index]?.codigo_repuesto
+                                                        !!formik.errors.se_facturan_en?.[index]?.codigo_repuesto
                                                     }
                                                     mb={3}
                                                 >
@@ -441,6 +442,9 @@ const FacturasPost = () => {
                                                         value={formik.values.se_facturan_en?.[index]?.codigo_repuesto}
                                                         onChange={(value) => {
                                                             formik.setFieldValue(`se_facturan_en.${index}.codigo_repuesto`, value);
+                                                            setTimeout(() => {
+                                                                formik.validateField(`se_facturan_en.${index}.codigo_repuesto`);
+                                                            }, 100);
                                                         }}
                                                         onSelect={(value) => {
                                                             formik.setFieldValue(`se_facturan_en.${index}.codigo_repuesto`, value)
@@ -553,6 +557,12 @@ const FacturasPost = () => {
                             </>
                             )}
                             </FieldArray>
+                            {formik.errors.se_facturan_en && typeof formik.errors.se_facturan_en === 'string' && (
+                                <Alert status="error" mb={4}>
+                                    <AlertIcon />
+                                    {formik.errors.se_facturan_en}
+                                </Alert>
+)}
                     </FormikProvider>
                 </Box>
 

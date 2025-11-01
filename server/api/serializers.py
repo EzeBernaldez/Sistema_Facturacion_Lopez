@@ -427,12 +427,15 @@ class FacturasSerializer(serializers.ModelSerializer):
                 
                 with connection.cursor() as cursor:
                     resultado = ''
-                    cursor.callproc('sp_actualizar_stock', [repuesto['codigo_repuesto'].pk, repuesto['cantidad'], resultado])
-                    cursor.execute( "select @_sp_actualizar_stock")
+                    cursor.callproc('sp_actualizar_stock', [repuesto['codigo_repuesto'].pk, repuesto['cantidad'], ''])
+                    cursor.execute( "select @_sp_actualizar_stock_2")
+                    resultado = cursor.fetchone()[0]
+                
+                print(f'entra {resultado}')
                 
                 if resultado == 'Error al actualizar stock':
                     raise serializers.ValidationError({
-                        'SeFacturanEn': f'Hay un error con el stock en el repuesto {repuesto['codigo_origen']} con cantidad {repuesto['cantidad']}'
+                        'SeFacturanEn': f'Hay un error con el stock en el repuesto {repuesto['codigo_repuesto'].pk} con cantidad {repuesto['cantidad']}'
                     })
             else:
                 raise serializers.ValidationError({
