@@ -70,6 +70,10 @@ const EmpleadosSeleccionar = () => {
             replace: true });
     };
 
+    const volver = () => {
+        const pathAnterior = location.pathname.replace(/\/clientes\/seleccionar\/?.*$/,"");
+        navigate(pathAnterior);
+    };
 
     return(
         <>
@@ -143,7 +147,7 @@ const EmpleadosSeleccionar = () => {
                             <Tr>
                                 <Td>No hay elementos para mostrar</Td>
                             </Tr>
-                            <Button onClick={() => navigate('/facturas/nuevo')}>Volver</Button>
+                            <Button onClick={() => volver()}>Volver</Button>
                         </Tbody>
                     )}
                 </Table>

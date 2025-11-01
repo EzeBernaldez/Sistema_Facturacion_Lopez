@@ -21,6 +21,7 @@ import {
     Heading,
     Stack,
     Select,
+    useToast,
 } from '@chakra-ui/react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
@@ -34,6 +35,9 @@ const EmpleadosPatch = () => {
     const [error, setError] = useState("");
     const { dni } = useParams();
     const navigate = useNavigate();
+    const toastC = useToast({
+        position: 'top',
+    })
 
 
     useEffect(() => {
@@ -87,9 +91,19 @@ const EmpleadosPatch = () => {
                         else{
                             setError(errorMessage);
                         }
+                        toastC({
+                            status: 'error',
+                            isClosable: true,
+                            title: `404 - Error al actualizar el empleado en ${field}`,
+                        })
                     })
                 } else {
                     setError('Error al actualizar el empleado. Intente nuevamente.');
+                    toastC({
+                            status: 'error',
+                            isClosable: true,
+                            title: error
+                        })
                 }
                 console.error('Error:', err.response?.data);
             }
@@ -109,22 +123,6 @@ const EmpleadosPatch = () => {
     
     return(
         <>
-        <Collapse in={!!error} animateOpacity>
-                <Box
-                    position="fixed"
-                    top="1rem"
-                    left='50%'
-                    transform="translateX(-50%)"
-                    zIndex={9999}
-                    w="90%"
-                    maxW="lg"
-                >
-                    <Alert status='error' variant="left-accent" borderRadius="md" boxShadow="md">
-                    <AlertIcon />
-                        {error}
-                    </Alert>
-                </Box>
-        </Collapse>
         <header>
             <Header />
         </header>

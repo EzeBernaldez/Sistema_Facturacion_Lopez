@@ -18,7 +18,8 @@ import {
     Stack,
     Grid,
     Select,
-    IconButton
+    IconButton,
+    useToast
 } from '@chakra-ui/react';
 import api from "../../utils/api";
 import BeatLoader from "react-spinners/BeatLoader";
@@ -34,6 +35,9 @@ const ProveedoresPost = () => {
     const [loading,setLoading] = useState(false);
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    const toastC = useToast({
+        position: 'top',
+    })
 
     const {
         pagina
@@ -83,9 +87,19 @@ const ProveedoresPost = () => {
                         else{
                             setError(errorMessage);
                         }
+                        toastC({
+                            status: 'error',
+                            isClosable: true,
+                            title: `404 - Error al crear el proveedor en ${field}`,
+                        })
                     })
                 } else {
                     setError('Error al crear el proveedor. Intente nuevamente.');
+                    toastC({
+                            status: 'error',
+                            isClosable: true,
+                            title: error
+                        })
                 }
                 console.error('Error:', err.response?.data);
             }

@@ -20,6 +20,7 @@ import {
     Heading,
     Stack,
     Select,
+    useToast,
 } from '@chakra-ui/react';
 import api from "../../utils/api";
 import BeatLoader from "react-spinners/BeatLoader";
@@ -35,6 +36,9 @@ const CamionPatch = () => {
     const [error, setError] = useState("");
     const navigate = useNavigate();
     const { codigo } = useParams();
+    const toastC = useToast({
+        position: 'top',
+    })
 
     useEffect(() => {
         const fetchVehiculos = async () => {
@@ -90,9 +94,19 @@ const CamionPatch = () => {
                         else{
                             setError(errorMessage);
                         }
+                        toastC({
+                            status: 'error',
+                            isClosable: true,
+                            title: errorMessage
+                        })
                     })
                 } else {
                     setError('Error al actualizar el camion. Intente nuevamente.');
+                    toastC({
+                            status: 'error',
+                            isClosable: true,
+                            title: error
+                        })
                 }
                 console.error('Error:', err.response?.data);
             }
@@ -108,22 +122,6 @@ const CamionPatch = () => {
 
     return(
         <>
-        <Collapse in={!!error} animateOpacity>
-                <Box
-                    position="fixed"
-                    top="1rem"
-                    left='50%'
-                    transform="translateX(-50%)"
-                    zIndex={9999}
-                    w="90%"
-                    maxW="lg"
-                >
-                    <Alert status='error' variant="left-accent" borderRadius="md" boxShadow="md">
-                    <AlertIcon />
-                        {error}
-                    </Alert>
-                </Box>
-        </Collapse>
         <header>
             <Header />
         </header>

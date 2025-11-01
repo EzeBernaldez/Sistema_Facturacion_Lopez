@@ -91,6 +91,11 @@ const RepuestosSeleccionar = () => {
         repuestosFiltrados = arrayRepuestos;
     }
 
+    const volver = () => {
+        const pathAnterior = location.pathname.replace(/\/repuestos\/seleccionar\/?.*$/,"");
+        navigate(pathAnterior);
+    };
+
     return(
         <>
         <header>
@@ -158,7 +163,7 @@ const RepuestosSeleccionar = () => {
                             <Tr>
                                 <Td>No hay elementos para mostrar</Td>
                             </Tr>
-                            <Button onClick={() => navigate('/facturas/nuevo')}>Volver</Button>
+                            <Button onClick={() => volver()}>Volver</Button>
                         </Tbody>
                     )}
                 </Table>

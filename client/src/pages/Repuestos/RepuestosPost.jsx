@@ -27,7 +27,8 @@ import {
     AccordionButton,
     AccordionIcon,
     AccordionItem,
-    AccordionPanel
+    AccordionPanel,
+    useToast
 } from '@chakra-ui/react';
 import api from "../../utils/api";
 import BeatLoader from "react-spinners/BeatLoader";
@@ -44,6 +45,9 @@ const RepuestosPost = () => {
     const [error, setError] = useState("");
     const navigate = useNavigate();
     const location = useLocation();
+    const toastC = useToast({
+        position: 'top',
+    })
 
     const {
         estadoRepuestos,
@@ -121,9 +125,19 @@ const RepuestosPost = () => {
                         else{
                             setError(errorMessage);
                         }
+                        toastC({
+                            status: 'error',
+                            isClosable: true,
+                            title: `404 - Error al crear el repuesto en ${field == 'suministra' ? 'proveedor' : `${field}`}`,
+                        })
                     })
                 } else {
                     setError('Error al crear el repuesto. Intente nuevamente.');
+                    toastC({
+                            status: 'error',
+                            isClosable: true,
+                            title: error
+                        })
                 }
                 console.error('Error:', err.response?.data);
             }
@@ -186,22 +200,6 @@ const RepuestosPost = () => {
 
     return(
         <>
-        <Collapse in={!!error} animateOpacity>
-                <Box
-                    position="fixed"
-                    top="1rem"
-                    left='50%'
-                    transform="translateX(-50%)"
-                    zIndex={9999}
-                    w="90%"
-                    maxW="lg"
-                >
-                    <Alert status='error' variant="left-accent" borderRadius="md" boxShadow="md">
-                    <AlertIcon />
-                        {error}
-                    </Alert>
-                </Box>
-        </Collapse>
         <header>
             <Header />
         </header>

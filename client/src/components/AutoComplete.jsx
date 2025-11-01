@@ -137,6 +137,7 @@ const AutoComplete = ({ para, value, onChange, onSelect, error, touched , provee
                 value={searchTerm}
                 onChange={handleInputChange}
                 onFocus={handleInputFocus}
+                onBlur={handleInputFocus}
                 placeholder="Buscar..." 
                 isInvalid={touched && error}
                 autoComplete='off'
@@ -161,7 +162,8 @@ const AutoComplete = ({ para, value, onChange, onSelect, error, touched , provee
                         <Text p={2}>Buscando...</Text>
                     ) : suggestions.length > 0 ? (
                         <List>
-                            {suggestions.map((item) => (
+                            {suggestions.map((item) => 
+                            (
                                 <ListItem
                                     key={item.id}
                                     p={2}

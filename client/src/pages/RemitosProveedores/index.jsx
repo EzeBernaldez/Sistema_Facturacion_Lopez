@@ -122,11 +122,6 @@ const RemitoProveedores = () => {
                                                     onDoubleClick={() => deleteRemitoProveedores(item.nro_remito)}>
                                                         { isDeleted ? `Eliminar` : `¿Desea eliminar el remito?` } 
                                                     </Button>
-                                                    { isDeleted && (
-                                                    <Button colorScheme='green' className='ms-3' onClick={() => navigate(`/remito_proveedores/actualizar/${item.nro_remito}`)}>
-                                                        Actualizar
-                                                    </Button>
-                                                    )}
                                                     { !isDeleted && (
                                                         <IconButton ms={1} icon={<FontAwesomeIcon icon={faXmark} color='black' fade/> 
                                                         } 
