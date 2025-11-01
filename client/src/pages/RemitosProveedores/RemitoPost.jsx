@@ -61,7 +61,7 @@ const RemitoProveedoresPost = () => {
             nro_remito: estadoRemitoProveedores.nro_remito || '',
             fecha: estadoRemitoProveedores.fecha || Date.now(),
             monto_total: estadoRemitoProveedores.monto_total || 0,
-            pagado: estadoRemitoProveedores.pagado || '',
+            pagado: estadoRemitoProveedores.pagado || 'Si',
             proveedor: estadoRemitoProveedores.proveedor || '',
             repuestos: estadoRemitoProveedores.repuestos || [{
                 codigo_contiene: '',
@@ -250,7 +250,7 @@ const RemitoProveedoresPost = () => {
                                     id='pagado'
                                     {...formik.getFieldProps('pagado')}
                                 >
-                                    <option value="si" selected>Sí</option>
+                                    <option value="si">Sí</option>
                                     <option value="no">No</option>
                                 </Select>
                                 <FormErrorMessage>{formik.errors.pagado}</FormErrorMessage>

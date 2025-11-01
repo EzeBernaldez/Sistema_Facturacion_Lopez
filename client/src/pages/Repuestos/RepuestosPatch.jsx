@@ -82,7 +82,7 @@ const RepuestosPatch = () => {
       codigo: estadoRepuestos.codigo || "",
       descripcion: estadoRepuestos.descripcion || "",
       marca: estadoRepuestos.marca || "",
-      precio_venta: estadoRepuestos.precio_venta || "",
+      precio_base: estadoRepuestos.precio_base || "",
       tipo: estadoRepuestos.tipo || "",
       porcentaje_recargo: estadoRepuestos.porcentaje_recargo || 0,
       suministra: estadoRepuestos.suministra || [
@@ -110,7 +110,7 @@ const RepuestosPatch = () => {
         const payload = {
           ...values,
           stock: stock,
-          precio_venta: parseFloat(values.precio_venta).toFixed(2).toString(),
+          precio_base: parseFloat(values.precio_base).toFixed(2).toString(),
         };
 
         console.log(payload);
@@ -167,9 +167,9 @@ const RepuestosPatch = () => {
           "Debe ingresar una nombre más acotado, pruebe con alguna abreviación del nombre original."
         )
         .required("Debe ingresar la marca del repuesto."),
-      precio_venta: Yup.string()
+      precio_base: Yup.string()
         .matches(/^\d{1,10}(\.\d+)?$/, "Debe tener hasta 10 dígitos")
-        .required("El precio de venta es obligatorio"),
+        .required("El precio base es obligatorio"),
       tipo: Yup.string()
         .max(100, "Debe ingresar un tipo con menos de 100 caracteres.")
         .required("Debe ingresar un tipo"),
@@ -303,18 +303,18 @@ const RepuestosPatch = () => {
                 <FormControl
                   width="100%"
                   isInvalid={
-                    formik.touched.precio_venta && !!formik.errors.precio_venta
+                    formik.touched.precio_base && !!formik.errors.precio_base
                   }
                 >
-                  <FormLabel htmlFor="precio">Precio de Venta:</FormLabel>
+                  <FormLabel htmlFor="precio">Precio Base:</FormLabel>
                   <NumberInput
                     id="precio"
                     min={0}
                     precision={2}
                     step={0.05}
-                    value={formik.values.precio_venta}
+                    value={formik.values.precio_base}
                     onChange={(value) =>
-                      formik.setFieldValue("precio_venta", value)
+                      formik.setFieldValue("precio_base", value)
                     }
                   >
                     <NumberInputField />
@@ -324,7 +324,7 @@ const RepuestosPatch = () => {
                     </NumberInputStepper>
                   </NumberInput>
                   <FormErrorMessage>
-                    {formik.errors.precio_venta}
+                    {formik.errors.precio_base}
                   </FormErrorMessage>
                 </FormControl>
                 <FormControl

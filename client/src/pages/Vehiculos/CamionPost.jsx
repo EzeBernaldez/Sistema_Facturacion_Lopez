@@ -99,7 +99,7 @@ const CamionPost = () => {
         },
         validationSchema: Yup.object({
             modelo: Yup.string().trim().max(30,'Debe ingresar modelo mas acotado').required('Debe ingresar un modelo.'),
-            ano_fabricacion: Yup.date().required('Debe ingresar una fecha.').typeError('Debe ingresar una fecha válida.'),
+            ano_fabricacion: Yup.string().length(4,"'El año debe tener exactamente 4 dígitos").required('Debe ingresar el año de fabricacion.').typeError('Debe ingresar un año valido.'),
             marca: Yup.string().trim().max(30,'Debe ingresar una marca mas acotado').required('Debe ingresar una marca.'),
             motor: Yup.string().max(10,'Debe ingresar un motor mas corto').required("Debe ingresar un motor"),
         })
@@ -129,8 +129,8 @@ const CamionPost = () => {
                                 <FormLabel htmlFor="fecha">Año de Fabricacion:</FormLabel>
                                 <Input
                                     id='ano_fabricacion'
-                                    size='md'
-                                    type="date"
+                                    placeholder="Ingrese la marca del camion"
+                                    type="number"
                                     {...formik.getFieldProps('ano_fabricacion')}
                                 />
                                 <FormErrorMessage>{formik.errors.ano_fabricacion}</FormErrorMessage>

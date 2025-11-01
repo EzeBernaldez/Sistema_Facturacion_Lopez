@@ -32,7 +32,8 @@ import {
     HStack,
     Select,
     Flex,
-    Grid
+    Grid,
+    useToast
 } from '@chakra-ui/react';
 import { FontAwesomeIcon, } from "@fortawesome/react-fontawesome";
 import { faXmark, faMagnifyingGlass, faPlus } from "@fortawesome/free-solid-svg-icons";
@@ -49,13 +50,10 @@ const FacturasPost = () => {
     const [error, setError] = useState("");
     const navigate = useNavigate();
     const location = useLocation();
-<<<<<<< HEAD
-=======
     const toastC = useToast({
         position: 'top',
 
     });
->>>>>>> 2e5bdfe41a7ab29dfd79243f81a40d25b49b2d5b
 
     let [dataClientes, setDataClientes] = useState('');
     let [dataEmpleados, setDataEmpleados] = useState('');
@@ -125,15 +123,12 @@ const FacturasPost = () => {
                         else{
                             setError(errorMessage);
                         }
-<<<<<<< HEAD
-=======
 
                         toastC({
                             status: 'error',
                             isClosable: true,
                             title: `404 - Error al crear la factura en ${field}`,
                         })
->>>>>>> 2e5bdfe41a7ab29dfd79243f81a40d25b49b2d5b
                     })
                 } else {
                     setError('Error al actualizar el cliente. Intente nuevamente.');

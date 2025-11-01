@@ -15,9 +15,14 @@ import {
     Flex,
     IconButton,
     Button,
-    background
+    background,
+    MenuButton,
+    MenuList,
+    MenuItem,
+    Menu,
+    Text,
 } from '@chakra-ui/react';
-import { faPlus, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faXmark, faPhone } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
@@ -102,7 +107,7 @@ const Clientes = (props) => {
                                     arrayClientes.map((item,index) => {
                                         return(
                                             <Tr key={index}>
-                                                <Td>{item.codigo}</Td>
+                                                <Td>{item.codigo_clientes}</Td>
                                                 <Td>{item.nombre}</Td>
                                                 <Td>{item.razon_social}</Td>
                                                 <Td>{item.condicion_iva}</Td>
@@ -113,10 +118,29 @@ const Clientes = (props) => {
                                                     {
                                                         item.telefonos.length > 0 ? (
                                                             <>
-                                                            {
-                                                                item.telefonos.map((telefono,index) =>
-                                                                    `${index+1}: ${telefono.numero} ` )
-                                                            }
+                                                                <Menu>
+                                                                    <MenuButton
+                                                                        as={IconButton}
+                                                                        aria-label="Opciones de Teléfono"
+                                                                        icon={<FontAwesomeIcon icon={faPhone}/>}
+                                                                        size="sm"
+                                                                        variant="outline"
+                                                                        colorScheme="blue"
+                                                                    >
+                                                                        <Text ml={2}>{item.telefonos.length}</Text>
+                                                                    </MenuButton>
+                                                                    <MenuList>
+                                                                        <Text fontWeight="bold" px={3} py={1}>Números Registrados:</Text>
+                                                                        {item.telefonos.map((t, index) => (
+                                                                            <MenuItem 
+                                                                                key={index}
+                                                                                onClick={() => navigator.clipboard.writeText(t.numero)} 
+                                                                            >
+                                                                                {t.numero} 
+                                                                            </MenuItem>
+                                                                        ))}
+                                                                    </MenuList>
+                                                                </Menu>
                                                             </>
                                                         ) : item.telefonos[0]
                                                     }

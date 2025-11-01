@@ -59,7 +59,6 @@ const CamionPatch = () => {
 
     const formik = useFormik({
         initialValues: {
-            codigo_vehiculos: '',
             modelo: '',
             ano_fabricacion: '',
             marca: '',
@@ -112,9 +111,8 @@ const CamionPatch = () => {
             }
         },
         validationSchema: Yup.object({
-            codigo_vehiculos: Yup.string().trim().max(30, 'Debe ingresar un código menor a 30 dígitos').required('Debe ingresar un código de camion.'),
             modelo: Yup.string().trim().max(30,'Debe ingresar modelo mas acotado').required('Debe ingresar un modelo.'),
-            ano_fabricacion: Yup.date().required('Debe ingresar una fecha.').typeError('Debe ingresar una fecha válida.'),
+            ano_fabricacion: Yup.string().length(4,"'El año debe tener exactamente 4 dígitos").required('Debe ingresar el año de fabricacion.').typeError('Debe ingresar un año valido.'),
             marca: Yup.string().trim().max(30,'Debe ingresar una marca mas acotado').required('Debe ingresar una marca.'),
             motor: Yup.string().max(10,'Debe ingresar un motor mas corto').required("Debe ingresar un motor"),
         })
@@ -131,17 +129,6 @@ const CamionPatch = () => {
                     <Heading as='h2' fontSize='2xl' mb={4}>Actualizar Camion</Heading>
                     <form onSubmit={formik.handleSubmit}>
                         <VStack gap="4" alignItems='flex-start'>
-                            <FormControl width='100%' isInvalid={formik.touched.codigo_vehiculos && !!formik.errors.codigo_vehiculos}>
-                                <FormLabel htmlFor="codigo_vehiculos">Código:</FormLabel>
-                                <Input
-                                id="codigo_vehiculos"
-                                width='100%'
-                                border='1px solid #A0BDE8'
-                                {...formik.getFieldProps("codigo_vehiculos")}
-                                disabled
-                                />
-                                <FormErrorMessage>{formik.errors.codigo_vehiculos}</FormErrorMessage>
-                            </FormControl>
                             <FormControl width='100%' isInvalid={formik.touched.modelo && !!formik.errors.modelo}>
                                 <FormLabel htmlFor="modelo">Modelo:</FormLabel>
                                 <Textarea
@@ -156,7 +143,7 @@ const CamionPatch = () => {
                                 <Input
                                     id='ano_fabricacion'
                                     size='md'
-                                    type="date"
+                                    type="number"
                                     {...formik.getFieldProps('ano_fabricacion')}
                                 />
                                 <FormErrorMessage>{formik.errors.ano_fabricacion}</FormErrorMessage>

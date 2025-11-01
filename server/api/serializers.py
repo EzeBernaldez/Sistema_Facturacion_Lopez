@@ -65,7 +65,7 @@ class RepuestosSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Repuestos
-        fields = ['codigo', 'descripcion', 'marca', 'precio_venta', 'stock', 'tipo', 'porcentaje_recargo', 'suministra', 'suministra_read']
+        fields = ['codigo', 'descripcion', 'marca', 'precio_venta','precio_base', 'stock', 'tipo', 'porcentaje_recargo', 'suministra', 'suministra_read']
 
     @transaction.atomic
     def create(self, validated_data):
@@ -173,15 +173,6 @@ class TelefonosClientesSerializer(serializers.ModelSerializer):
 
 class ClientesSerializer(serializers.ModelSerializer):
     
-    codigo = serializers.CharField(
-        source='codigo_clientes',
-        validators=[
-            UniqueValidator(
-                queryset=Clientes.objects.all(),
-                message='El código de cliente ya existe. Utilice otro código o modifique el cliente existente'
-            )
-        ]
-    )
     
     cuit = serializers.CharField(
         validators=[
@@ -198,7 +189,7 @@ class ClientesSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Clientes
-        fields = ['codigo', 'correo', 'nombre','condicion_iva', 'razon_social', 'telefonos', 'telefonos_clientes','cuit','direccion']
+        fields = ['codigo_clientes', 'correo', 'nombre','condicion_iva', 'razon_social', 'telefonos', 'telefonos_clientes','cuit','direccion']
     
     def create(self, validated_data):
         telefonos_clientes = validated_data.pop('telefonos_clientes', [])

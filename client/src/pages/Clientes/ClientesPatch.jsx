@@ -140,25 +140,29 @@ const ClientesPatch = () => {
                     <Heading as='h2' fontSize='2xl' mb={4}>Actualizar Cliente</Heading>
                     <form onSubmit={formik.handleSubmit}>
                         <VStack gap="4" alignItems='flex-start'>
-                            <FormControl width='100%' isInvalid={formik.touched.codigo && !!formik.errors.codigo}>
-                                <FormLabel htmlFor="codigo">Código:</FormLabel>
+                            <FormControl width='100%' isInvalid={formik.touched.nombre && !!formik.errors.nombre}>
+                                <FormLabel htmlFor="nombre">Nombre</FormLabel>
                                 <Input
-                                id="codigo"
-                                width='100%'
-                                border='1px solid #A0BDE8'
-                                {...formik.getFieldProps("codigo")}
-                                disabled
+                                    id='nombre'
+                                    {...formik.getFieldProps('nombre')}
                                 />
-                                <FormErrorMessage>{formik.errors.codigo}</FormErrorMessage>
+                                <FormErrorMessage>{formik.errors.nombre}</FormErrorMessage>
                             </FormControl>
-                            <FormControl width='100%' isInvalid={formik.touched.correo && !!formik.errors.correo}>
-                                <FormLabel htmlFor="correo">Correo:</FormLabel>
-                                <Textarea
-                                    id='correo'
-                                    placeholder="Ingrese la descripción de su producto"
-                                    {...formik.getFieldProps('correo')}
+                            <FormControl width='100%' isInvalid={formik.touched.razon_social && !!formik.errors.razon_social}>
+                                <FormLabel htmlFor="razon_social">Razon Social:</FormLabel>
+                                <Input
+                                    id='razon_social'
+                                    {...formik.getFieldProps('razon_social')}
                                 />
-                                <FormErrorMessage>{formik.errors.correo}</FormErrorMessage>
+                                <FormErrorMessage>{formik.errors.razon_social}</FormErrorMessage>
+                            </FormControl>
+                            <FormControl width='100%' isInvalid={formik.touched.cuit && !!formik.errors.cuit}>
+                                <FormLabel htmlFor="tipo">CUIT:</FormLabel>
+                                <Input
+                                    id='cuit'
+                                    {...formik.getFieldProps('cuit')}
+                                />
+                                <FormErrorMessage>{formik.errors.cuit}</FormErrorMessage>
                             </FormControl>
                             <FormControl width='100%' isInvalid={formik.touched.condicion_iva && !!formik.errors.condicion_iva}>
                                 <FormLabel htmlFor="condicion_iva">Condición de IVA:</FormLabel>
@@ -174,29 +178,14 @@ const ClientesPatch = () => {
                                 </Select>
                                 <FormErrorMessage>{formik.errors.condicion_iva}</FormErrorMessage>
                             </FormControl>
-                            <FormControl width='100%' isInvalid={formik.touched.nombre && !!formik.errors.nombre}>
-                                <FormLabel htmlFor="nombre">Nombre</FormLabel>
-                                <Input
-                                    id='nombre'
-                                    {...formik.getFieldProps('nombre')}
+                            <FormControl width='100%' isInvalid={formik.touched.correo && !!formik.errors.correo}>
+                                <FormLabel htmlFor="correo">Correo:</FormLabel>
+                                <Textarea
+                                    id='correo'
+                                    placeholder="Ingrese la descripción de su producto"
+                                    {...formik.getFieldProps('correo')}
                                 />
-                                <FormErrorMessage>{formik.errors.nombre}</FormErrorMessage>
-                            </FormControl>
-                            <FormControl width='100%' isInvalid={formik.touched.razon_social && !!formik.errors.razon_social}>
-                                <FormLabel htmlFor="razon_social">Razon Social:</FormLabel>
-                                <Input
-                                    id='razon_social'
-                                    {...formik.getFieldProps('razon_social')}
-                                />
-                                <FormErrorMessage>{formik.errors.condicion_iva}</FormErrorMessage>
-                            </FormControl>
-                            <FormControl width='100%' isInvalid={formik.touched.cuit && !!formik.errors.cuit}>
-                                <FormLabel htmlFor="tipo">CUIT:</FormLabel>
-                                <Input
-                                    id='cuit'
-                                    {...formik.getFieldProps('cuit')}
-                                />
-                                <FormErrorMessage>{formik.errors.cuit}</FormErrorMessage>
+                                <FormErrorMessage>{formik.errors.correo}</FormErrorMessage>
                             </FormControl>
                             <FormControl width='100%' isInvalid={formik.touched.direccion && !!formik.errors.direccion}>
                                 <FormLabel htmlFor="tipo">Dirección:</FormLabel>
@@ -225,6 +214,7 @@ const ClientesPatch = () => {
                                                     <FormLabel>Número {index + 1}</FormLabel>
                                                     <Input 
                                                         placeholder="+541112345678"
+                                                        type="number"
                                                         {...formik.getFieldProps(`telefonos_clientes.${index}.numero`)}
                                                     />
                                                     <FormErrorMessage>

@@ -89,7 +89,7 @@ const Repuestos = (props) => {
                                     <Th>Código</Th>
                                     <Th>Descripción</Th>
                                     <Th>Marca</Th>
-                                    <Th>Precio</Th>
+                                    <Th>Precio de Venta</Th>
                                     <Th>Stock</Th>
                                     <Th>Tipo</Th>
                                     <Th>Acciones</Th>

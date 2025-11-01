@@ -63,7 +63,7 @@ const RepuestosPost = () => {
             codigo: estadoRepuestos.codigo || '',
             descripcion: estadoRepuestos.descripcion || '',
             marca: estadoRepuestos.marca || '',
-            precio_venta: estadoRepuestos.precio_venta || '',
+            precio_base: estadoRepuestos.precio_base || '',
             tipo: estadoRepuestos.tipo || '',
             porcentaje_recargo: estadoRepuestos.porcentaje_recargo || 0,
             suministra: estadoRepuestos.suministra || [{
@@ -92,7 +92,7 @@ const RepuestosPost = () => {
                 const payload = {
                     ...values,
                     stock: stock,
-                    precio_venta: parseFloat(values.precio_venta)
+                    precio_base: parseFloat(values.precio_base)
                         .toFixed(2)
                         .toString(),
                 };
@@ -146,7 +146,7 @@ const RepuestosPost = () => {
             codigo: Yup.string().trim().max(30, 'Debe ingresar un código menor a 30 dígitos').required('Debe ingresar un código de repuesto.'),
             descripcion: Yup.string().trim().min(5, 'Debe ingresar una descripción más precisa del repuesto.').max(70,'Debe ingresar una descripción más acotada del repuesto.').required('Debe ingresar una descripción del repuesto.'),
             marca: Yup.string().trim().max(100,'Debe ingresar una nombre más acotado, pruebe con alguna abreviación del nombre original.').required('Debe ingresar la marca del repuesto.'),
-            precio_venta: Yup.string().matches(/^\d{1,10}(\.\d+)?$/, "Debe tener hasta 10 dígitos").required("El precio de venta es obligatorio"),
+            precio_base: Yup.string().matches(/^\d{1,10}(\.\d+)?$/, "Debe tener hasta 10 dígitos").required("El precio base es obligatorio"),
             tipo: Yup.string().max(100, 'Debe ingresar un tipo con menos de 100 caracteres.').required('Debe ingresar un tipo'),
             porcentaje_recargo: Yup.number().min(0,'Debe ingresar un porcentaje de recargo mayor o igual a 0').required('Debe ingresar un porcentaje de recargo'),
             suministra: Yup.array()
@@ -236,17 +236,17 @@ const RepuestosPost = () => {
                                 />
                                 <FormErrorMessage>{formik.errors.marca}</FormErrorMessage>
                             </FormControl>
-                            <FormControl width='100%' isInvalid={formik.touched.precio_venta && !!formik.errors.precio_venta}>
-                                <FormLabel htmlFor="precio">Precio de Venta:</FormLabel>
-                                <NumberInput id="precio" min={0} precision={2} step={0.05} value={formik.values.precio_venta}
-                                onChange={(value) => formik.setFieldValue('precio_venta', value)}>
+                            <FormControl width='100%' isInvalid={formik.touched.precio_base && !!formik.errors.precio_base}>
+                                <FormLabel htmlFor="precio">Precio Base:</FormLabel>
+                                <NumberInput id="precio" min={0} precision={2} step={0.05} value={formik.values.precio_base}
+                                onChange={(value) => formik.setFieldValue('precio_base', value)}>
                                     <NumberInputField />
                                     <NumberInputStepper>
                                         <NumberIncrementStepper />
                                         <NumberDecrementStepper />
                                     </NumberInputStepper>
                                 </NumberInput>
-                                <FormErrorMessage>{formik.errors.precio_venta}</FormErrorMessage>
+                                <FormErrorMessage>{formik.errors.precio_base}</FormErrorMessage>
                             </FormControl>
                             <FormControl width='100%' isInvalid={formik.touched.tipo && !!formik.errors.tipo}>
                                 <FormLabel htmlFor="tipo">Tipo:</FormLabel>

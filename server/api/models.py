@@ -4,7 +4,8 @@ class Repuestos(models.Model):
     codigo = models.CharField(primary_key=True, max_length=30, db_index=True)
     descripcion = models.TextField()
     marca = models.CharField(max_length=100)
-    precio_venta = models.DecimalField(max_digits=10 ,decimal_places=2)
+    precio_venta = models.DecimalField(max_digits=10 ,decimal_places=2,default=0)
+    precio_base = models.DecimalField(max_digits=10 ,decimal_places=2, default=0)
     stock = models.IntegerField(default=0)
     tipo = models.CharField(max_length=100, null=True)
     porcentaje_recargo = models.IntegerField()
@@ -15,14 +16,14 @@ class Repuestos(models.Model):
 class Vehiculos(models.Model):
     codigo_vehiculos = models.AutoField(primary_key=True)
     modelo = models.CharField(max_length=30)
-    ano_fabricacion = models.DateField()
+    ano_fabricacion = models.SmallIntegerField()
     marca = models.CharField(max_length=30)
     motor = models.CharField(max_length=10, null=True)
     tipo_vehiculo = models.CharField(max_length=20, db_index=True)
     tipo_semirremolque = models.CharField(max_length=30, null=True)
 
 class Proveedores(models.Model):
-    codigo_proveedores = models.CharField(primary_key=True,db_index=True,max_length=30)
+    codigo_proveedores = models.AutoField(primary_key=True, db_index=True)
     correo = models.EmailField(max_length=254, help_text='Ingrese una dirección de email válida')
     nombre = models.CharField(max_length=100)
     direccion = models.CharField(max_length=200)
@@ -46,7 +47,7 @@ class Clientes(models.Model):
     ]
     
     nombre=models.CharField(max_length=100, default="Sin nombre")
-    codigo_clientes = models.CharField(max_length=30, db_index=True, primary_key=True)
+    codigo_clientes = models.AutoField(primary_key=True, db_index=True)
     correo = models.EmailField(max_length=254, help_text='Ingrese una dirección de email válida')
     condicion_iva = models.CharField(max_length=11, choices=condiciones_iva)
     razon_social = models.CharField(max_length=50)

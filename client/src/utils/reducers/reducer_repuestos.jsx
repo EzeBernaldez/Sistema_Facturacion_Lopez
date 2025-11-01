@@ -14,6 +14,7 @@ export const initialValueRepuestos = {
     descripcion: '',
     marca: '',
     precio_venta: '',
+    precio_base: '',
     stock: 0,
     tipo: '',
     porcentaje_recargo: 0,

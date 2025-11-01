@@ -285,7 +285,7 @@ def get_vehiculos_no_pertenece(request, codigo_repuesto):
     return Response(serializer.data)
 
 class RetrieveUpdateDestroyPertenece(RetrieveUpdateDestroyAPIView):
-    serializer_class = Pertenece
+    serializer_class = PerteneceSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
     queryset = Pertenece.objects.all()

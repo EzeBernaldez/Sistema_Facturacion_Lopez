@@ -59,7 +59,6 @@ const ProveedoresPatch = () => {
 
     const formik = useFormik({
         initialValues: {
-            codigo_proveedores: '',
             correo: '',
             nombre: '',
             nombre: '',
@@ -136,17 +135,6 @@ const ProveedoresPatch = () => {
                     <Heading as='h2' fontSize='2xl' mb={4}>Actualizar Proveedor</Heading>
                     <form onSubmit={formik.handleSubmit}>
                         <VStack gap="4" alignItems='flex-start'>
-                            <FormControl width='100%' isInvalid={formik.touched.codigo_proveedores && !!formik.errors.codigo_proveedores}>
-                                <FormLabel htmlFor="codigo_proveedor">Código de proveedor:</FormLabel>
-                                <Input
-                                id="codigo_proveedor"
-                                width='100%'
-                                border='1px solid #A0BDE8'
-                                {...formik.getFieldProps("codigo_proveedores")}
-                                disabled
-                                />
-                                <FormErrorMessage>{formik.errors.codigo_proveedores}</FormErrorMessage>
-                            </FormControl>
                             <FormControl width='100%' isInvalid={formik.touched.correo && !!formik.errors.correo}>
                                 <FormLabel htmlFor="correo">Correo:</FormLabel>
                                 <Input
@@ -192,6 +180,7 @@ const ProveedoresPatch = () => {
                                                     <FormLabel>Número {index + 1}</FormLabel>
                                                     <Input 
                                                         placeholder="+541112345678"
+                                                        type="number"
                                                         {...formik.getFieldProps(`telefonos_proveedores.${index}.numero`)}
                                                     />
                                                     <FormErrorMessage>

@@ -99,7 +99,7 @@ const EmpleadosPost = () => {
             }
         },
         validationSchema: Yup.object({
-            dni_empleado: Yup.string().trim().max(11, "Debe ingresar un dni válido. No coloque .'s").required('Debe ingresar el dni del empleado.'),
+            dni_empleado: Yup.string().trim().min(7, "Debe ingresar un dni válido. Un dni tiene mas de 7 digitos").max(9, "Debe ingresar un dni válido. Longitud maxima 9").required('Debe ingresar el dni del empleado.').matches(/^[0-9]+$/, 'Solo se permiten números.'),
             nombre: Yup.string().trim().max(20,'Debe ingresar un nombre más acotado').required('Debe ingresar el nombre del empleado.'),
             apellido: Yup.string().max(20,'Debe ingresar un apellido más acotado').required("Debe ingresar el apellido del empleado"),
             telefonos_empleados: Yup.array()
@@ -145,6 +145,7 @@ const EmpleadosPost = () => {
                                 id="dni"
                                 width='100%'
                                 border='1px solid #A0BDE8'
+                                type="number"
                                 {...formik.getFieldProps("dni_empleado")}
                                 />
                                 <FormErrorMessage>{formik.errors.dni_empleado}</FormErrorMessage>
@@ -184,6 +185,7 @@ const EmpleadosPost = () => {
                                                     <FormLabel>Número {index + 1}</FormLabel>
                                                     <Input 
                                                         placeholder="+541112345678"
+                                                        type="number"
                                                         {...formik.getFieldProps(`telefonos_empleados.${index}.numero`)}
                                                     />
                                                     <FormErrorMessage>

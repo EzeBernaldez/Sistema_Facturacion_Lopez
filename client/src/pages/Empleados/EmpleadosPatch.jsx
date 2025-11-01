@@ -178,6 +178,7 @@ const EmpleadosPatch = () => {
                                                     <FormLabel>Número {index + 1}</FormLabel>
                                                     <Input 
                                                         placeholder="+541112345678"
+                                                        type="number"
                                                         {...formik.getFieldProps(`telefonos_empleados.${index}.numero`)}
                                                     />
                                                     <FormErrorMessage>

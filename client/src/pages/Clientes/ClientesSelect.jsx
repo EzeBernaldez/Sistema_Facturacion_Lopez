@@ -107,7 +107,7 @@ const EmpleadosSeleccionar = () => {
                                     arrayClientes.map((item, index) => {
                                         return(
                                             <Tr key={index}>
-                                                <Td>{item.codigo}</Td>
+                                                <Td>{item.codigo_clientes}</Td>
                                                 <Td>{item.correo}</Td>
                                                 <Td>{item.nombre}</Td>
                                                 <Td>{item.condicion_iva}</Td>
@@ -129,7 +129,7 @@ const EmpleadosSeleccionar = () => {
                                                 <Td>
                                                     <Button colorScheme='blue' 
                                                     onClick={
-                                                        () => seleccionaCliente(item.codigo)
+                                                        () => seleccionaCliente(item.codigo_clientes)
                                                     }
                                                     >
                                                         Seleccionar 
