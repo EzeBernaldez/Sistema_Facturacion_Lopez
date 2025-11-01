@@ -229,16 +229,13 @@ class FacturasViewSet(viewsets.ReadOnlyModelViewSet):
     
     @action(detail=False, methods=['get'])
     def ultima(self, request):
-        # 1. Obtiene la factura con el ID más alto
         try:
             ultima_factura = self.get_queryset().latest('nro_factura') 
         except Facturas.DoesNotExist:
             return Response({"detail": "No hay facturas registradas."}, status=404)
         
-        # 2. Serializa la instancia completa
         serializer = self.get_serializer(ultima_factura)
-        
-        # 3. Devuelve la factura completa, incluyendo el ID
+
         return Response(serializer.data)
 
 # -----------------------------------------Pertenece

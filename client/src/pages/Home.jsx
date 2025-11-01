@@ -103,25 +103,6 @@ const Home = () => {
                                 <Text>Facturas</Text>
                             </Button>
 
-                            <Button
-                                size='lg'
-                                shadow='lg'
-                                borderRadius='lg'
-                                p={4}
-                                bgColor='#C4DAFA'
-                                _hover={{ bgColor:'#A0BDE8' }}
-                                display='flex'
-                                flexDirection='column'
-                                height='auto'
-                                alignItems='center'
-                                justifyContent='center'
-                                gap={2}
-                                onClick={generarPDF}
-                                >
-                                <FontAwesomeIcon icon={faFileInvoiceDollar} fontSize='2rem' />
-                                <Text>Descargar Factura</Text>
-                            </Button>
-
                             <Button size='lg'  shadow='lg' borderRadius='lg' p={4} bgColor='#C4DAFA' _hover={{
                                 bgColor:'#A0BDE8'
                             }}
