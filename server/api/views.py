@@ -1,5 +1,5 @@
-from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework import status, viewsets
+from rest_framework.decorators import api_view, permission_classes, authentication_classes, action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth.models import User
@@ -219,6 +219,27 @@ class RetrieveUpdateDestroyFacturas(RetrieveUpdateDestroyAPIView):
     queryset = Facturas.objects.all()
     lookup_field = 'nro_factura'
 
+class FacturasViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = (
+        Facturas.objects
+        .select_related('empleado_hace', 'cliente_participa')
+        .prefetch_related('sefacturanen_set__codigo_repuesto')
+    )
+    serializer_class = FacturasSerializer
+    
+    @action(detail=False, methods=['get'])
+    def ultima(self, request):
+        # 1. Obtiene la factura con el ID más alto
+        try:
+            ultima_factura = self.get_queryset().latest('nro_factura') 
+        except Facturas.DoesNotExist:
+            return Response({"detail": "No hay facturas registradas."}, status=404)
+        
+        # 2. Serializa la instancia completa
+        serializer = self.get_serializer(ultima_factura)
+        
+        # 3. Devuelve la factura completa, incluyendo el ID
+        return Response(serializer.data)
 
 # -----------------------------------------Pertenece
 

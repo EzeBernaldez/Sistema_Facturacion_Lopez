@@ -17,10 +17,11 @@ import {
     Button,
     background
 } from '@chakra-ui/react';
-import { faPlus, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faXmark, faFilePdf } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
+import { generarPDF } from '../../components/generarPDF';
 
 const Facturas = (props) => {
 
@@ -95,7 +96,20 @@ const Facturas = (props) => {
                                                 <Td>{item.fecha}</Td>
                                                 <Td>{item.metodo_pago}</Td>
                                                 <Td>
-                                                    otra cosa
+                                                    <IconButton
+                                                    colorScheme="blue"
+                                                    size="md"
+                                                    icon={<FontAwesomeIcon icon={faFilePdf} />}
+                                                    onClick={async () => {
+                                                        try {
+                                                            const response = await api.get(`/api/facturas/${item.nro_factura}/`);
+                                                            const facturaSeleccionada = response.data;
+                                                            generarPDF(facturaSeleccionada);
+                                                        } catch (error) {
+                                                            console.error("Error en la solicitud de la factura:", error);
+                                                        }
+                                                    }}
+                                                    />
                                                 </Td>
                                             </Tr>
                                         );

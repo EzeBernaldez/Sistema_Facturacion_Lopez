@@ -343,6 +343,9 @@ class RemitoProveedoresSerializer(serializers.ModelSerializer):
         return instance
 
 class SeFacturanEnSerializer(serializers.ModelSerializer):
+    
+    codigo_repuesto = RepuestosSerializer(read_only=True)
+    
     class Meta:
         model = SeFacturanEn
         fields = ['codigo_repuesto', 'cantidad', 'precio', 'subtotal']
@@ -350,6 +353,15 @@ class SeFacturanEnSerializer(serializers.ModelSerializer):
             'codigo_repuesto' : {'validators': []} 
         }
 
+class SeFacturanEnWriteSerializer(serializers.ModelSerializer):
+    
+    codigo_repuesto = serializers.PrimaryKeyRelatedField(
+        queryset=Repuestos.objects.all()
+    )
+
+    class Meta:
+        model = SeFacturanEn
+        fields = ['codigo_repuesto', 'cantidad', 'precio', 'subtotal']
 
 class FacturasSerializer(serializers.ModelSerializer):
     
@@ -369,13 +381,13 @@ class FacturasSerializer(serializers.ModelSerializer):
     
     cliente_participa_read = ClientesSerializer(source='cliente_participa', read_only=True)
     
-    se_facturan_en = SeFacturanEnSerializer(many=True, write_only=True, required=False)
+    se_facturan_en = SeFacturanEnWriteSerializer(many=True, write_only=True, required=False) 
     
     se_facturan_en_read = SeFacturanEnSerializer(many=True, read_only=True, source='sefacturanen_set') #Duda, capaz necesito hacer un serializer que contenga todos los atributos
     
     class Meta:
         model = Facturas
-        fields = ['total', 'fecha', 'metodo_pago', 'empleado_hace', 'empleado_hace_read', 'cliente_participa', 'cliente_participa_read', 'se_facturan_en', 'se_facturan_en_read']
+        fields = ['nro_factura','total', 'fecha', 'metodo_pago', 'empleado_hace', 'empleado_hace_read', 'cliente_participa', 'cliente_participa_read', 'se_facturan_en', 'se_facturan_en_read']
     
     def validate(self, data):
         
@@ -426,8 +438,10 @@ class FacturasSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({
                     'sefacturanen': f'Repuesto {repuesto['codigo_origen']} duplicado en la factura'
                 })
-        
+
         return factura
+    
+    
     
     # @transaction.atomic
     # def update(self, instance, validated_data):

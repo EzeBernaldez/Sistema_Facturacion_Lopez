@@ -42,7 +42,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import AutoComplete from "../../components/AutoComplete";
 import { useContexto } from "../../contexts/GlobalContext";
 import { icon } from "@fortawesome/fontawesome-svg-core";
-
+import { generarPDF } from "../../components/generarPDF";
 
 const FacturasPost = () => {
     const [loading,setLoading] = useState(false);
@@ -93,8 +93,6 @@ const FacturasPost = () => {
                     total: total,
                 };
 
-                console.log(payload)
-
                 await api.post(`/api/facturas`, payload);
                 
                 setLoading(false);
@@ -103,6 +101,8 @@ const FacturasPost = () => {
                     type: actionFacturas.REINICIARVALORES, 
                 })
                 toast.success("La factura se cargó correctamente")
+                const ultima = await api.get(`/api/facturas/ultima/`);
+                generarPDF(ultima.data)
                 navigate('/facturas');
             }
             catch (err){

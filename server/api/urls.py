@@ -1,7 +1,10 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework.routers import DefaultRouter
 
+router = DefaultRouter()
+router.register(r'facturas', views.FacturasViewSet, basename='facturas')
 
 urlpatterns = [
     path('auth/login/', views.login_view, name='login'),
@@ -34,5 +37,6 @@ urlpatterns = [
     path('repuestos/<str:codigo_repuesto>/vehiculo/nuevo', views.get_vehiculos_no_pertenece),
     path('pertenece/<str:V_Codigo_pertenece>/<str:R_Codigo_pertenece>/', views.RetrieveUpdateDestroyPertenece.as_view(), name='pertenece-detail'),    
     path('pertenece/', views.CreatePertenece.as_view()),  
+    path('', include(router.urls)),
      
 ]
