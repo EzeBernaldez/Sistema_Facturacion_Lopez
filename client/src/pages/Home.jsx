@@ -106,10 +106,11 @@ const Home = () => {
                             <Button size='lg'  shadow='lg' borderRadius='lg' p={4} bgColor='#C4DAFA' _hover={{
                                 bgColor:'#A0BDE8'
                             }}
-                            display='flex' flexDirection='column' height='auto' alignItems='center' justifyContent='center' gap={2}>
-                                <FontAwesomeIcon icon={faCommentDollar} fontSize='2rem
+                            display='flex' flexDirection='column' height='auto' alignItems='center' justifyContent='center' gap={2}
+                            onClick={ () => navigate("/remito_proveedores")}>
+                                <FontAwesomeIcon icon={faFileInvoice} fontSize='2rem
                                 '/>
-                                <Text>Presupuesto</Text>
+                                <Text>Remito Proveedores</Text>
                             </Button>
 
                             <Button size='lg'  shadow='lg' borderRadius='lg' p={4} bgColor='#C4DAFA' _hover={{
@@ -122,15 +123,7 @@ const Home = () => {
                                 <Text>Clientes</Text>
                             </Button>
                         
-                            <Button size='lg'  shadow='lg' borderRadius='lg' p={4} bgColor='#C4DAFA' _hover={{
-                                bgColor:'#A0BDE8'
-                            }}
-                            display='flex' flexDirection='column' height='auto' alignItems='center' justifyContent='center' gap={2}
-                            onClick={ () => navigate("/remito_proveedores")}>
-                                <FontAwesomeIcon icon={faFileInvoice} fontSize='2rem
-                                '/>
-                                <Text>Remito Proveedores</Text>
-                            </Button>
+                            
 
                             <Button size='lg'  shadow='lg' borderRadius='lg' p={4} bgColor='#C4DAFA' _hover={{
                                 bgColor:'#A0BDE8'

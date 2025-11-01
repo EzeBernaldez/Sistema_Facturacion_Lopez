@@ -19,6 +19,7 @@ import {
     Heading,
     Stack,
     Select,
+    useToast,
 } from '@chakra-ui/react';
 import api from "../../utils/api";
 import BeatLoader from "react-spinners/BeatLoader";
@@ -33,6 +34,9 @@ const ClientesPost = () => {
     const [loading,setLoading] = useState(false);
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    const toastC = useToast({
+        position: 'top',
+    })
 
     const { pagina } = useContexto();
 
@@ -80,9 +84,19 @@ const ClientesPost = () => {
                         else{
                             setError(errorMessage);
                         }
+                        toastC({
+                            status: 'error',
+                            isClosable: true,
+                            title: `404 - Error al crear el cliente en ${field}`,
+                        })
                     })
                 } else {
                     setError('Error al crear el cliente. Intente nuevamente.');
+                    toastC({
+                            status: 'error',
+                            isClosable: true,
+                            title: error
+                        })
                 }
                 console.error('Error:', err.response?.data);
             }
@@ -107,22 +121,6 @@ const ClientesPost = () => {
 
     return(
         <>
-        <Collapse in={!!error} animateOpacity>
-                <Box
-                    position="fixed"
-                    top="1rem"
-                    left='50%'
-                    transform="translateX(-50%)"
-                    zIndex={9999}
-                    w="90%"
-                    maxW="lg"
-                >
-                    <Alert status='error' variant="left-accent" borderRadius="md" boxShadow="md">
-                    <AlertIcon />
-                        {error}
-                    </Alert>
-                </Box>
-        </Collapse>
         <header>
             <Header />
         </header>

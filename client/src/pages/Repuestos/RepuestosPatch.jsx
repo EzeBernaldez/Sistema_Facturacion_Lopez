@@ -30,6 +30,7 @@ import {
   AccordionIcon,
   AccordionItem,
   AccordionPanel,
+  useToast,
 } from "@chakra-ui/react";
 import api from "../../utils/api";
 import BeatLoader from "react-spinners/BeatLoader";
@@ -37,8 +38,7 @@ import { ToastContainer, toast } from "react-toastify";
 import { useContexto } from "../../contexts/GlobalContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
-import AutoComplete   from '../../components/AutoComplete';
-
+import AutoComplete from "../../components/AutoComplete";
 
 const RepuestosPatch = () => {
   const [loading, setLoading] = useState(false);
@@ -46,33 +46,36 @@ const RepuestosPatch = () => {
   const { codigo } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const toastC = useToast({
+    position: "top",
+  });
 
   const { estadoRepuestos, dispatchRepuestos, actionRepuestos } = useContexto();
 
-const [datosCargados, setDatosCargados] = useState(false);
+  const [datosCargados, setDatosCargados] = useState(false);
 
-useEffect(() => {
-  if (!datosCargados && !location.state?.proveedorSeleccionado) {
-    const fetchRepuesto = async () => {
-      try {
-        const response = await api.get(`/api/repuestos/actualizar/${codigo}`);
-        const datos = {
-          ...response.data,
-          suministra: response.data.suministra_read.map((item) => ({
-            cantidad: item.cantidad,
-            codigo_origen: item.codigo_origen,
-            proveedor_suministra: item.proveedor_suministra, 
-          })),
+  useEffect(() => {
+    if (!datosCargados && !location.state?.proveedorSeleccionado) {
+      const fetchRepuesto = async () => {
+        try {
+          const response = await api.get(`/api/repuestos/actualizar/${codigo}`);
+          const datos = {
+            ...response.data,
+            suministra: response.data.suministra_read.map((item) => ({
+              cantidad: item.cantidad,
+              codigo_origen: item.codigo_origen,
+              proveedor_suministra: item.proveedor_suministra,
+            })),
+          };
+          formik.setValues(datos);
+          setDatosCargados(true);
+        } catch (err) {
+          console.error("Error actualizando repuesto:", err);
         }
-        formik.setValues(datos);
-        setDatosCargados(true);
-      } catch (err) {
-        console.error("Error actualizando repuesto:", err);
-      }
-    };
-    fetchRepuesto();
-  }
-}, [codigo, datosCargados, location.state]);
+      };
+      fetchRepuesto();
+    }
+  }, [codigo, datosCargados, location.state]);
 
   const formik = useFormik({
     initialValues: {
@@ -94,16 +97,15 @@ useEffect(() => {
       setLoading(true);
       setError("");
       try {
-        let stock = 0 ;
-        const repuestoStockTotal = values.suministra.map(item => {
-            const stockParcial = (parseInt(item.cantidad) || 0);
-            stock += stockParcial;
-            return {
-                ...item,
-                stockParcial: stockParcial
-            };
+        let stock = 0;
+        const repuestoStockTotal = values.suministra.map((item) => {
+          const stockParcial = parseInt(item.cantidad) || 0;
+          stock += stockParcial;
+          return {
+            ...item,
+            stockParcial: stockParcial,
+          };
         });
-
 
         const payload = {
           ...values,
@@ -111,10 +113,10 @@ useEffect(() => {
           precio_venta: parseFloat(values.precio_venta).toFixed(2).toString(),
         };
 
-        console.log(payload)
+        console.log(payload);
         await api.patch(`/api/repuestos/actualizar/${codigo}`, payload);
 
-        dispatchRepuestos( {type: actionRepuestos.REINICIARVALORES});
+        dispatchRepuestos({ type: actionRepuestos.REINICIARVALORES });
 
         setLoading(false);
         formik.resetForm();
@@ -122,20 +124,32 @@ useEffect(() => {
         navigate("/repuestos");
       } catch (err) {
         setLoading(false);
+        console.log(err)
         if (err.response?.status === 400) {
           const data = err.response.data;
           Object.keys(data).forEach((field) => {
-            const errorMessage = Array.isArray(data[field])
+            let errorMessage = Array.isArray(data[field])
               ? data[field][0]
               : data[field];
+
             if (formik.values.hasOwnProperty(field)) {
               formik.setFieldError(field, errorMessage);
             } else {
               setError(errorMessage);
             }
+            toastC({
+              status: "error",
+              isClosable: true,
+              title: `404 - Error al actualizar el repuesto en ${field == 'suministra' ? 'proveedor' : `${field}`}`,
+            });
           });
         } else {
           setError("Error al actualizar el repuesto. Intente nuevamente.");
+          toastC({
+            status: "error",
+            isClosable: true,
+            title: error,
+          });
         }
         console.error("Error:", err.response?.data);
       }
@@ -182,69 +196,48 @@ useEffect(() => {
     }),
   });
 
-    useEffect(() => {
-        const timeoutId = setTimeout(() => {
-            dispatchRepuestos({
-            payload: formik.values,
-            type: actionRepuestos.SETREPUESTO,
-            });
-        }, 100);
-        
-        return () => clearTimeout(timeoutId);
-    }, [formik.values, dispatchRepuestos]);
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      dispatchRepuestos({
+        payload: formik.values,
+        type: actionRepuestos.SETREPUESTO,
+      });
+    }, 100);
 
+    return () => clearTimeout(timeoutId);
+  }, [formik.values, dispatchRepuestos]);
 
   useEffect(() => {
+    if (location.state?.proveedorSeleccionado && location.state?.index) {
+      const indice = Number(location.state.index);
 
-    if (location.state?.proveedorSeleccionado && location.state?.index){
-        const indice = Number(location.state.index);
+      const proveedorSeleccionado = location.state.proveedorSeleccionado;
 
-        const proveedorSeleccionado = location.state.proveedorSeleccionado;
+      const proveedorSeleccionadoLimpio = String(proveedorSeleccionado).trim();
 
-        const proveedorSeleccionadoLimpio = String(proveedorSeleccionado).trim();
-
-        const nuevosSuministra = formik.values.suministra.map((item, i) => {
+      const nuevosSuministra = formik.values.suministra.map((item, i) => {
         if (i === indice) {
-            return {
+          return {
             ...item,
-            proveedor_suministra: proveedorSeleccionadoLimpio
-            };
+            proveedor_suministra: proveedorSeleccionadoLimpio,
+          };
         }
         return item;
-        });
+      });
 
-        dispatchRepuestos({type: actionRepuestos.SETSUMINISTRA, payload: nuevosSuministra});
-        
-        formik.setFieldValue('suministra', nuevosSuministra);
+      dispatchRepuestos({
+        type: actionRepuestos.SETSUMINISTRA,
+        payload: nuevosSuministra,
+      });
 
-        window.history.replaceState({}, document.title);
+      formik.setFieldValue("suministra", nuevosSuministra);
+
+      window.history.replaceState({}, document.title);
     }
   }, [location.state]);
 
-
   return (
     <>
-      <Collapse in={!!error} animateOpacity>
-        <Box
-          position="fixed"
-          top="1rem"
-          left="50%"
-          transform="translateX(-50%)"
-          zIndex={9999}
-          w="90%"
-          maxW="lg"
-        >
-          <Alert
-            status="error"
-            variant="left-accent"
-            borderRadius="md"
-            boxShadow="md"
-          >
-            <AlertIcon />
-            {error}
-          </Alert>
-        </Box>
-      </Collapse>
       <header>
         <Header />
       </header>
@@ -470,7 +463,9 @@ useEffect(() => {
                                           colorScheme="blue"
                                           boxShadow="md"
                                           onClick={() => {
-                                            navigate(`proveedores/seleccionar/${index}`);
+                                            navigate(
+                                              `proveedores/seleccionar/${index}`
+                                            );
                                           }}
                                         >
                                           Buscar

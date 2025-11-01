@@ -21,6 +21,7 @@ import {
     Heading,
     Stack,
     Select,
+    useToast,
 } from '@chakra-ui/react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
@@ -34,6 +35,9 @@ const ProveedoresPatch = () => {
     const [error, setError] = useState("");
     const { codigo } = useParams();
     const navigate = useNavigate();
+    const toastC = useToast({
+        position: 'top',
+    })
 
 
     useEffect(() => {
@@ -89,9 +93,19 @@ const ProveedoresPatch = () => {
                         else{
                             setError(errorMessage);
                         }
+                        toastC({
+                            status: 'error',
+                            isClosable: true,
+                            title: `Error al actualizar el proveedor en ${field}`,
+                        })
                     })
                 } else {
                     setError('Error al actualizar el proveedor. Intente nuevamente.');
+                    toastC({
+                            status: 'error',
+                            isClosable: true,
+                            title: error
+                        })
                 }
                 console.error('Error:', err.response?.data);
             }
@@ -113,22 +127,6 @@ const ProveedoresPatch = () => {
     
     return(
         <>
-        <Collapse in={!!error} animateOpacity>
-                <Box
-                    position="fixed"
-                    top="1rem"
-                    left='50%'
-                    transform="translateX(-50%)"
-                    zIndex={9999}
-                    w="90%"
-                    maxW="lg"
-                >
-                    <Alert status='error' variant="left-accent" borderRadius="md" boxShadow="md">
-                    <AlertIcon />
-                        {error}
-                    </Alert>
-                </Box>
-        </Collapse>
         <header>
             <Header />
         </header>

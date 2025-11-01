@@ -29,6 +29,7 @@ import {
     AccordionItem,
     AccordionPanel,
     Select,
+    useToast,
 } from '@chakra-ui/react';
 import api from "../../utils/api";
 import BeatLoader from "react-spinners/BeatLoader";
@@ -45,6 +46,9 @@ const RemitoProveedoresPost = () => {
     const [error, setError] = useState("");
     const navigate = useNavigate();
     const location = useLocation();
+    const toastC = useToast({
+        position: 'top',
+    })
 
     const {
         estadoRemitoProveedores,
@@ -78,9 +82,11 @@ const RemitoProveedoresPost = () => {
                     total += subtotal;
                     return {
                         ...item,
-                        subtotal: subtotal
+                        subtotal: subtotal.toFixed(2).toString(),
                     };
                 });
+
+                console.log(repuestosConSubtotal)
 
                 const payload = {
                     nro_remito: values.nro_remito,
@@ -116,9 +122,22 @@ const RemitoProveedoresPost = () => {
                         else{
                             setError(errorMessage);
                         }
+
+                        toastC({
+                            status: 'error',
+                            isClosable: true,
+                            title: `Error al actualizar el remito en ${field}`
+                        })
+
                     })
                 } else {
                     setError('Error al crear el remito. Intente nuevamente.');
+
+                    toastC({
+                        status: 'error',
+                        isClosable: true,
+                        title: error,
+                    })
                 }
                 console.error('Error:', err.response?.data);
             }
@@ -132,11 +151,17 @@ const RemitoProveedoresPost = () => {
             .of(
                 Yup.object().shape({
                     codigo_contiene: Yup.string().trim().min(1,'Debe ingresar un código más preciso').max(30,'Debe ingresar un código más acotado').required('Debe ingresar el código de repuesto'),
-                    cantidad: Yup.number().min(0,'Debe ser un valor mayor a 0').required('Debe ingresar una cantidad'),
-                    precio_stock: Yup.string().matches(/^\d{1,10}(\.\d+)?$/, "Debe tener hasta 10 dígitos").required("El precio de stock es obligatorio."),
+                    cantidad: Yup.number().min(1,'Debe ser un valor mayor a 0').required('Debe ingresar una cantidad'),
+                    precio_stock: Yup.string().matches(/^\d{1,10}(\.\d+)?$/, "Debe tener hasta 10 dígitos").min(1,'Debe ingresar un precio mayor a 0    ').required("El precio de stock es obligatorio."),
                 })
             )
-            .min(1, "Debe ingresar al menos un proveedor que lo suministre"),
+            .min(1, "Debe ingresar al menos un proveedor que lo suministre")
+            .test('codigos-unicos', 'No pueden haber repuestos repetidos', function (value) {
+                    if (!value) return true;
+                    const codigos = value.map(item => item.codigo_contiene);
+                    const codigosUnicos = [...new Set(codigos)];
+                    return codigos.length === codigosUnicos.length;
+                }),
         })
     });
 
@@ -190,22 +215,6 @@ const RemitoProveedoresPost = () => {
 
     return(
         <>
-        <Collapse in={!!error} animateOpacity>
-                <Box
-                    position="fixed"
-                    top="1rem"
-                    left='50%'
-                    transform="translateX(-50%)"
-                    zIndex={9999}
-                    w="90%"
-                    maxW="lg"
-                >
-                    <Alert status='error' variant="left-accent" borderRadius="md" boxShadow="md">
-                    <AlertIcon />
-                        {error}
-                    </Alert>
-                </Box>
-        </Collapse>
         <header>
             <Header />
         </header>
@@ -241,7 +250,7 @@ const RemitoProveedoresPost = () => {
                                     id='pagado'
                                     {...formik.getFieldProps('pagado')}
                                 >
-                                    <option value="si">Sí</option>
+                                    <option value="si" selected>Sí</option>
                                     <option value="no">No</option>
                                 </Select>
                                 <FormErrorMessage>{formik.errors.pagado}</FormErrorMessage>
@@ -353,7 +362,7 @@ const RemitoProveedoresPost = () => {
                                                                 mb={3}
                                                             >
                                                                 <FormLabel htmlFor="precio_stock">Precio de Stock:</FormLabel>
-                                                                <NumberInput id="precio_stock" min={0} precision={2} step={0.05} value={formik.values.repuestos?.[index].precio_stock}
+                                                                <NumberInput id="precio_stock" min={0} precision={2} step={1000} value={formik.values.repuestos?.[index].precio_stock}
                                                                 onChange={(value) => formik.setFieldValue(`repuestos.${index}.precio_stock`, value)}>
                                                                     <NumberInputField />
                                                                     <NumberInputStepper>
@@ -387,17 +396,12 @@ const RemitoProveedoresPost = () => {
                                                                     {formik.errors.repuestos?.[index]?.cantidad}
                                                                 </FormErrorMessage>
                                                             </FormControl>
-
-
-
                                                         </AccordionPanel>
-                                                        
                                                 </AccordionItem>
                                                 </>
                                                 ))}
                                             </Accordion>
                                         </Box>
-
 
                                         <Button
                                             type="button"
@@ -421,6 +425,12 @@ const RemitoProveedoresPost = () => {
                                     </>
                                     )}
                                     </FieldArray>
+                                    {formik.errors.repuestos && typeof formik.errors.repuestos === 'string' && (
+                                        <Alert status="error" mb={4}>
+                                            <AlertIcon />
+                                            {formik.errors.repuestos}
+                                        </Alert>
+                                    )}
                             </FormikProvider>
                         </VStack>
 

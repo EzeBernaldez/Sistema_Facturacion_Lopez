@@ -50,7 +50,7 @@ const FacturasPost = () => {
     const [error, setError] = useState("");
     const navigate = useNavigate();
     const location = useLocation();
-    const toast = useToast({
+    const toastC = useToast({
         position: 'top',
 
     });
@@ -124,14 +124,19 @@ const FacturasPost = () => {
                             setError(errorMessage);
                         }
 
-                        toast({
+                        toastC({
                             status: 'error',
                             isClosable: true,
-                            title: errorMessage,
+                            title: `404 - Error al crear la factura en ${field}`,
                         })
                     })
                 } else {
                     setError('Error al actualizar el cliente. Intente nuevamente.');
+                    toastC({
+                            status: 'error',
+                            isClosable: true,
+                            title: error,
+                        })
                 }
                 console.error('Error:', err.response?.data);
             }
