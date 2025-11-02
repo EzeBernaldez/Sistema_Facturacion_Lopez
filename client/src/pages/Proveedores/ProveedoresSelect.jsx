@@ -47,7 +47,7 @@ const ProveedoresSeleccionar = () => {
 
     useEffect(
         () => {
-            setPagina('ProveedoresSeleccionar');
+            setPagina(location.pathname);
             const fetchData = async () => {
                 const response = await api.get('api/proveedores')
                 dispatch(

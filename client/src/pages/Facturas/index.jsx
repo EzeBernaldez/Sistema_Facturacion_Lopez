@@ -91,7 +91,7 @@ const Facturas = (props) => {
                                         return(
                                             <Tr key={index}>
                                                 <Td>{item.nro_factura}</Td>
-                                                <Td>{item.cliente_participa_read.nombre}</Td>
+                                                <Td>{item.cliente_participa_razon_social_log}</Td>
                                                 <Td>{item.total}</Td>
                                                 <Td>{item.fecha}</Td>
                                                 <Td>{item.metodo_pago}</Td>

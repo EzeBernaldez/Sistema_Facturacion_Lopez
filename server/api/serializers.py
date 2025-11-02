@@ -74,11 +74,11 @@ class RepuestosSerializer(serializers.ModelSerializer):
         repuesto = Repuestos.objects.create(**validated_data)
         
         for suministra in suministran:
-            if not Suministra.objects.filter(codigo_origen=suministra['codigo_origen']).exists():
+            if not Suministra.objects.filter(proveedor_suministra=suministra['proveedor_suministra'], repuesto_suministra=repuesto).exists():
                 Suministra.objects.create(repuesto_suministra=repuesto, **suministra)
             else:
                 raise serializers.ValidationError({
-                    'suministra': f'Código origen duplicado: {suministra['codigo_origen']}'
+                    'suministra': f'El proveedor {suministra['proveedor_suministra'].pk} ya está asociado al repuesto'
                 })
         return repuesto
     
@@ -95,11 +95,11 @@ class RepuestosSerializer(serializers.ModelSerializer):
             Suministra.objects.filter(repuesto_suministra=instance).delete()
             
             for suministra in suministran:
-                if not Suministra.objects.filter(codigo_origen=suministra['codigo_origen']).exists():
+                if not Suministra.objects.filter(proveedor_suministra=suministra['proveedor_suministra'], repuesto_suministra=instance).exists():
                     Suministra.objects.create(repuesto_suministra=instance, **suministra) 
                 else:
                     raise serializers.ValidationError({
-                        'suministra': f'Código origen duplicado: {suministra['codigo_origen']}'
+                        'suministra': f'El proveedor {suministra['proveedor_suministra'].pk} ya está asociado al repuesto'
                     })
             
         return instance
@@ -339,7 +339,7 @@ class SeFacturanEnSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = SeFacturanEn
-        fields = ['codigo_repuesto', 'cantidad', 'precio', 'subtotal']
+        fields = ['codigo_repuesto', 'cantidad', 'precio', 'subtotal', 'codigo_repuesto_log', 'descripcion_repuesto_log']
         extra_kwargs = {
             'codigo_repuesto' : {'validators': []} 
         }
@@ -362,7 +362,6 @@ class FacturasSerializer(serializers.ModelSerializer):
         required=False,
     )
     
-    empleado_hace_read = EmpleadosSerializer(source='empleado_hace', read_only=True)
     
     cliente_participa = serializers.PrimaryKeyRelatedField(
         queryset=Clientes.objects.all(),
@@ -370,15 +369,19 @@ class FacturasSerializer(serializers.ModelSerializer):
         required=False,
     )
     
-    cliente_participa_read = ClientesSerializer(source='cliente_participa', read_only=True)
-    
     se_facturan_en = SeFacturanEnWriteSerializer(many=True, write_only=True, required=False) 
     
     se_facturan_en_read = SeFacturanEnSerializer(many=True, read_only=True, source='sefacturanen_set') #Duda, capaz necesito hacer un serializer que contenga todos los atributos
     
+    empleado_hace_log = serializers.CharField(read_only=True)
+    cliente_participa_razon_social_log = serializers.CharField(read_only=True)
+    cliente_participa_cuit_log = serializers.CharField(read_only=True)
+    cliente_participa_direccion_log = serializers.CharField(read_only=True)
+    
+    
     class Meta:
         model = Facturas
-        fields = ['nro_factura','total', 'fecha', 'metodo_pago', 'empleado_hace', 'empleado_hace_read', 'cliente_participa', 'cliente_participa_read', 'se_facturan_en', 'se_facturan_en_read']
+        fields = ['nro_factura','total', 'fecha', 'metodo_pago', 'empleado_hace', 'cliente_participa', 'se_facturan_en', 'se_facturan_en_read', 'empleado_hace_log', 'cliente_participa_razon_social_log', 'cliente_participa_cuit_log', 'cliente_participa_direccion_log']
     
     def validate(self, data):
         
@@ -409,12 +412,19 @@ class FacturasSerializer(serializers.ModelSerializer):
     @transaction.atomic
     def create(self, validated_data):
         repuestos_se_facturan = validated_data.pop('se_facturan_en', [])
+        empleado_hace = validated_data.get('empleado_hace')
+        cliente_participa = validated_data.get('cliente_participa')
         
-        factura = Facturas.objects.create(**validated_data)
+        
+        empleado = f'{empleado_hace.nombre} {empleado_hace.apellido}'
+        
+        factura = Facturas.objects.create(**validated_data, empleado_hace_log=empleado, cliente_participa_razon_social_log=cliente_participa.razon_social, cliente_participa_cuit_log=cliente_participa.cuit, cliente_participa_direccion_log=cliente_participa.direccion)
+        
+        
         
         for repuesto in repuestos_se_facturan:
             if not SeFacturanEn.objects.filter(codigo_repuesto=repuesto['codigo_repuesto'], nro_factura=factura).exists():
-                SeFacturanEn.objects.create(nro_factura=factura, **repuesto)
+                SeFacturanEn.objects.create(nro_factura=factura, **repuesto, codigo_repuesto_log=repuesto['codigo_repuesto'].pk, descripcion_repuesto_log=repuesto['codigo_repuesto'].descripcion)
                 
                 with connection.cursor() as cursor:
                     resultado = ''

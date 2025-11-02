@@ -47,7 +47,6 @@ const RepuestosSeleccionar = () => {
 
     useEffect(
         () => {
-            setPagina('RepuestosSeleccionar');
             const fetchData = async () => {
                 const response = await api.get('api/repuestos')
                 dispatch(
@@ -85,7 +84,7 @@ const RepuestosSeleccionar = () => {
 
     if (paginaAnterior !== 'Facturas'){
         repuestosFiltrados = arrayRepuestos.filter((item) => item.suministra_read?.some(
-        (proveedor) => proveedor.proveedor_suministra === params.proveedor
+        (proveedor) => proveedor.proveedor_suministra == params.proveedor
         ));
     } else{
         repuestosFiltrados = arrayRepuestos;

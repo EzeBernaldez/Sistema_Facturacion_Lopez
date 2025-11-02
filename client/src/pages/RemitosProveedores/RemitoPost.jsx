@@ -54,7 +54,12 @@ const RemitoProveedoresPost = () => {
         estadoRemitoProveedores,
         dispatchRemitoProveedores,
         actionRemitoProveedores,
+        cargarPagina: setPagina
     } = useContexto();
+
+    useEffect(() =>{
+        setPagina('RemitoProveedores')
+    }, []);
 
     const formik = useFormik({
         initialValues: {

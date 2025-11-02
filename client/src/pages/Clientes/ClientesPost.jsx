@@ -114,7 +114,13 @@ const ClientesPost = () => {
                     numero: Yup.string().required("Número obligatorio"),
                     })
                 )
-                .min(1, "Debe ingresar al menos un teléfono"),
+                .min(1, "Debe ingresar al menos un teléfono")
+                .test('telefonos-unicos', 'No pueden haber teléfonos repetidos', function (value) {
+                    if (!value) return true;
+                    const telefonos = value.map(item => item.numero);
+                    const telefonosUnicos = [...new Set(telefonos)];
+                    return telefonos.length === telefonosUnicos.length;
+                }),
                     })
                 });
 
@@ -242,6 +248,12 @@ const ClientesPost = () => {
                                         </>
                                     )}
                                     </FieldArray>
+                                    {formik.errors.telefonos_clientes && typeof formik.errors.telefonos_clientes === 'string' && (
+                                        <Alert status="error" mb={4}>
+                                            <AlertIcon />
+                                            {formik.errors.telefonos_clientes}
+                                        </Alert>
+                                    )}
                                 </form>
                             </FormikProvider>
                         </VStack>

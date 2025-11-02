@@ -98,6 +98,7 @@ const FacturasPost = () => {
                     total: total,
                 };
 
+                console.log(payload)
                 await api.post(`/api/facturas`, payload);
                 
                 setLoading(false);
@@ -131,7 +132,7 @@ const FacturasPost = () => {
                         })
                     })
                 } else {
-                    setError('Error al actualizar el cliente. Intente nuevamente.');
+                    setError('Error al crear la factura. Intente nuevamente.');
                     toastC({
                             status: 'error',
                             isClosable: true,
@@ -152,7 +153,13 @@ const FacturasPost = () => {
                     precio: Yup.number().required('Debe ingresar el precio del repuesto'),
                     })
                 )
-                .min(1, "Debe ingresar al menos un teléfono"),
+                .min(1, "Debe ingresar al menos un repuesto")
+                .test('repuestos-unicos', 'No pueden haber repuestos repetidos', function (value) {
+                    if (!value) return true;
+                    const repuestos = value.map(item => item.codigo_repuesto);
+                    const repuestosUnicos = [...new Set(repuestos)];
+                    return repuestos.length === repuestosUnicos.length;
+                }),
         })
     });
     
@@ -162,7 +169,7 @@ const FacturasPost = () => {
             let timeout;
             const fetchData = async () =>{
                 try{
-                    if (formik.values.cliente_participa.length > 1){
+                    if (formik.values.cliente_participa.length >= 1){
                         const response = await api.get(`api/clientes/cliente/${formik.values.cliente_participa}`);
                         setDataClientes(response.data);
                     }
@@ -181,7 +188,40 @@ const FacturasPost = () => {
             }
         },
         [formik.values.cliente_participa]
-    )
+    );
+
+    // Para traer información de repuestos e inicializar el precio del mismo
+    useEffect(
+        () => {
+            let timeout;
+            const fetchData = async () =>{
+                try{
+                    formik.values.se_facturan_en.map( async(item, index) => {
+                        if (item.codigo_repuesto.length >= 1){
+                            console.log(item)
+                            const response = await api.get(`api/repuestos/${item.codigo_repuesto}`);
+                            const repuestoDato = response.data;
+                            formik.setFieldValue(`se_facturan_en.${index}.precio`, repuestoDato.precio_venta);
+                        }
+                    })
+                }
+                catch(err){
+                    toastC({
+                        status: 'error',
+                        isClosable: true, 
+                        title: err,
+                    })
+                }
+            }
+
+            timeout = setTimeout(() => {
+                fetchData();
+            }, 300)
+
+            return () => {
+                clearTimeout(timeout);
+            }
+        },[formik.values.se_facturan_en]);
 
     // Para traer información de empleados
     useEffect(
@@ -263,22 +303,6 @@ const FacturasPost = () => {
 
     return(
         <>
-        <Collapse in={!!error} animateOpacity>
-                <Box
-                    position="fixed"
-                    top="1rem"
-                    left='50%'
-                    transform="translateX(-50%)"
-                    zIndex={9999}
-                    w="90%"
-                    maxW="lg"
-                >
-                    <Alert status='error' variant="left-accent" borderRadius="md" boxShadow="md">
-                    <AlertIcon />
-                        {error}
-                    </Alert>
-                </Box>
-        </Collapse>
         <header>
             <Header />
         </header>
@@ -314,59 +338,6 @@ const FacturasPost = () => {
                             </FormErrorMessage>
                         </FormControl>
                     </Flex>
-                </Box>
-                    <Box width='100%' mb={5}>
-                        <Flex mb={5} borderBottom='1px solid #777' ms={1} width='100%'>
-                            <Heading as='h3' fontSize='2xl' width='50%' textAlign='start' color='teal'>Empleado</Heading>
-                            <Text width='50%' textAlign='end' me={2}>{dataEmpleados.nombre}</Text>
-                        </Flex>
-                        <Box>
-                            <FormControl 
-                                flex={1} 
-                                isInvalid={
-                                    formik.touched.empleado_hace && 
-                                    !!formik.errors.empleado_hace
-                                }
-                                mb={3}
-                            >
-                                <Box display='flex' gap={2}>
-                                    <AutoComplete
-                                    para='empleados'
-                                    value={formik.values.empleado_hace}
-                                    onChange={(value) => {
-                                        formik.setFieldValue('empleado_hace', value);
-                                    }}
-                                    onSelect={(value) => {
-                                        formik.setFieldValue('empleado_hace', value)
-                                    }}
-                                    error={formik.errors.empleado_hace}
-                                    touched={formik.touched.empleado_hace}
-                                    ></AutoComplete>
-                                    <Button 
-                                        type="button"
-                                        colorScheme="blue"
-                                        boxShadow='md'
-                                        onClick={() => {
-                                            navigate(`empleados/seleccionar/`);
-                                        }}
-                                    >
-                                        Buscar
-                                    </Button>
-                                </Box>
-                                <FormErrorMessage>
-                                    {formik.errors.empleado_hace}
-                                </FormErrorMessage>
-                            </FormControl>
-                            {dataEmpleados && (
-                                <VStack alignItems='start' mt={2} ms={4}>
-                                    <Text>DNI: {dataEmpleados.dni_empleado}</Text>
-                                    <Text>Nombre: {dataEmpleados.nombre}</Text>
-                                    <Text>Apellido: {dataEmpleados.apellido}</Text>
-                                </VStack>
-                            )}
-                        </Box>
-                    </Box>
-
 
                     <Box width='100%' mb={5}>
                         <Flex mb={5} borderBottom='1px solid #777' ms={1} width='100%'>
@@ -422,7 +393,58 @@ const FacturasPost = () => {
                         </Box>
                     </Box>
 
-
+                </Box>
+                    <Box width='100%' mb={5}>
+                        <Flex mb={5} borderBottom='1px solid #777' ms={1} width='100%'>
+                            <Heading as='h3' fontSize='2xl' width='50%' textAlign='start' color='teal'>Empleado</Heading>
+                            <Text width='50%' textAlign='end' me={2}>{dataEmpleados.nombre}</Text>
+                        </Flex>
+                        <Box>
+                            <FormControl 
+                                flex={1} 
+                                isInvalid={
+                                    formik.touched.empleado_hace && 
+                                    !!formik.errors.empleado_hace
+                                }
+                                mb={3}
+                            >
+                                <Box display='flex' gap={2}>
+                                    <AutoComplete
+                                    para='empleados'
+                                    value={formik.values.empleado_hace}
+                                    onChange={(value) => {
+                                        formik.setFieldValue('empleado_hace', value);
+                                    }}
+                                    onSelect={(value) => {
+                                        formik.setFieldValue('empleado_hace', value)
+                                    }}
+                                    error={formik.errors.empleado_hace}
+                                    touched={formik.touched.empleado_hace}
+                                    ></AutoComplete>
+                                    <Button 
+                                        type="button"
+                                        colorScheme="blue"
+                                        boxShadow='md'
+                                        onClick={() => {
+                                            navigate(`empleados/seleccionar/`);
+                                        }}
+                                    >
+                                        Buscar
+                                    </Button>
+                                </Box>
+                                <FormErrorMessage>
+                                    {formik.errors.empleado_hace}
+                                </FormErrorMessage>
+                            </FormControl>
+                            {dataEmpleados && (
+                                <VStack alignItems='start' mt={2} ms={4}>
+                                    <Text>DNI: {dataEmpleados.dni_empleado}</Text>
+                                    <Text>Nombre: {dataEmpleados.nombre}</Text>
+                                    <Text>Apellido: {dataEmpleados.apellido}</Text>
+                                </VStack>
+                            )}
+                        </Box>
+                    </Box>
 
                     <Box width='100%' mb={2}>
                         <Flex mb={5} borderBottom='1px solid #777' ms={1} width='100%'>
@@ -569,6 +591,12 @@ const FacturasPost = () => {
                             </>
                             )}
                             </FieldArray>
+                            {formik.errors.se_facturan_en && typeof formik.errors.se_facturan_en === 'string' && (
+                                <Alert status="error" mb={4}>
+                                    <AlertIcon />
+                                    {formik.errors.se_facturan_en}
+                                </Alert>
+                            )}
                     </FormikProvider>
                 </Box>
 

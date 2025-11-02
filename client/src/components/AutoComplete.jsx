@@ -76,6 +76,7 @@ const AutoComplete = ({ para, value, onChange, onSelect, error, touched , provee
                 const response = await api.get(url);
                 setSuggestions(response.data);
 
+
                 if (!seleccionado){
                     onOpen();
                 }
@@ -105,7 +106,7 @@ const AutoComplete = ({ para, value, onChange, onSelect, error, touched , provee
 
     const handleSelectObjeto = (obj) => {
         let codigo;
-        if (objeto === 'repuesto' || objeto === 'cliente'){
+        if (objeto === 'repuesto'){
             codigo = obj.codigo;
         } 
         else{
@@ -116,7 +117,13 @@ const AutoComplete = ({ para, value, onChange, onSelect, error, touched , provee
                 if (objeto === 'empleado'){
                     codigo = obj.dni_empleado;
                 }
+                else{
+                    if (objeto === 'cliente'){
+                        codigo = obj.codigo_clientes
+                    }
+                }
             }
+
         }
         setSearchTerm(codigo); 
         onSelect(codigo); 

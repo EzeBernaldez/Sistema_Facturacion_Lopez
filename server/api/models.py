@@ -113,9 +113,10 @@ class Pagos(models.Model):
     remito_se_efectuan = models.ForeignKey(Remito_Proveedores, on_delete=models.CASCADE)
 
 class Suministra(models.Model):
+    id = models.AutoField(primary_key=True)
     repuesto_suministra = models.ForeignKey(Repuestos, on_delete=models.CASCADE)
     proveedor_suministra = models.ForeignKey(Proveedores, on_delete=models.CASCADE)
-    codigo_origen = models.CharField(primary_key=True, max_length=20, db_index=True)
+    codigo_origen = models.CharField(max_length=20, db_index=True)
     cantidad = models.IntegerField(default=0)
     fecha_repuesto_suministrado = models.DateField(default='2010-01-01')
     
@@ -138,15 +139,23 @@ class Facturas(models.Model):
     total = models.DecimalField(max_digits=20, decimal_places=2)
     fecha = models.DateField()
     metodo_pago = models.CharField(max_length=15, choices=metodo_pago_choices)
-    empleado_hace = models.ForeignKey(Empleados, on_delete=models.CASCADE)
-    cliente_participa = models.ForeignKey(Clientes, on_delete=models.CASCADE)
+    empleado_hace = models.ForeignKey(Empleados, on_delete=models.SET_NULL, null=True)
+    empleado_hace_log = models.CharField(max_length=40, default='')
+    
+    cliente_participa = models.ForeignKey(Clientes, on_delete=models.SET_NULL, null=True)
+    cliente_participa_razon_social_log = models.CharField(max_length=50, default='')
+    cliente_participa_cuit_log = models.CharField(max_length=50, default='')
+    cliente_participa_direccion_log = models.CharField(max_length=200, default='')
 
 class SeFacturanEn(models.Model):
     nro_factura = models.ForeignKey(Facturas, on_delete=models.CASCADE)
-    codigo_repuesto = models.ForeignKey(Repuestos, on_delete=models.CASCADE)
+    codigo_repuesto = models.ForeignKey(Repuestos, on_delete=models.SET_NULL, null=True)
     cantidad = models.IntegerField()
     precio = models.DecimalField(max_digits=15, decimal_places=2)
     subtotal = models.DecimalField(max_digits=15, decimal_places=2)
+    codigo_repuesto_log = models.CharField(max_length=30, default='')
+    descripcion_repuesto_log = models.TextField(default='')
+    
     
     class Meta:
         unique_together = [['nro_factura', 'codigo_repuesto']]

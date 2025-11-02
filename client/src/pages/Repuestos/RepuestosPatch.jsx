@@ -192,7 +192,13 @@ const RepuestosPatch = () => {
               .required("Debe ingresar una cantidad"),
           })
         )
-        .min(1, "Debe ingresar al menos un proveedor que lo suministre"),
+        .min(1, "Debe ingresar al menos un proveedor que lo suministre")
+        .test('proveedores-unicos', 'No pueden haber proveedores repetidos', function (value) {
+                    if (!value) return true;
+                    const proveedores = value.map(item => item.proveedor_suministra);
+                    const proveedoresUnicos = [...new Set(proveedores)];
+                    return proveedores.length === proveedoresUnicos.length;
+                }),
     }),
   });
 
@@ -311,7 +317,7 @@ const RepuestosPatch = () => {
                     id="precio"
                     min={0}
                     precision={2}
-                    step={0.05}
+                    step={1000}
                     value={formik.values.precio_base}
                     onChange={(value) =>
                       formik.setFieldValue("precio_base", value)
@@ -579,6 +585,12 @@ const RepuestosPatch = () => {
                       </>
                     )}
                   </FieldArray>
+                  {formik.errors.suministra && typeof formik.errors.suministra === 'string' && (
+                      <Alert status="error" mb={4}>
+                          <AlertIcon />
+                          {formik.errors.suministra}
+                      </Alert>
+                  )}
                 </FormikProvider>
               </VStack>
 

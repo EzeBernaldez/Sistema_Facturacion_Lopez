@@ -105,7 +105,7 @@ const RepuestosPost = () => {
                     type: actionRepuestos.REINICIARVALORES
                 });
                 toast.success("Repuesto cargado correctamente");
-                if (pagina === 'RepuestosSeleccionar'){
+                if (pagina === 'Facturas'){
                     navigate('/facturas/nuevo/repuestos/seleccionar');
                 }
                 else{
@@ -157,7 +157,13 @@ const RepuestosPost = () => {
                     cantidad: Yup.number().min(0,'Debe ser un valor mayor a 0').required('Debe ingresar una cantidad'),
                 })
             )
-            .min(1, "Debe ingresar al menos un proveedor que lo suministre"),
+            .min(1, "Debe ingresar al menos un proveedor que lo suministre")
+            .test('proveedores-unicos', 'No pueden haber proveedores repetidos', function (value) {
+                    if (!value) return true;
+                    const proveedores = value.map(item => item.proveedor_suministra);
+                    const proveedoresUnicos = [...new Set(proveedores)];
+                    return proveedores.length === proveedoresUnicos.length;
+                }),
         })
     });
 
@@ -238,7 +244,7 @@ const RepuestosPost = () => {
                             </FormControl>
                             <FormControl width='100%' isInvalid={formik.touched.precio_base && !!formik.errors.precio_base}>
                                 <FormLabel htmlFor="precio">Precio Base:</FormLabel>
-                                <NumberInput id="precio" min={0} precision={2} step={0.05} value={formik.values.precio_base}
+                                <NumberInput id="precio" min={0} precision={2} step={1000} value={formik.values.precio_base}
                                 onChange={(value) => formik.setFieldValue('precio_base', value)}>
                                     <NumberInputField />
                                     <NumberInputStepper>
@@ -407,6 +413,12 @@ const RepuestosPost = () => {
                                 </>
                                 )}
                                 </FieldArray>
+                                {formik.errors.suministra && typeof formik.errors.suministra === 'string' && (
+                                    <Alert status="error" mb={4}>
+                                        <AlertIcon />
+                                        {formik.errors.suministra}
+                                    </Alert>
+                                )}
                             </FormikProvider>
                         </VStack>
 

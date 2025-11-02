@@ -149,12 +149,12 @@ const Clientes = (props) => {
                                                     <Button colorScheme='red'
                                                     onClick={() => setIsDeleted(false)}
                                                     onDoubleClick={() => {
-                                                        deleteClientes(item.codigo)
+                                                        deleteClientes(item.codigo_clientes)
                                                     }}>
                                                         { isDeleted ? `Eliminar` : `¿Desea eliminar el cliente?` }
                                                     </Button>
                                                     { isDeleted && (
-                                                    <Button colorScheme='green' className='ms-3' onClick={() => navigate(`/clientes/actualizar/${item.codigo}`)}>
+                                                    <Button colorScheme='green' className='ms-3' onClick={() => navigate(`/clientes/actualizar/${item.codigo_clientes}`)}>
                                                         Actualizar
                                                     </Button>
                                                     )}

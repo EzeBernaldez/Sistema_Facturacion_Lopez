@@ -119,7 +119,13 @@ const ProveedoresPatch = () => {
                     numero: Yup.string().max(20,'Debe ingresar un número menor a 20 caracteres').required("Número obligatorio"),
                     })
                 )
-                .min(1, "Debe ingresar al menos un teléfono"),
+                .min(1, "Debe ingresar al menos un teléfono")
+                .test('telefonos-unicos', 'No pueden haber teléfonos repetidos', function (value) {
+                    if (!value) return true;
+                    const telefonos = value.map(item => item.numero);
+                    const telefonosUnicos = [...new Set(telefonos)];
+                    return telefonos.length === telefonosUnicos.length;
+                }),
                     
         })
     });
@@ -218,6 +224,12 @@ const ProveedoresPatch = () => {
                                         </>
                                     )}
                                     </FieldArray>
+                                    {formik.errors.telefonos_proveedores && typeof formik.errors.telefonos_proveedores === 'string' && (
+                                        <Alert status="error" mb={4}>
+                                            <AlertIcon />
+                                            {formik.errors.telefonos_proveedores}
+                                        </Alert>
+                                    )}
                                 </form>
                                 </FormikProvider>
                         </VStack>
