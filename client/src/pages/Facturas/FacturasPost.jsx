@@ -83,29 +83,29 @@ const FacturasPost = () => {
             setError('');
             try{
 
-                let total = 0;
-                
-                formik.values.se_facturan_en.map((item, index) => {
-                    const subtotalParcial = Number(formik.values.se_facturan_en?.[index]?.cantidad * formik.values.se_facturan_en?.[index]?.precio);
-                    formik.setFieldValue(`se_facturan_en.${index}.subtotal`, subtotalParcial);
-                    total += subtotalParcial;
-                }) 
+                const repuestosConSubtotal = values.se_facturan_en.map(item => ({
+                    ...item,
+                    subtotal: Number(item.cantidad) * Number(item.precio)
+                }));
 
+                const total = repuestosConSubtotal.reduce((sum, item) => sum + item.subtotal, 0)
+                
                 const fechaActual = new Date().toISOString().split('T')[0];
                 const payload = {
                     ...values,
+                    se_facturan_en: repuestosConSubtotal,
                     fecha: fechaActual,
                     total: total,
                 };
 
+                dispatch({
+                    type: actionFacturas.REINICIARVALORES, 
+                })
                 console.log(payload)
                 await api.post(`/api/facturas`, payload);
                 
                 setLoading(false);
                 formik.resetForm();
-                dispatch({
-                    type: actionFacturas.REINICIARVALORES, 
-                })
                 toast.success("La factura se cargó correctamente")
                 const ultima = await api.get(`/api/facturas/ultima/`);
                 generarPDF(ultima.data)
@@ -198,10 +198,11 @@ const FacturasPost = () => {
                 try{
                     formik.values.se_facturan_en.map( async(item, index) => {
                         if (item.codigo_repuesto.length >= 1){
-                            console.log(item)
                             const response = await api.get(`api/repuestos/${item.codigo_repuesto}`);
                             const repuestoDato = response.data;
-                            formik.setFieldValue(`se_facturan_en.${index}.precio`, repuestoDato.precio_venta);
+                            if (formik.values.se_facturan_en?.[index]?.precio == 0){
+                                formik.setFieldValue(`se_facturan_en.${index}.precio`, repuestoDato.precio_venta);
+                            }
                         }
                     })
                 }
