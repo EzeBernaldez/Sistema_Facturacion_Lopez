@@ -140,6 +140,7 @@ class ProveedoresSerializer(serializers.ModelSerializer):
         model = Proveedores
         fields = ['codigo_proveedores', 'correo', 'nombre', 'direccion', 'telefonos', 'telefonos_proveedores']
     
+    @transaction.atomic
     def create(self, validated_data):
         telefonos_proveedores = validated_data.pop('telefonos_proveedores', [])
         
@@ -150,6 +151,7 @@ class ProveedoresSerializer(serializers.ModelSerializer):
         
         return proveedor
     
+    @transaction.atomic
     def update(self, instance, validated_data):
         telefonos_proveedores = validated_data.pop('telefonos_proveedores', None)
         
@@ -191,6 +193,7 @@ class ClientesSerializer(serializers.ModelSerializer):
         model = Clientes
         fields = ['codigo_clientes', 'correo', 'nombre','condicion_iva', 'razon_social', 'telefonos', 'telefonos_clientes','cuit','direccion']
     
+    @transaction.atomic
     def create(self, validated_data):
         telefonos_clientes = validated_data.pop('telefonos_clientes', [])
         
@@ -201,6 +204,7 @@ class ClientesSerializer(serializers.ModelSerializer):
         
         return cliente
     
+    @transaction.atomic
     def update(self, instance, validated_data):
         telefonos_clientes = validated_data.pop('telefonos_clientes', None)
         
@@ -231,6 +235,7 @@ class EmpleadosSerializer(serializers.ModelSerializer):
         model = Empleados
         fields = ['dni_empleado', 'nombre', 'apellido', 'telefonos', 'telefonos_empleados']
     
+    @transaction.atomic
     def create(self, validated_data):
         telefonos_empleados = validated_data.pop('telefonos_empleados', [])
         
@@ -241,6 +246,7 @@ class EmpleadosSerializer(serializers.ModelSerializer):
         
         return empleado
     
+    @transaction.atomic
     def update(self, instance, validated_data):
         telefonos_empleados = validated_data.pop('telefonos_empleados', None)
         
