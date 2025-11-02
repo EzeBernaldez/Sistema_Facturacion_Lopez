@@ -15,9 +15,12 @@ import {
     Flex,
     IconButton,
     Button,
-    background
+    background,
+    InputGroup,
+    InputLeftAddon,
+    Input
 } from '@chakra-ui/react';
-import { faPlus, faXmark, faFilePdf } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faXmark, faFilePdf, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
@@ -28,6 +31,7 @@ const Facturas = (props) => {
     const navigate = useNavigate();
     const [isDeleted,setIsDeleted] = useState(true);
     const [success,setSuccess] = useState(false);
+    const [filterFacturas, setFilterFacturas] = useState('');
 
     const {
         cargarPagina: setPagina,
@@ -42,24 +46,53 @@ const Facturas = (props) => {
 
     const {
         SETARRAYFACTURAS,
+        REINICIARVALORES    
     } = actionFacturas;
 
     useEffect(
         () => {
-            setPagina('Facturas');
-            const fetchData = async () => {
-                const response = await api.get('api/facturas')
-                console.log(response)
-                dispatch(
-                    {
-                        payload: Array.isArray(response.data) ? response.data : [],
-                        type: SETARRAYFACTURAS,
-                    }
-                )
+            if (filterFacturas === ''){
+                setPagina('Facturas');
+                const fetchData = async () => {
+                    const response = await api.get('api/facturas')
+                    console.log(response)
+                    dispatch(
+                        {
+                            payload: Array.isArray(response.data) ? response.data : [],
+                            type: SETARRAYFACTURAS,
+                        }
+                    )
+                }
+                fetchData();
             }
-            fetchData();
         }
-    , [success]);
+    , [success, filterFacturas]);
+
+    useEffect(
+        () => {
+            if(filterFacturas !== ''){
+                const fetchData = async () => {
+                    try{
+                        const response  = await api.get(`api/facturas/filter/?search=${encodeURIComponent(filterFacturas)}`)
+                        dispatch( {
+                            type: REINICIARVALORES,
+                        });
+                        dispatch(
+                            {
+                                payload: Array.isArray(response.data) ? response.data : [],
+                                type: SETARRAYFACTURAS,
+                            }
+                        )
+                    }
+                    catch(err){
+                        console.log('no entra')
+                    }
+                }
+                fetchData();
+            }
+        },
+        [filterFacturas]
+    )
 
     return(
         <>
@@ -67,7 +100,11 @@ const Facturas = (props) => {
             <Header></Header>
         </header>
 
-        <Flex justifyContent='end' p={3} >
+        <Flex justifyContent='space-between' p={3} >
+            <InputGroup>
+                <InputLeftAddon bg='#A0BDE8'><FontAwesomeIcon icon={faMagnifyingGlass}/></InputLeftAddon>
+                <Input width='20vw' onChange={(e) => setFilterFacturas(e.target.value)} placeholder='Filtrar...'/>
+            </InputGroup>
             <IconButton colorScheme='blue' size='md' icon={<FontAwesomeIcon icon={faPlus}/>} onClick={() => navigate("/facturas/nuevo")}/>
         </Flex>
         <Stack mt={6}>

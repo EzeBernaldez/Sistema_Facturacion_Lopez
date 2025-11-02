@@ -37,6 +37,10 @@ urlpatterns = [
     path('repuestos/<str:codigo_repuesto>/vehiculo/nuevo', views.get_vehiculos_no_pertenece),
     path('pertenece/<str:v_codigo_pertenece>/<str:r_codigo_pertenece>/', views.RetrieveUpdateDestroyPertenece.as_view(), name='pertenece-detail'),    
     path('pertenece/', views.CreatePertenece.as_view()),  
+    path('repuestos/filter/', views.autoCompleteRepuestosFilter, name='repuestosFilter'),
+    path('vehiculos/filter/', views.autoCompleteVehiculosFilter, name='vehiculosFilter'),   
+    path('proveedores/filter/', views.autoCompleteProveedoresFilter, name='proveedoresFilter'),
+    path('facturas/filter/', views.autoCompleteFacturasFilter, name='facturasFilter'),
     path('', include(router.urls)),
-     
+    
 ]

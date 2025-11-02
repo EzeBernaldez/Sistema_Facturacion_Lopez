@@ -20,8 +20,11 @@ import {
     MenuItem,
     Menu,
     Text,
+    InputGroup,
+    InputLeftAddon,
+    Input
 } from '@chakra-ui/react';
-import { faPlus, faXmark, faPhone } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faXmark, faPhone, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ToastContainer, toast } from 'react-toastify';
 
@@ -31,6 +34,7 @@ const Empleados = () => {
     const [isDeleted, setIsDeleted] = useState(true);
     const notify = () => toast("Wow so easy!");
     const [success,setSuccess] = useState(false);
+    const [filterEmpleados, setFilterEmpleados] = useState('');
 
     const {
         cargarPagina: setPagina,
@@ -45,24 +49,53 @@ const Empleados = () => {
 
     const {
         SETARRAYEMPLEADOS,
+        REINICIARVALORES,
     } = actionEmpleados;
 
 
     useEffect(
         () => {
-            setPagina('Empleados');
-            const fetchData = async () => {
-                const response = await api.get('api/empleados')
-                dispatch(
-                    {
-                        payload: Array.isArray(response.data) ? response.data : [],
-                        type: SETARRAYEMPLEADOS,
-                    }
-                )
+            if (filterEmpleados === ''){
+                setPagina('Empleados');
+                const fetchData = async () => {
+                    const response = await api.get('api/empleados')
+                    dispatch(
+                        {
+                            payload: Array.isArray(response.data) ? response.data : [],
+                            type: SETARRAYEMPLEADOS,
+                        }
+                    )
+                }
+                fetchData();
             }
-            fetchData();
         }
-    , [success]);
+    , [success, filterEmpleados]);
+
+    useEffect(
+        () => {
+            if(filterEmpleados !== ''){
+                const fetchData = async () => {
+                    try{
+                        const response  = await api.get(`api/empleados/autocomplete/?search=${encodeURIComponent(filterEmpleados)}`)
+                        dispatch( {
+                            type: REINICIARVALORES,
+                        });
+                        dispatch(
+                            {
+                                payload: Array.isArray(response.data) ? response.data : [],
+                                type: SETARRAYEMPLEADOS,
+                            }
+                        )
+                    }
+                    catch(err){
+                        console.log('no entra')
+                    }
+                }
+                fetchData();
+            }
+        },
+        [filterEmpleados]
+    )
 
     const deleteEmpleados = async (id) => {
         try{
@@ -81,7 +114,11 @@ const Empleados = () => {
             <Header></Header>
         </header>
 
-        <Flex justifyContent='end' p={3} >
+        <Flex justifyContent='space-between' p={3} >
+            <InputGroup>
+                <InputLeftAddon bg='#A0BDE8'><FontAwesomeIcon icon={faMagnifyingGlass}/></InputLeftAddon>
+                <Input width='20vw' onChange={(e) => setFilterEmpleados(e.target.value)} placeholder='Filtrar...'/>
+            </InputGroup>
             <IconButton colorScheme='blue' size='md' icon={<FontAwesomeIcon icon={faPlus}/>} onClick={() => navigate("/empleados/nuevo")}/>
         </Flex>
         <Stack mt={6}>

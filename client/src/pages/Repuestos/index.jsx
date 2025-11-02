@@ -15,9 +15,11 @@ import {
     Flex,
     IconButton,
     Button,
-    background
+    InputGroup,
+    InputLeftAddon,
+    Input
 } from '@chakra-ui/react';
-import { faPlus, faXmark, faTruck } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faXmark, faTruck, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
@@ -27,6 +29,7 @@ const Repuestos = (props) => {
     const navigate = useNavigate();
     const [isDeleted, setIsDeleted] = useState(true);
     const notify = () => toast("Wow so easy!");
+    const [filterRepuestos, setFilterRepuestos] = useState('');
 
     const {
         cargarPagina: setPagina,
@@ -40,25 +43,54 @@ const Repuestos = (props) => {
     } = estadoRepuestos;
 
     const {
+        REINICIARVALORES,
         SETARRAYREPUESTOS,
     } = actionRepuestos;
 
 
     useEffect(
         () => {
-            setPagina('Repuestos');
-            const fetchData = async () => {
-                const response = await api.get('api/repuestos')
-                dispatch(
-                    {
-                        payload: Array.isArray(response.data) ? response.data : [],
-                        type: SETARRAYREPUESTOS,
-                    }
-                )
+            if (filterRepuestos === ''){
+                setPagina('Repuestos');
+                const fetchData = async () => {
+                    const response = await api.get('api/repuestos')
+                    dispatch(
+                        {
+                            payload: Array.isArray(response.data) ? response.data : [],
+                            type: SETARRAYREPUESTOS,
+                        }
+                    )
+                }
+                fetchData();
             }
-            fetchData();
         }
-    , [isDeleted]);
+    , [isDeleted, filterRepuestos]);
+
+    useEffect(
+        () => {
+            if(filterRepuestos !== ''){
+                const fetchData = async () => {
+                    try{
+                        const response  = await api.get(`api/repuestos/filter/?search=${encodeURIComponent(filterRepuestos)}`)
+                        dispatch( {
+                            type: REINICIARVALORES,
+                        });
+                        dispatch(
+                            {
+                                payload: Array.isArray(response.data) ? response.data : [],
+                                type: SETARRAYREPUESTOS,
+                            }
+                        )
+                    }
+                    catch(err){
+                        console.log('no entra')
+                    }
+                }
+                fetchData();
+            }
+        },
+        [filterRepuestos]
+    )
 
     const deleteRepuesto = async (id) => {
         try{
@@ -76,7 +108,11 @@ const Repuestos = (props) => {
             <Header></Header>
         </header>
 
-        <Flex justifyContent='end' p={3} >
+        <Flex justifyContent='space-between' p={3} >
+            <InputGroup>
+                <InputLeftAddon bg='#A0BDE8'><FontAwesomeIcon icon={faMagnifyingGlass}/></InputLeftAddon>
+                <Input width='20vw' onChange={(e) => setFilterRepuestos(e.target.value)} placeholder='Filtrar...'/>
+            </InputGroup>
             <IconButton colorScheme='blue' size='md' icon={<FontAwesomeIcon icon={faPlus}/>} onClick={() => navigate("/repuestos/nuevo")}/>
         </Flex>
         <Stack mt={6}>

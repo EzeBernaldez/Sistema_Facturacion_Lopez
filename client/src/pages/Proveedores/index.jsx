@@ -20,8 +20,11 @@ import {
     MenuItem,
     Menu,
     Text,
+    InputGroup,
+    InputLeftAddon,
+    Input
 } from '@chakra-ui/react';
-import { faPlus, faXmark, faPhone } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faXmark, faPhone, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ToastContainer, toast } from 'react-toastify';
 
@@ -31,6 +34,7 @@ const Proveedores = () => {
     const [isDeleted, setIsDeleted] = useState(true);
     const notify = () => toast("Wow so easy!");
     const [success,setSuccess] = useState(false);
+    const [filterProveedores, setFilterProveedores] = useState('');
 
     const {
         cargarPagina: setPagina,
@@ -45,24 +49,53 @@ const Proveedores = () => {
 
     const {
         SETARRAYPROVEEDORES,
+        REINICIARVALORES
     } = actionProveedores;
 
 
     useEffect(
         () => {
-            setPagina('Proveedores');
-            const fetchData = async () => {
-                const response = await api.get('api/proveedores')
-                dispatch(
-                    {
-                        payload: Array.isArray(response.data) ? response.data : [],
-                        type: SETARRAYPROVEEDORES,
-                    }
-                )
+            if(filterProveedores === ''){
+                setPagina('Proveedores');
+                const fetchData = async () => {
+                    const response = await api.get('api/proveedores')
+                    dispatch(
+                        {
+                            payload: Array.isArray(response.data) ? response.data : [],
+                            type: SETARRAYPROVEEDORES,
+                        }
+                    )
+                }
+                fetchData();
             }
-            fetchData();
         }
-    , [success]);
+    , [success, filterProveedores]);
+
+    useEffect(
+        () => {
+            if(filterProveedores !== ''){
+                const fetchData = async () => {
+                    try{
+                        const response  = await api.get(`api/proveedores/filter/?search=${encodeURIComponent(filterProveedores)}`)
+                        dispatch( {
+                            type: REINICIARVALORES,
+                        });
+                        dispatch(
+                            {
+                                payload: Array.isArray(response.data) ? response.data : [],
+                                type: SETARRAYPROVEEDORES,
+                            }
+                        )
+                    }
+                    catch(err){
+                        console.log('no entra')
+                    }
+                }
+                fetchData();
+            }
+        },
+        [filterProveedores]
+    );
 
     const deleteProveedores = async (id) => {
         try{
@@ -81,7 +114,11 @@ const Proveedores = () => {
             <Header></Header>
         </header>
 
-        <Flex justifyContent='end' p={3} >
+        <Flex justifyContent='space-between' p={3} >
+            <InputGroup>
+                <InputLeftAddon bg='#A0BDE8'><FontAwesomeIcon icon={faMagnifyingGlass}/></InputLeftAddon>
+                <Input width='20vw' onChange={(e) => setFilterProveedores(e.target.value)} placeholder='Filtrar...'/>
+            </InputGroup>
             <IconButton colorScheme='blue' size='md' icon={<FontAwesomeIcon icon={faPlus}/>} onClick={() => navigate("/proveedores/nuevo")}/>
         </Flex>
         <Stack mt={6}>

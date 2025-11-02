@@ -21,8 +21,11 @@ import {
     MenuItem,
     Menu,
     Text,
+    InputGroup,
+    InputLeftAddon,
+    Input
 } from '@chakra-ui/react';
-import { faPlus, faXmark, faPhone } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faXmark, faPhone, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
@@ -32,6 +35,7 @@ const Clientes = (props) => {
     const navigate = useNavigate();
     const [isDeleted,setIsDeleted] = useState(true);
     const [success,setSuccess] = useState(false);
+    const [filterClientes, setFilterClientes] = useState('');
 
     const {
         cargarPagina: setPagina,
@@ -45,24 +49,53 @@ const Clientes = (props) => {
     } = estadoClientes;
 
     const {
+        REINICIARVALORES,
         SETARRAYCLIENTES,
     } = actionClientes;
 
     useEffect(
         () => {
-            setPagina('Clientes');
-            const fetchData = async () => {
-                const response = await api.get('api/clientes')
-                dispatch(
-                    {
-                        payload: Array.isArray(response.data) ? response.data : [],
-                        type: SETARRAYCLIENTES,
-                    }
-                )
+            if (filterClientes === ''){
+                setPagina('Clientes');
+                const fetchData = async () => {
+                    const response = await api.get('api/clientes')
+                    dispatch(
+                        {
+                            payload: Array.isArray(response.data) ? response.data : [],
+                            type: SETARRAYCLIENTES,
+                        }
+                    )
+                }
+                fetchData();
             }
-            fetchData();
         }
-    , [success]);
+    , [success, filterClientes]);
+
+        useEffect(
+            () => {
+                if(filterClientes !== ''){
+                    const fetchData = async () => {
+                        try{
+                            const response  = await api.get(`api/clientes/autocomplete/?search=${encodeURIComponent(filterClientes)}`)
+                            dispatch( {
+                                type: REINICIARVALORES,
+                            });
+                            dispatch(
+                                {
+                                    payload: Array.isArray(response.data) ? response.data : [],
+                                    type: SETARRAYCLIENTES,
+                                }
+                            )
+                        }
+                        catch(err){
+                            console.log('no entra')
+                        }
+                    }
+                    fetchData();
+                }
+            },
+            [filterClientes]
+        )
 
     const deleteClientes = async (id) => {
         try{
@@ -81,7 +114,11 @@ const Clientes = (props) => {
             <Header></Header>
         </header>
 
-        <Flex justifyContent='end' p={3} >
+        <Flex justifyContent='space-between' p={3} >
+            <InputGroup>
+                <InputLeftAddon bg='#A0BDE8'><FontAwesomeIcon icon={faMagnifyingGlass}/></InputLeftAddon>
+                <Input width='20vw' onChange={(e) => setFilterClientes(e.target.value)} placeholder='Filtrar...'/>
+            </InputGroup>
             <IconButton colorScheme='blue' size='md' icon={<FontAwesomeIcon icon={faPlus}/>} onClick={() => navigate("/clientes/nuevo")}/>
         </Flex>
         <Stack mt={6}>

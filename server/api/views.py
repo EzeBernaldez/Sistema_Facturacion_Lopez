@@ -369,19 +369,17 @@ def autoCompleteRepuestos(request):
         return Response([])
 
 
+# Este autocomplete es el mismo para el filtro de cliente
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 @authentication_classes([JWTAuthentication])
 def autoCompleteClientes(request):
     search_term = request.GET.get('search', '').strip()
     
-    if len(search_term) < 2:
-        return Response([])
-    
     clientes = Clientes.objects.filter(
         Q(nombre__icontains=search_term) | 
         Q(codigo_clientes__icontains=search_term) |
-        Q(cuit__icontains=search_term) |
+        Q(cuit=search_term) |
         Q(razon_social=search_term)
     )[:10]
     
@@ -389,14 +387,12 @@ def autoCompleteClientes(request):
     return Response(serializer.data)
 
 
+# Este autocomplete es el mismo para el filtro de empleado
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 @authentication_classes([JWTAuthentication])
 def autoCompleteEmpleados(request):
     search_term = request.GET.get('search', '').strip()
-    
-    if len(search_term) < 2:
-        return Response([])
     
     empleados = Empleados.objects.filter(
         Q(nombre__icontains=search_term) | 
@@ -405,4 +401,77 @@ def autoCompleteEmpleados(request):
     )[:10]
     
     serializer = EmpleadosSerializer(empleados, many=True)
+    return Response(serializer.data)
+
+
+
+# ----------------------------------Filtros
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([JWTAuthentication])
+def autoCompleteVehiculosFilter(request):
+    search_term = request.GET.get('search', '').strip()
+    
+    
+    vehiculos = Vehiculos.objects.filter(
+        Q(codigo_vehiculos__icontains=search_term) | 
+        Q(modelo__icontains=search_term) |
+        Q(marca__icontains=search_term) |
+        Q(motor__icontains=search_term) |
+        Q(tipo_semirremolque__icontains=search_term) |
+        Q(ano_fabricacion__icontains=search_term)
+    )[:10]
+    
+    serializer = VehiculosSerializer(vehiculos, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([JWTAuthentication])
+def autoCompleteProveedoresFilter(request):
+    search_term = request.GET.get('search', '').strip()
+    
+    
+    proveedores = Proveedores.objects.filter(
+        Q(nombre__icontains=search_term) | 
+        Q(codigo_proveedores__icontains=search_term) |
+        Q(direccion__icontains=search_term) |
+        Q(correo__icontains=search_term)
+    )[:10]
+    
+    serializer = ProveedoresSerializer(proveedores, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([JWTAuthentication])
+def autoCompleteRepuestosFilter(request):
+    search_term = request.GET.get('search', '').strip()
+    
+    
+    repuestos = Repuestos.objects.filter(
+        Q(codigo__icontains=search_term) | 
+        Q(descripcion__icontains=search_term) |
+        Q(marca__icontains=search_term) |
+        Q(tipo__icontains=search_term)
+    )[:10]
+    
+    serializer = RepuestosSerializer(repuestos, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([JWTAuthentication])
+def autoCompleteFacturasFilter(request):
+    search_term = request.GET.get('search', '').strip()
+    
+    
+    facturas = Facturas.objects.filter(
+        Q(nro_factura__icontains=search_term) | 
+        Q(cliente_participa_razon_social_log__icontains=search_term) |
+        Q(metodo_pago__icontains=search_term)
+    )[:10]
+    
+    serializer = FacturasSerializer(facturas, many=True)
     return Response(serializer.data)

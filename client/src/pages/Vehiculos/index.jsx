@@ -23,9 +23,12 @@ import {
   TabPanels, 
   Tab, 
   TabPanel,
-  TabIndicator
+  TabIndicator,
+  InputGroup,
+  Input,
+  InputLeftAddon
 } from '@chakra-ui/react';
-import { faPlus, faXmark,faLeftLong } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faXmark, faLeftLong , faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -34,6 +37,7 @@ const Vehiculos = () => {
   const navigate = useNavigate();
   const [isDeleted, setIsDeleted] = useState(true);
   const [opcionSeleccionada, setOpcionSeleccionada] = useState(null);
+  const [filterVehiculos, setFilterVehiculos] = useState('')
 
   const {
     cargarPagina: setPagina,
@@ -43,19 +47,21 @@ const Vehiculos = () => {
   } = useContexto();
 
   const { arrayVehiculos } = estadoVehiculos;
-  const { SETARRAYVEHICULOS } = actionVehiculos;
+  const { SETARRAYVEHICULOS, REINICIARVALORES } = actionVehiculos;
 
   useEffect(() => {
-    setPagina('Vehiculos');
-    const fetchData = async () => {
-      const response = await api.get('api/vehiculos');
-      dispatch({
-        payload: Array.isArray(response.data) ? response.data : [],
-        type: SETARRAYVEHICULOS,
-      });
-    };
-    fetchData();
-  }, [isDeleted]);
+    if (filterVehiculos === ''){
+      setPagina('Vehiculos');
+      const fetchData = async () => {
+        const response = await api.get('api/vehiculos');
+        dispatch({
+          payload: Array.isArray(response.data) ? response.data : [],
+          type: SETARRAYVEHICULOS,
+        });
+      };
+      fetchData();
+    }
+  }, [isDeleted, filterVehiculos]);
 
   const deleteVehiculo = async (id) => {
     try {
@@ -66,6 +72,32 @@ const Vehiculos = () => {
       console.log('Error al eliminar el vehículo');
     }
   };
+
+  useEffect(
+          () => {
+              if(filterVehiculos !== ''){
+                  const fetchData = async () => {
+                      try{
+                          const response  = await api.get(`api/vehiculos/filter/?search=${encodeURIComponent(filterVehiculos)}`)
+                          dispatch( {
+                              type: REINICIARVALORES,
+                          });
+                          dispatch(
+                              {
+                                  payload: Array.isArray(response.data) ? response.data : [],
+                                  type: SETARRAYVEHICULOS,
+                              }
+                          )
+                      }
+                      catch(err){
+                          console.log('no entra')
+                      }
+                  }
+                  fetchData();
+              }
+          },
+          [filterVehiculos]
+      )
 
 
   return (
@@ -81,7 +113,11 @@ const Vehiculos = () => {
           <TabIndicator mt='-1.5px' height='2px' bg='blue.500' borderRadius='1px'></TabIndicator>
           <TabPanels>
             <TabPanel>
-              <Flex justifyContent="end" p={0}>
+              <Flex justifyContent="space-between" p={0}>
+                <InputGroup>
+                    <InputLeftAddon bg='#A0BDE8'><FontAwesomeIcon icon={faMagnifyingGlass}/></InputLeftAddon>
+                    <Input width='20vw' onChange={(e) => setFilterVehiculos(e.target.value)} placeholder='Filtrar...'/>
+                </InputGroup>
                 <IconButton
                   colorScheme="blue"
                   size="md"
