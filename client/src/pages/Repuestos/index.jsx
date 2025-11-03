@@ -51,6 +51,9 @@ const Repuestos = (props) => {
     useEffect(
         () => {
             if (filterRepuestos === ''){
+                dispatch({
+                    type: REINICIARVALORES
+                });
                 setPagina('Repuestos');
                 const fetchData = async () => {
                     const response = await api.get('api/repuestos')

@@ -66,7 +66,7 @@ const RemitoProveedoresPost = () => {
             nro_remito: estadoRemitoProveedores.nro_remito || '',
             fecha: estadoRemitoProveedores.fecha || Date.now(),
             monto_total: estadoRemitoProveedores.monto_total || 0,
-            pagado: estadoRemitoProveedores.pagado || 'Si',
+            pagado: estadoRemitoProveedores.pagado || 'si',
             proveedor: estadoRemitoProveedores.proveedor || '',
             repuestos: estadoRemitoProveedores.repuestos || [{
                 codigo_contiene: '',

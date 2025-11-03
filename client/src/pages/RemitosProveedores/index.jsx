@@ -40,12 +40,16 @@ const RemitoProveedores = () => {
 
     const {
         SETARRAYREMITOPROVEEDORES,
+        REINICIARVALORES,
     } = actionRemitoProveedores;
 
 
     useEffect(
         () => {
             setPagina('RemitoProveedores');
+            dispatch({
+                type: REINICIARVALORES,
+            })
             const fetchData = async () => {
                 const response = await api.get('api/remito_proveedores')
                 dispatch(

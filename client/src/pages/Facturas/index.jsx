@@ -53,6 +53,9 @@ const Facturas = (props) => {
         () => {
             if (filterFacturas === ''){
                 setPagina('Facturas');
+                dispatch({
+                    type: REINICIARVALORES
+                });
                 const fetchData = async () => {
                     const response = await api.get('api/facturas')
                     console.log(response)

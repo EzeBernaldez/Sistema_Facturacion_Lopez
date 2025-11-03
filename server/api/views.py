@@ -380,7 +380,7 @@ def autoCompleteClientes(request):
         Q(nombre__icontains=search_term) | 
         Q(codigo_clientes__icontains=search_term) |
         Q(cuit=search_term) |
-        Q(razon_social=search_term)
+        Q(razon_social__icontains=search_term)
     )[:10]
     
     serializer = ClientesSerializer(clientes, many=True)
