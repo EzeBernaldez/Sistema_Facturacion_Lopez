@@ -128,7 +128,7 @@ const FacturasPost = () => {
                         toastC({
                             status: 'error',
                             isClosable: true,
-                            title: (data !== 'se_facturan_en') ? `404 - Error al crear la factura: ${errorMessage}` : `${error}`, 
+                            title: (data !== 'se_facturan_en') ? `404 - Error al crear la factura` : `${error}`, 
                         })
                     })
                 } else {
@@ -198,15 +198,27 @@ const FacturasPost = () => {
                 try{
                     formik.values.se_facturan_en.map( async(item, index) => {
                         if (item.codigo_repuesto.length >= 1){
-                            const response = await api.get(`api/repuestos/${item.codigo_repuesto}`);
-                            const repuestoDato = response.data;
-                            if (formik.values.se_facturan_en?.[index]?.precio == 0){
-                                formik.setFieldValue(`se_facturan_en.${index}.precio`, repuestoDato.precio_venta);
+                            try{
+                                const response = await api.get(`api/repuestos/${item.codigo_repuesto}`);
+                                const repuestoDato = response.data;
+                                if (formik.values.se_facturan_en?.[index]?.precio == 0){
+                                    formik.setFieldValue(`se_facturan_en.${index}.precio`, repuestoDato.precio_venta);
+                                }
+                            }
+                            catch(err){
+                                console.log('entraaaa')
+                                formik.setFieldError(`se_facturan_en.${index}.codigo_repuesto`, 'No se encuentra')
+                                toastC({
+                                    status: 'error',
+                                    isClosable: true,
+                                    title: `El repuesto ${item.codigo_repuesto} no se encuentra`,
+                                })
                             }
                         }
                     })
                 }
                 catch(err){
+                    console.log('entra')
                     toastC({
                         status: 'error',
                         isClosable: true, 
@@ -470,7 +482,7 @@ const FacturasPost = () => {
                                                     flex={1} 
                                                     isInvalid={
                                                         formik.touched.se_facturan_en?.[index]?.codigo_repuesto && 
-                                                        !!formik.errors.repuestos?.[index]?.codigo_repuesto
+                                                        !!formik.errors.se_facturan_en?.[index]?.codigo_repuesto
                                                     }
                                                     mb={3}
                                                 >
