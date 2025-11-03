@@ -128,7 +128,7 @@ const FacturasPost = () => {
                         toastC({
                             status: 'error',
                             isClosable: true,
-                            title: `404 - Error al crear la factura en ${field}`,
+                            title: (data !== 'se_facturan_en') ? `404 - Error al crear la factura: ${errorMessage}` : `${error}`, 
                         })
                     })
                 } else {

@@ -438,15 +438,13 @@ class FacturasSerializer(serializers.ModelSerializer):
                     cursor.execute( "select @_sp_actualizar_stock_2")
                     resultado = cursor.fetchone()[0]
                 
-                print(f'entra {resultado}')
-                
-                if resultado == 'Error al actualizar stock':
+                if resultado != 'Stock actualizado correctamente':
                     raise serializers.ValidationError({
-                        'SeFacturanEn': f'Hay un error con el stock en el repuesto {repuesto['codigo_repuesto'].pk} con cantidad {repuesto['cantidad']}'
+                        'se_facturan_en': f'{resultado}'
                     })
             else:
                 raise serializers.ValidationError({
-                    'sefacturanen': f'Repuesto {repuesto['codigo_origen']} duplicado en la factura'
+                    'se_facturan_en': f'Repuesto {repuesto['codigo_origen']} duplicado en la factura'
                 })
 
         return factura

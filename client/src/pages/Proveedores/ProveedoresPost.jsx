@@ -192,7 +192,7 @@ const ProveedoresPost = () => {
                                                         !!formik.errors.telefonos_proveedores?.[index]?.numero
                                                     }
                                                 >
-                                                    <FormLabel>Número {index + 1}</FormLabel>
+                                                    <FormLabel>Teléfono {index + 1}</FormLabel>
                                                     <Input 
                                                         placeholder="+541112345678"
                                                         type="number"
