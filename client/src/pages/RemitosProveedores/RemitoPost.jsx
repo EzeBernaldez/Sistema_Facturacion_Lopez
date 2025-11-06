@@ -30,6 +30,7 @@ import {
     AccordionPanel,
     Select,
     useToast,
+    Text
 } from '@chakra-ui/react';
 import api from "../../utils/api";
 import BeatLoader from "react-spinners/BeatLoader";
@@ -70,6 +71,7 @@ const RemitoProveedoresPost = () => {
             proveedor: estadoRemitoProveedores.proveedor || '',
             repuestos: estadoRemitoProveedores.repuestos || [{
                 codigo_contiene: '',
+                descripcion:'',
                 precio_stock: 0,
                 cantidad: 0,
                 subtotal: 0,
@@ -170,6 +172,54 @@ const RemitoProveedoresPost = () => {
         })
     });
 
+
+    useEffect(
+        () => {
+            let timeout;
+            const fetchData = async () =>{
+                try{
+                    formik.values.repuestos.map( async(item, index) => {
+                        if (item.codigo_contiene.length >= 1){
+                            try{
+                                const response = await api.get(`api/repuestos/${item.codigo_contiene}`);
+                                const repuestoDato = response.data;
+                                if (formik.values.repuestos?.[index]?.codigo_contiene !== null){
+                                    formik.setFieldValue(`repuestos.${index}.descripcion`, repuestoDato.descripcion);
+                                }
+                                console.log(formik.values.repuestos?.[index]?.descripcion)
+
+                            }
+                            catch(err){
+                                console.log('entraaaa')
+                                formik.setFieldError(`repuestos.${index}.codigo_contiene`, 'No se encuentra')
+                                toastC({
+                                    status: 'error',
+                                    isClosable: true,
+                                    title: `El repuesto ${item.codigo_contiene} no se encuentra`,
+                                })
+                            }
+                        }
+                    })
+                }
+                catch(err){
+                    console.log('entra')
+                    toastC({
+                        status: 'error',
+                        isClosable: true, 
+                        title: err,
+                    })
+                }
+            }
+
+            timeout = setTimeout(() => {
+                fetchData();
+            }, 300)
+
+            return () => {
+                clearTimeout(timeout);
+            }
+        },[formik.values.repuestos]);
+
     useEffect(() => {
         dispatchRemitoProveedores({
             payload: formik.values,
@@ -177,6 +227,34 @@ const RemitoProveedoresPost = () => {
         })
     }, [formik.values, dispatchRemitoProveedores])
 
+    let [dataProveedores, setDataProveedores] = useState('');
+
+    useEffect(
+        () => {
+            let timeout;
+            const fetchData = async () =>{
+                try{
+                    if (formik.values.proveedor.length >= 1){
+                        const response = await api.get(`api/proveedores/proveedor/${formik.values.proveedor}`);
+                        setDataProveedores(response.data);
+                    }
+                    console.log(dataProveedores.nombre)
+                }
+                catch(err){
+                    setDataProveedores('');
+                }
+            }
+
+            timeout = setTimeout(() => {
+                fetchData();
+            }, 300)
+
+            return () => {
+                clearTimeout(timeout);
+            }
+        },
+        [formik.values.proveedor]
+    );
 
     useEffect(() => {
         if (location.state?.proveedorSeleccionado && !location.state?.index){
@@ -288,6 +366,13 @@ const RemitoProveedoresPost = () => {
                                 </Box>
                                 <FormErrorMessage>{formik.errors.proveedor}</FormErrorMessage>
                             </FormControl>
+                            {dataProveedores && (
+                                <VStack alignItems='start' mt={2} ms={4}>
+                                    <Text>Nombre: {dataProveedores.nombre}</Text>
+                                    <Text>Correo: {dataProveedores.correo}</Text>
+                                    <Text>Direccion: {dataProveedores.direccion}</Text>
+                                </VStack>
+                            )}
                             <FormikProvider value={formik.getFieldProps('repuestos')}>
                                     <FieldArray name="repuestos">
                                     {({ push, remove }) => (
@@ -357,6 +442,28 @@ const RemitoProveedoresPost = () => {
                                                                         {formik.errors.repuestos?.[index]?.codigo_contiene}
                                                                     </FormErrorMessage>
                                                             </FormControl>
+                                                            <FormLabel htmlFor="descripcion">Descripcion</FormLabel>
+                                                                <FormControl
+                                                                    flex={1}
+                                                                    isInvalid={
+                                                                    formik.touched.repuestos?.[index]?.descripcion &&
+                                                                    !!formik.errors.repuestos?.[index]?.descripcion
+                                                                    }
+                                                                    mb={3}
+                                                                >
+                                                                    <Input
+                                                                        id="descripcion"
+                                                                        type="text"
+                                                                        value={formik.values.repuestos?.[index]?.descripcion || ""}
+                                                                        onChange={(e) =>
+                                                                            formik.setFieldValue(`repuestos.${index}.descripcion`, e.target.value)
+                                                                        }
+                                                                        placeholder="Ingrese descripción"
+                                                                        />
+                                                                    <FormErrorMessage>
+                                                                    {formik.errors.repuestos?.[index]?.descripcion}
+                                                                    </FormErrorMessage>
+                                                                </FormControl>
 
                                                             <FormControl 
                                                                 flex={1} 
@@ -366,7 +473,7 @@ const RemitoProveedoresPost = () => {
                                                                 }
                                                                 mb={3}
                                                             >
-                                                                <FormLabel htmlFor="precio_stock">Precio de Stock:</FormLabel>
+                                                                <FormLabel htmlFor="precio_stock">Precio de Stock</FormLabel>
                                                                 <NumberInput id="precio_stock" min={0} precision={2} step={1000} value={formik.values.repuestos?.[index].precio_stock}
                                                                 onChange={(value) => formik.setFieldValue(`repuestos.${index}.precio_stock`, value)}>
                                                                     <NumberInputField />

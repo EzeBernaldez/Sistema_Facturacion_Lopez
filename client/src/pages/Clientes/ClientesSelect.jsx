@@ -15,8 +15,13 @@ import {
     Flex,
     IconButton,
     Button,
+    MenuButton,
+    MenuList,
+    MenuItem,
+    Menu,
+    Text,
 } from '@chakra-ui/react';
-import { faPlus, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faXmark, faPhone } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ToastContainer, toast } from 'react-toastify';
 import { array } from "yup";
@@ -116,10 +121,29 @@ const EmpleadosSeleccionar = () => {
                                                     {
                                                         item.telefonos.length > 0 ? (
                                                             <>
-                                                            {
-                                                                item.telefonos.map((telefono,index) =>
-                                                                    `${index+1}: ${telefono.numero} ` )
-                                                            }
+                                                                <Menu>
+                                                                    <MenuButton
+                                                                        as={IconButton}
+                                                                        aria-label="Opciones de Teléfono"
+                                                                        icon={<FontAwesomeIcon icon={faPhone}/>}
+                                                                        size="sm"
+                                                                        variant="outline"
+                                                                        colorScheme="blue"
+                                                                    >
+                                                                        <Text ml={2}>{item.telefonos.length}</Text>
+                                                                    </MenuButton>
+                                                                    <MenuList>
+                                                                        <Text fontWeight="bold" px={3} py={1}>Números Registrados:</Text>
+                                                                        {item.telefonos.map((t, index) => (
+                                                                            <MenuItem 
+                                                                                key={index}
+                                                                                onClick={() => navigator.clipboard.writeText(t.numero)} 
+                                                                            >
+                                                                                {t.numero} 
+                                                                            </MenuItem>
+                                                                        ))}
+                                                                    </MenuList>
+                                                                </Menu>
                                                             </>
                                                         ) : item.telefonos[0]
                                                     }

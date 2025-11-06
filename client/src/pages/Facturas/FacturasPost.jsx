@@ -33,7 +33,8 @@ import {
     Select,
     Flex,
     Grid,
-    useToast
+    useToast,
+    Input
 } from '@chakra-ui/react';
 import { FontAwesomeIcon, } from "@fortawesome/react-fontawesome";
 import { faXmark, faMagnifyingGlass, faPlus } from "@fortawesome/free-solid-svg-icons";
@@ -73,6 +74,7 @@ const FacturasPost = () => {
             empleado_hace: estadoFacturas.empleado_hace || '',
             se_facturan_en: estadoFacturas.se_facturan_en || [{
                 codigo_repuesto: '',
+                descripcion: '',
                 cantidad: 0,
                 precio: 0,
                 subtotal: 0,
@@ -149,6 +151,7 @@ const FacturasPost = () => {
                 .of(
                     Yup.object().shape({
                     codigo_repuesto: Yup.string().required("Debe ingresar el código del repuesto"),
+                    descripcion: Yup.string().required("Debe ingresar el código del repuesto"),
                     cantidad: Yup.number().min(1, 'La cantidad debe ser mayor a 1').required('Debe ingresar la cantidad requerida del repuesto'),
                     precio: Yup.number().required('Debe ingresar el precio del repuesto'),
                     })
@@ -204,6 +207,11 @@ const FacturasPost = () => {
                                 if (formik.values.se_facturan_en?.[index]?.precio == 0){
                                     formik.setFieldValue(`se_facturan_en.${index}.precio`, repuestoDato.precio_venta);
                                 }
+                                if (formik.values.se_facturan_en?.[index]?.codigo_repuesto !== null){
+                                    formik.setFieldValue(`se_facturan_en.${index}.descripcion`, repuestoDato.descripcion);
+                                }
+                                console.log(formik.values.se_facturan_en?.[index]?.descripcion)
+
                             }
                             catch(err){
                                 console.log('entraaaa')
@@ -468,15 +476,16 @@ const FacturasPost = () => {
                             {({ push, remove }) => (
                                 <>
                                 <Box gap={2} mb={3} width='100%'>
-                                    <Grid templateColumns='auto 20% 20% 10%' gap={3} borderBottom='1px solid #777' m={2} mt={8}>
+                                    <Grid templateColumns='30% 30% 10% 20% 10%' gap={2} borderBottom='1px solid #777' m={2} mt={8}>
                                         <Box color='teal'>Repuesto</Box>
+                                        <Box color='teal'>Descripcion</Box>
                                         <Box color='teal'>Cantidad</Box>
                                         <Box color='teal'>Precio</Box>
                                         <Box color='teal'>Acciones</Box>
                                     </Grid>
                                     {formik.values.se_facturan_en.map((item, index) => (
                                         <>
-                                        <Grid templateColumns='auto 20% 20% 5%' gap={3}>
+                                        <Grid templateColumns='30% 30% 10% 20% 10%' gap={2}>
                                             <Box justifySelf='center' alignSelf='center' width='100%'>
                                                 <FormControl 
                                                     flex={1} 
@@ -514,6 +523,30 @@ const FacturasPost = () => {
                                                         <FormErrorMessage>
                                                             {formik.errors.se_facturan_en?.[index]?.codigo_repuesto}
                                                         </FormErrorMessage>
+                                                </FormControl>
+                                            </Box>
+
+                                            <Box justifySelf='center' alignSelf='center' width='100%'>
+                                                <FormControl
+                                                    flex={1}
+                                                    isInvalid={
+                                                    formik.touched.se_facturan_en?.[index]?.descripcion &&
+                                                    !!formik.errors.se_facturan_en?.[index]?.descripcion
+                                                    }
+                                                    mb={3}
+                                                >
+                                                    <Input
+                                                        id="descripcion"
+                                                        type="text"
+                                                        value={formik.values.se_facturan_en?.[index]?.descripcion || ""}
+                                                        onChange={(e) =>
+                                                            formik.setFieldValue(`se_facturan_en.${index}.descripcion`, e.target.value)
+                                                        }
+                                                        placeholder="Ingrese descripción"
+                                                        />
+                                                    <FormErrorMessage>
+                                                    {formik.errors.se_facturan_en?.[index]?.descripcion}
+                                                    </FormErrorMessage>
                                                 </FormControl>
                                             </Box>
 
@@ -591,6 +624,7 @@ const FacturasPost = () => {
                                             ...formik.values.se_facturan_en,
                                             {
                                                 codigo_repuesto: '',
+                                                descripcion: '',
                                                 cantidad: 0,
                                                 precio: 0,
                                                 subtotal: 0,

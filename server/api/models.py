@@ -113,7 +113,7 @@ class Pagos(models.Model):
     remito_se_efectuan = models.ForeignKey(Remito_Proveedores, on_delete=models.CASCADE)
 
 class Suministra(models.Model):
-    id = models.AutoField(primary_key=True)
+    id= models.AutoField(primary_key=True)
     repuesto_suministra = models.ForeignKey(Repuestos, on_delete=models.CASCADE)
     proveedor_suministra = models.ForeignKey(Proveedores, on_delete=models.CASCADE)
     codigo_origen = models.CharField(max_length=20, db_index=True)
