@@ -432,8 +432,11 @@ const RemitoProveedoresPost = () => {
                                                                             colorScheme="blue"
                                                                             boxShadow='md'
                                                                             onClick={() => {
-                                                                                navigate(`repuestos/seleccionar/${formik.values.proveedor}/${index}`);
+                                                                                if(formik.values.proveedor !== ''){
+                                                                                    navigate(`repuestos/seleccionar/${formik.values.proveedor}/${index}`);
+                                                                                }
                                                                             }}
+                                                                            isDisabled={formik.values.proveedor === ''}
                                                                         >
                                                                             Buscar
                                                                         </Button>
@@ -451,18 +454,7 @@ const RemitoProveedoresPost = () => {
                                                                     }
                                                                     mb={3}
                                                                 >
-                                                                    <Input
-                                                                        id="descripcion"
-                                                                        type="text"
-                                                                        value={formik.values.repuestos?.[index]?.descripcion || ""}
-                                                                        onChange={(e) =>
-                                                                            formik.setFieldValue(`repuestos.${index}.descripcion`, e.target.value)
-                                                                        }
-                                                                        placeholder="Ingrese descripción"
-                                                                        />
-                                                                    <FormErrorMessage>
-                                                                    {formik.errors.repuestos?.[index]?.descripcion}
-                                                                    </FormErrorMessage>
+                                                                    <Text ms={2} textAlign='start' id='descripcion'>{formik.values.repuestos?.[index]?.descripcion || ''}</Text>
                                                                 </FormControl>
 
                                                             <FormControl 

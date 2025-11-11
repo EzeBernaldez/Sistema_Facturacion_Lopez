@@ -535,18 +535,7 @@ const FacturasPost = () => {
                                                     }
                                                     mb={3}
                                                 >
-                                                    <Input
-                                                        id="descripcion"
-                                                        type="text"
-                                                        value={formik.values.se_facturan_en?.[index]?.descripcion || ""}
-                                                        onChange={(e) =>
-                                                            formik.setFieldValue(`se_facturan_en.${index}.descripcion`, e.target.value)
-                                                        }
-                                                        placeholder="Ingrese descripción"
-                                                        />
-                                                    <FormErrorMessage>
-                                                    {formik.errors.se_facturan_en?.[index]?.descripcion}
-                                                    </FormErrorMessage>
+                                                    <Text id="descripcion">{formik.values.se_facturan_en?.[index].descripcion || ""}</Text>
                                                 </FormControl>
                                             </Box>
 

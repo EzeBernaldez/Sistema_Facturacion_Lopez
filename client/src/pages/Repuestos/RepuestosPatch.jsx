@@ -31,6 +31,7 @@ import {
   AccordionItem,
   AccordionPanel,
   useToast,
+  Select
 } from "@chakra-ui/react";
 import api from "../../utils/api";
 import BeatLoader from "react-spinners/BeatLoader";
@@ -49,6 +50,10 @@ const RepuestosPatch = () => {
   const toastC = useToast({
     position: "top",
   });
+  const [marcaExtension, setMarcaExtension] = useState('');
+  
+  const marcas = ['Mann-Filter',"Bosch" ,"Osram" ,"Wix" ,"Vaden" ,"Kobo" ,"Juntas-Pampa" ,"Frasle", "Skf"]
+  
 
   const { estadoRepuestos, dispatchRepuestos, actionRepuestos } = useContexto();
 
@@ -68,6 +73,13 @@ const RepuestosPatch = () => {
             })),
           };
           formik.setValues(datos);
+          if (marcas.includes(datos.marca)){
+            setMarcaExtension(datos.marca)
+          }
+          else{
+            setMarcaExtension('Otra')
+
+          }
           setDatosCargados(true);
         } catch (err) {
           console.error("Error actualizando repuesto:", err);
@@ -107,8 +119,11 @@ const RepuestosPatch = () => {
           };
         });
 
+        const marcaFinal = marcaExtension !== "Otra" ? marcaExtension : formik.values.marca;
+
         const payload = {
           ...values,
+          marca: marcaFinal,
           stock: stock,
           precio_base: parseFloat(values.precio_base).toFixed(2).toString(),
         };
@@ -124,7 +139,7 @@ const RepuestosPatch = () => {
         navigate("/repuestos");
       } catch (err) {
         setLoading(false);
-        console.log(err)
+        console.log(err);
         if (err.response?.status === 400) {
           const data = err.response.data;
           Object.keys(data).forEach((field) => {
@@ -140,7 +155,9 @@ const RepuestosPatch = () => {
             toastC({
               status: "error",
               isClosable: true,
-              title: `404 - Error al actualizar el repuesto en ${field == 'suministra' ? 'proveedor' : `${field}`}`,
+              title: `404 - Error al actualizar el repuesto en ${
+                field == "suministra" ? "proveedor" : `${field}`
+              }`,
             });
           });
         } else {
@@ -193,12 +210,16 @@ const RepuestosPatch = () => {
           })
         )
         .min(1, "Debe ingresar al menos un proveedor que lo suministre")
-        .test('proveedores-unicos', 'No pueden haber proveedores repetidos', function (value) {
-                    if (!value) return true;
-                    const proveedores = value.map(item => item.proveedor_suministra);
-                    const proveedoresUnicos = [...new Set(proveedores)];
-                    return proveedores.length === proveedoresUnicos.length;
-                }),
+        .test(
+          "proveedores-unicos",
+          "No pueden haber proveedores repetidos",
+          function (value) {
+            if (!value) return true;
+            const proveedores = value.map((item) => item.proveedor_suministra);
+            const proveedoresUnicos = [...new Set(proveedores)];
+            return proveedores.length === proveedoresUnicos.length;
+          }
+        ),
     }),
   });
 
@@ -302,9 +323,37 @@ const RepuestosPatch = () => {
                   width="100%"
                   isInvalid={formik.touched.marca && !!formik.errors.marca}
                 >
-                  <FormLabel htmlFor="marca">Marca:</FormLabel>
-                  <Input id="marca" {...formik.getFieldProps("marca")} />
-                  <FormErrorMessage>{formik.errors.marca}</FormErrorMessage>
+                  <FormLabel htmlFor="select-marca">Marca:</FormLabel>
+                  <Select
+                    id="select-marca"
+                    onChange={(e) => setMarcaExtension(e.target.value)}
+                    value={
+                      marcaExtension === "Otra"
+                        ? "Otra"
+                        : marcaExtension
+                    }
+                  >
+                    <option value="Wabco">WABCO</option>
+                    <option value="Mann-Filter">Mann-Filter</option>
+                    <option value="Bosch">Bosch</option>
+                    <option value="Osram">Osram</option>
+                    <option value="Wix">Wix</option>
+                    <option value="Vaden">Vaden</option>
+                    <option value="Kobo">Kobo</option>
+                    <option value="Juntas-Pampa">Juntas Pampa</option>
+                    <option value="Frasle">Frasle</option>
+                    <option value="Skf">SKF</option>
+                    <option value="Otra">Otra marca...</option>
+                  </Select>
+                  {marcaExtension === "Otra" && (
+                    <>
+                      <FormLabel mt={4} htmlFor="marca">
+                        Ingrese la marca:
+                      </FormLabel>
+                      <Input id="marca" {...formik.getFieldProps("marca")} />
+                      <FormErrorMessage>{formik.errors.marca}</FormErrorMessage>
+                    </>
+                  )}
                 </FormControl>
                 <FormControl
                   width="100%"
@@ -585,12 +634,13 @@ const RepuestosPatch = () => {
                       </>
                     )}
                   </FieldArray>
-                  {formik.errors.suministra && typeof formik.errors.suministra === 'string' && (
+                  {formik.errors.suministra &&
+                    typeof formik.errors.suministra === "string" && (
                       <Alert status="error" mb={4}>
-                          <AlertIcon />
-                          {formik.errors.suministra}
+                        <AlertIcon />
+                        {formik.errors.suministra}
                       </Alert>
-                  )}
+                    )}
                 </FormikProvider>
               </VStack>
 

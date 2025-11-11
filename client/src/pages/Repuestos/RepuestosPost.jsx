@@ -28,7 +28,8 @@ import {
     AccordionIcon,
     AccordionItem,
     AccordionPanel,
-    useToast
+    useToast,
+    Select
 } from '@chakra-ui/react';
 import api from "../../utils/api";
 import BeatLoader from "react-spinners/BeatLoader";
@@ -48,6 +49,7 @@ const RepuestosPost = () => {
     const toastC = useToast({
         position: 'top',
     })
+    const [marcaExtension, setMarcaExtension] = useState('');
 
     const {
         estadoRepuestos,
@@ -86,6 +88,10 @@ const RepuestosPost = () => {
                         stockParcial: stockParcial
                     };
                 });
+                
+                if (marcaExtension !== 'Otra'){
+                    formik.setFieldValue('marca', marcaExtension);
+                }
 
                 formik.setFieldValue()
 
@@ -235,12 +241,31 @@ const RepuestosPost = () => {
                                 <FormErrorMessage>{formik.errors.descripcion}</FormErrorMessage>
                             </FormControl>
                             <FormControl width='100%' isInvalid={formik.touched.marca && !!formik.errors.marca}>
-                                <FormLabel htmlFor="marca">Marca:</FormLabel>
-                                <Input
-                                    id='marca'
-                                    {...formik.getFieldProps('marca')}
-                                />
-                                <FormErrorMessage>{formik.errors.marca}</FormErrorMessage>
+                                <FormLabel htmlFor='select-marca'>Marca:</FormLabel>
+                                <Select id='select-marca' onChange={e => setMarcaExtension(e.target.value)}>
+                                    <option value="Wabco">WABCO</option>
+                                    <option value="Mann-Filter">Mann-Filter</option>
+                                    <option value="Bosch">Bosch</option>
+                                    <option value="Osram">Osram</option>
+                                    <option value="Wix">Wix</option>
+                                    <option value="Vaden">Vaden</option>
+                                    <option value="Kobo">Kobo</option>
+                                    <option value="Juntas-Pampa">Juntas Pampa</option>
+                                    <option value="Frasle">Frasle</option>
+                                    <option value="Skf">SKF</option>
+                                    <option value="Otra">Otra marca...</option>
+                                </Select>
+                                {marcaExtension === 'Otra' && (
+                                    <>
+                                        <FormLabel mt={4} htmlFor="marca">Ingrese la marca:</FormLabel>
+                                        <Input
+                                            id='marca'
+                                            {...formik.getFieldProps('marca')}
+                                            />
+                                        <FormErrorMessage>{formik.errors.marca}</FormErrorMessage>
+                                    </>
+                                )}
+
                             </FormControl>
                             <FormControl width='100%' isInvalid={formik.touched.precio_base && !!formik.errors.precio_base}>
                                 <FormLabel htmlFor="precio">Precio Base:</FormLabel>
