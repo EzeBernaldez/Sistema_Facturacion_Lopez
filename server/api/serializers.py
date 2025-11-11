@@ -484,9 +484,6 @@ class FacturasSerializer(serializers.ModelSerializer):
     #     return instance
     
 
-
-#si ves esto y no entendes, yo menos
-#puse detalle ahi porque (segun geminis) estás creando un campo en tu serializador con un nombre que ya existe en el modelo y, además, le estás especificando source con ese mismo nombre. Django REST Framework (DRF) te dice que no hace falta, ya que ya conoce el mapeo
 class PerteneceSerializer(serializers.ModelSerializer):
     V_Codigo_pertenece_detalle = VehiculosSerializer(source='v_codigo_pertenece', read_only=True)
     R_Codigo_pertenece_detalle = RepuestosSerializer(source='r_codigo_pertenece', read_only=True)
